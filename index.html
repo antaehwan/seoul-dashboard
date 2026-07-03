@@ -217,7 +217,7 @@ function pct(a, b) { return b ? Math.round(a/b*100) : 0; }
 function yoy(cur, prev) { if (!prev) return null; return Math.round((cur-prev)/prev*100); }
 function colorPct(p) { return p >= 100 ? 'up' : p >= 90 ? 'neutral' : 'dn'; }
 function colorYoy(y) { return y > 0 ? 'up' : y < 0 ? 'dn' : 'neutral'; }
-function signStr(n) { return n > 0 ? '▲'+n+'%' : n < 0 ? '▼'+Math.abs(n)+'%' : '-'; }
+function signStr(n) { const a = Math.abs(n).toFixed(1); return n > 0 ? '▲'+a+'%' : n < 0 ? '▼'+a+'%' : '-'; }
 
 function render(month) {
   currentMonth = month;
@@ -256,8 +256,8 @@ function render(month) {
   const cards = [
     {
       label: '당월 누적 매출',
-      value: fmtM(cumActual),
-      sub: `목표 ${fmtM(monthTarget)}`,
+      value: cumActual.toLocaleString('ko-KR') + '원',
+      sub: `목표 ${monthTarget.toLocaleString('ko-KR')}원`,
       delta: yoyVal !== null ? `전년 ${signStr(yoyVal)}` : null,
       cls: yoyVal !== null ? colorYoy(yoyVal) : ''
     },
