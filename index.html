@@ -252,44 +252,38 @@ function render(month) {
   document.getElementById('summary-sub').textContent = dateRange;
   document.getElementById('chart-sub').textContent = `${mName} · 일별`;
 
-  // Cards
-  const cards = [
-    {
-      label: '당월 누적 매출',
-      value: cumActual.toLocaleString('ko-KR') + '원',
-      sub: `누적 목표 ${cumTarget.toLocaleString('ko-KR')}원`,
-      delta: (() => { const diff = cumActual - cumTarget; return (diff >= 0 ? '+' : '') + diff.toLocaleString('ko-KR') + '원'; })(),
-      cls: cumActual >= cumTarget ? 'up' : 'dn'
-    },
-    {
-      label: '사업 계획 매출',
-      value: monthTarget.toLocaleString('ko-KR') + '원',
-      sub: `달성률 ${curAch}%`,
-      delta: null, cls: colorPct(Number(curAch))
-    },
-    {
-      label: '예상 달성률',
-      value: projectedAch + '%',
-      sub: `월말 예상 ${fmtM(Math.round(projected))}`,
-      delta: null, cls: colorPct(projectedAch)
-    },
-    {
-      label: '객수 / 객단가',
-      value: cumCount.toLocaleString('ko-KR') + '명',
-      sub: `객단가 ${fmt(avgSpend)}원`,
-      delta: null, cls: ''
-    },
-  ];
+  // 차질 금액 + % 포맷
+  const diff1 = cumActual - cumTarget;
+  const diffPct1 = cumTarget > 0 ? (Math.abs(diff1) / cumTarget * 100).toFixed(1) : '0.0';
+  const diffArrow = diff1 >= 0 ? '▲' : '▼';
+  const diffStr = `${diffArrow}${Math.abs(diff1).toLocaleString('ko-KR')}원 (${diffArrow}${diffPct1}%)`;
 
   const cardEl = document.getElementById('summary-cards');
-  cardEl.innerHTML = cards.map(c => `
+  cardEl.innerHTML = `
     <div class="card">
-      <div class="label">${c.label}</div>
-      <div class="value ${c.cls}">${c.value}</div>
-      <div class="sub-value">${c.sub}</div>
-      ${c.delta ? `<div class="delta ${c.cls}">${c.delta}</div>` : ''}
+      <div class="label">당월 누적 매출</div>
+      <div class="value ${diff1 >= 0 ? 'up' : 'dn'}">${cumActual.toLocaleString('ko-KR')}원</div>
+      <div class="sub-value">누적 목표 ${cumTarget.toLocaleString('ko-KR')}원</div>
+      <div class="delta ${diff1 >= 0 ? 'up' : 'dn'}">${diffStr}</div>
     </div>
-  `).join('');
+    <div class="card">
+      <div class="label">사업 계획 매출</div>
+      <div class="sub-value" style="margin-bottom:4px">진행 <span style="color:var(--text);font-weight:600">${cumActual.toLocaleString('ko-KR')}원</span></div>
+      <div class="sub-value" style="margin-bottom:4px">실행일 기준 <span style="color:var(--text);font-weight:600">${cumTarget.toLocaleString('ko-KR')}원</span></div>
+      <div class="sub-value" style="margin-bottom:6px">총 계획 <span style="color:var(--text);font-weight:600">${monthTarget.toLocaleString('ko-KR')}원</span></div>
+      <div class="delta ${colorPct(Number(curAch))}">진행 현황 ${diffArrow}${diffPct1}% (${curAch}%)</div>
+    </div>
+    <div class="card">
+      <div class="label">예상 달성률</div>
+      <div class="value ${colorPct(projectedAch)}">${projectedAch}%</div>
+      <div class="sub-value">월말 예상 ${fmtM(Math.round(projected))}</div>
+    </div>
+    <div class="card">
+      <div class="label">객수 / 객단가</div>
+      <div class="value">${cumCount.toLocaleString('ko-KR')}명</div>
+      <div class="sub-value">객단가 ${fmt(avgSpend)}원</div>
+    </div>
+  `;
 
   renderBarChart(days, today);
   renderTable(days, today);
