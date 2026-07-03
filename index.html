@@ -237,7 +237,7 @@ function render(month) {
   const dailyAvg = dataCount > 0 ? cumActual / dataCount : 0;
   const projected = dailyAvg * totalDays;
   const projectedAch = monthTarget > 0 ? Math.round(projected / monthTarget * 100) : 0;
-  const curAch = pct(cumActual, cumTarget);
+  const curAch = cumTarget > 0 ? (cumActual / cumTarget * 100).toFixed(1) : '0.0';
 
   const cumPrevActual = withData.reduce((s,d) => s+d.prev_actual, 0);
   const yoyVal = yoy(cumActual, cumPrevActual);
@@ -249,7 +249,7 @@ function render(month) {
   const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   const mName = monthNames[month-1];
   const dateRange = dataCount > 0 ? `${mName} (${withData[0].date.slice(5)} ~ ${withData[withData.length-1].date.slice(5)})` : mName;
-  document.getElementById('summary-sub').textContent = `매일 아침 5초 파악 · ${dateRange}`;
+  document.getElementById('summary-sub').textContent = dateRange;
   document.getElementById('chart-sub').textContent = `${mName} · 일별`;
 
   // Cards
@@ -264,8 +264,8 @@ function render(month) {
     {
       label: '목표 달성률',
       value: curAch + '%',
-      sub: `Σ실적 ÷ Σ목표 (${dataCount}일)`,
-      delta: null, cls: colorPct(curAch)
+      sub: `목표 ${cumTarget.toLocaleString('ko-KR')}원`,
+      delta: null, cls: colorPct(Number(curAch))
     },
     {
       label: '예상 달성률',
