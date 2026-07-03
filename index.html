@@ -282,11 +282,12 @@ function render(month) {
     <div class="card">
       <div class="label">사업 계획</div>
       <div class="value ${diff2 >= 0 ? 'up' : 'dn'}">${cumTarget.toLocaleString('ko-KR')}원</div>
+      <div class="sub-value" style="margin-top:6px;font-size:12px">월간 사업계획 목표 ${monthTarget.toLocaleString('ko-KR')}원</div>
     </div>
     <div class="card">
       <div class="label">예상 달성률</div>
-      <div class="sub-value" style="margin-bottom:6px">계획 기준 <span style="color:var(--text);font-weight:600">${projRounded.toLocaleString('ko-KR')}원</span> <span class="${projVsPlanArr==='▲'?'up':'dn'}">(${projVsPlanArr} ${projVsPlan}%)</span></div>
-      <div class="sub-value">전년 기준 <span style="color:var(--text);font-weight:600">${projRounded.toLocaleString('ko-KR')}원</span> <span class="${projVsPrevArr==='▲'?'up':'dn'}">(${projVsPrevArr} ${projVsPrev}%)</span></div>
+      <div class="sub-value" style="margin-bottom:6px">계획 <span style="color:var(--text);font-weight:600">${projRounded.toLocaleString('ko-KR')}원</span> <span class="${projVsPlanArr==='▲'?'up':'dn'}">(${projVsPlanArr} ${projVsPlan}%)</span></div>
+      <div class="sub-value">전년 <span style="color:var(--text);font-weight:600">${monthPrevActual.toLocaleString('ko-KR')}원</span> <span class="${projVsPrevArr==='▲'?'up':'dn'}">(${projVsPrevArr} ${projVsPrev}%)</span></div>
     </div>
     <div class="card">
       <div class="label">객수 / 객단가</div>
