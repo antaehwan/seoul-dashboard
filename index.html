@@ -252,26 +252,30 @@ function render(month) {
   document.getElementById('summary-sub').textContent = dateRange;
   document.getElementById('chart-sub').textContent = `${mName} · 일별`;
 
-  // 차질 금액 + % 포맷
+  // 실적 차질
   const diff1 = cumActual - cumTarget;
   const diffPct1 = cumTarget > 0 ? (Math.abs(diff1) / cumTarget * 100).toFixed(1) : '0.0';
-  const diffArrow = diff1 >= 0 ? '▲' : '▼';
-  const diffStr = `${diffArrow}${Math.abs(diff1).toLocaleString('ko-KR')}원 (${diffArrow}${diffPct1}%)`;
+  const arr1 = diff1 >= 0 ? '▲' : '▼';
+  const diffStr = `${arr1} ${Math.abs(diff1).toLocaleString('ko-KR')}원 (${arr1}${diffPct1}%)`;
+
+  // 사업 계획 차질 (vs 실행일 기준 계획)
+  const diff2 = cumActual - cumTarget;
+  const diffPct2 = cumTarget > 0 ? (Math.abs(diff2) / cumTarget * 100).toFixed(1) : '0.0';
+  const arr2 = diff2 >= 0 ? '▲' : '▼';
+  const diffStr2 = `${arr2} ${Math.abs(diff2).toLocaleString('ko-KR')}원 (${arr2}${diffPct2}%)`;
 
   const cardEl = document.getElementById('summary-cards');
   cardEl.innerHTML = `
     <div class="card">
-      <div class="label">당월 누적 매출</div>
+      <div class="label">실적</div>
       <div class="value ${diff1 >= 0 ? 'up' : 'dn'}">${cumActual.toLocaleString('ko-KR')}원</div>
-      <div class="sub-value">누적 목표 ${cumTarget.toLocaleString('ko-KR')}원</div>
-      <div class="delta ${diff1 >= 0 ? 'up' : 'dn'}">${diffStr}</div>
+      <div class="delta ${diff1 >= 0 ? 'up' : 'dn'}" style="margin-top:8px">${diffStr}</div>
     </div>
     <div class="card">
-      <div class="label">사업 계획 매출</div>
-      <div class="sub-value" style="margin-bottom:4px">진행 <span style="color:var(--text);font-weight:600">${cumActual.toLocaleString('ko-KR')}원</span></div>
-      <div class="sub-value" style="margin-bottom:4px">실행일 기준 <span style="color:var(--text);font-weight:600">${cumTarget.toLocaleString('ko-KR')}원</span></div>
-      <div class="sub-value" style="margin-bottom:6px">총 계획 <span style="color:var(--text);font-weight:600">${monthTarget.toLocaleString('ko-KR')}원</span></div>
-      <div class="delta ${colorPct(Number(curAch))}">진행 현황 ${diffArrow}${diffPct1}% (${curAch}%)</div>
+      <div class="label">사업 계획</div>
+      <div class="sub-value" style="margin-bottom:4px">진행 현황 매출 <span style="color:var(--text);font-weight:600">${cumActual.toLocaleString('ko-KR')}원</span></div>
+      <div class="sub-value" style="margin-bottom:6px">사업 계획 매출 <span style="color:var(--text);font-weight:600">${cumTarget.toLocaleString('ko-KR')}원</span></div>
+      <div class="delta ${diff2 >= 0 ? 'up' : 'dn'}">${diffStr2}</div>
     </div>
     <div class="card">
       <div class="label">예상 달성률</div>
