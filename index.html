@@ -542,7 +542,7 @@ function renderTable(days, today) {
     const achColor = achPct !== null ? (achPct >= 100 ? 'var(--green)' : achPct >= 90 ? 'var(--yellow)' : 'var(--red)') : 'var(--border)';
 
     return `<tr>
-      <td><span style="color:${dateColor}">${d.date.slice(8)} ${wdStr}${isHoliday && !isWeekend ? ' 🎌' : ''}</span></td>
+      <td><span style="color:${dateColor}">${d.date.slice(8)} ${wdStr}</span></td>
       <td>${fmt(d.target)}</td>
       <td>${hasData ? fmt(d.actual) : '<span style="color:var(--border)">-</span>'}</td>
       <td>${hasData ? fmtM(d.sales_l) : '-'}</td>
