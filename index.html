@@ -434,6 +434,64 @@ function renderReview(days, today, month) {
     lines.push(`${trendEmoji} 최근 3일 실적은 <strong>${trendTxt}</strong>입니다.`);
   }
 
+  // 9. 사업계획 타당성
+  const monthPrevActual = days.reduce((s,d)=>s+d.prev_actual,0);
+  if (monthPrevActual > 0 && monthTarget > 0) {
+    const impliedGrowth = ((monthTarget - monthPrevActual) / monthPrevActual * 100).toFixed(1);
+
+    // 연초 이후 완료된 달 데이터
+    const completedMonths = Object.entries(DATA.months).filter(([m]) => {
+      const mDays = DATA.months[m];
+      return parseInt(m) < month && mDays.some(d=>d.actual>0);
+    });
+
+    let avgYoy = null, ytdMonthlyAvg = null, maxMonthlyActual = null;
+    if (completedMonths.length > 0) {
+      const actuals = completedMonths.map(([,mDays]) => mDays.reduce((s,d)=>s+d.actual,0));
+      const yoyRates = completedMonths.map(([,mDays]) => {
+        const a = mDays.reduce((s,d)=>s+d.actual,0);
+        const p = mDays.reduce((s,d)=>s+d.prev_actual,0);
+        return p > 0 ? (a-p)/p*100 : null;
+      }).filter(r=>r!==null);
+      if (yoyRates.length > 0) avgYoy = (yoyRates.reduce((s,r)=>s+r,0)/yoyRates.length).toFixed(1);
+      ytdMonthlyAvg = Math.round(actuals.reduce((s,a)=>s+a,0)/actuals.length);
+      maxMonthlyActual = Math.max(...actuals);
+    }
+
+    const implied = parseFloat(impliedGrowth);
+    const avgY = avgYoy !== null ? parseFloat(avgYoy) : null;
+    const vsYtdAvg = ytdMonthlyAvg ? ((monthTarget - ytdMonthlyAvg) / ytdMonthlyAvg * 100).toFixed(1) : null;
+    const vsMax = maxMonthlyActual ? ((monthTarget - maxMonthlyActual) / maxMonthlyActual * 100).toFixed(1) : null;
+
+    // 과대 판단: YTD 월평균보다 10% 이상 높거나, YoY 요구가 실제 트렌드보다 5%p 이상 높은 경우
+    const isOverAmbitious = (vsYtdAvg !== null && parseFloat(vsYtdAvg) > 10) ||
+                            (avgY !== null && implied > avgY + 5);
+    const isSlightlyAmbitious = (vsYtdAvg !== null && parseFloat(vsYtdAvg) > 5) ||
+                                (avgY !== null && implied > avgY + 2);
+    const isConservative = implied < 0 || (vsYtdAvg !== null && parseFloat(vsYtdAvg) < -5);
+
+    let feasibilityEmoji, feasibilityText;
+    const details = [];
+    if (vsYtdAvg !== null) details.push(`연초 월평균 대비 ${parseFloat(vsYtdAvg)>=0?'+':''}${vsYtdAvg}%`);
+    if (avgY !== null) details.push(`전년비 요구 ${implied>=0?'+':''}${impliedGrowth}% vs 연초 YoY 실적 ${parseFloat(avgY)>=0?'+':''}${avgY}%`);
+    if (vsMax !== null && parseFloat(vsMax) > 0) details.push(`올해 최고 월 실적 대비 +${vsMax}%`);
+
+    if (isOverAmbitious) {
+      feasibilityEmoji = '⚠️';
+      feasibilityText = `<strong>과대 설정 가능성</strong>이 있습니다. ${details.join(' · ')}. 현재 페이스 기준 예상 달성율은 약 <strong>${achPct}%</strong>로, 목표 재검토 또는 집중 전략이 필요합니다.`;
+    } else if (isSlightlyAmbitious) {
+      feasibilityEmoji = '🟡';
+      feasibilityText = `<strong>다소 도전적인 목표</strong>입니다. ${details.join(' · ')}.`;
+    } else if (isConservative) {
+      feasibilityEmoji = '✅';
+      feasibilityText = `<strong>보수적으로 설정된 목표</strong>입니다. ${details.join(' · ')}.`;
+    } else {
+      feasibilityEmoji = '✅';
+      feasibilityText = `<strong>합리적인 목표</strong>로 판단됩니다. ${details.join(' · ')}.`;
+    }
+    lines.push(`${feasibilityEmoji} <strong>[사업계획 타당성]</strong> ${feasibilityText}`);
+  }
+
   el.innerHTML = `
     <div class="strat-card" style="line-height:1.9">
       ${lines.map(l=>`<div style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--border)">${l}</div>`).join('')}
