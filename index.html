@@ -140,6 +140,12 @@
     <div id="strategy-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px"></div>
   </section>
 
+  <section id="weekly-trend">
+    <h2>전년 트렌드 기반 당월 분석</h2>
+    <p class="sub">전년 동월 주차별 매출 흐름을 기반으로 당월 트렌드 분석 및 예상 매출 산출</p>
+    <div id="weekly-trend-grid" style="margin-top:12px"></div>
+  </section>
+
   <!-- 일별 테이블 -->
   <section id="daily">
     <h2>일별 현황</h2>
@@ -272,7 +278,8 @@ function render(month) {
   const projVsPlanArr = planRate >= 1 ? '▲' : '▼';
 
   const yoyRate = cumPrevActual > 0 ? cumActual / cumPrevActual : 0;
-  const yoyProj = Math.round(monthPrevActual * yoyRate);
+  const remPrevActual = days.filter(d => d.date > today).reduce((s,d) => s+d.prev_actual, 0);
+  const yoyProj = Math.round(cumActual + remPrevActual * yoyRate);
   const yoyDiff = (Math.abs(1 - yoyRate) * 100).toFixed(1);
   const projVsPrevArr = yoyRate >= 1 ? '▲' : '▼';
 
@@ -328,6 +335,7 @@ function render(month) {
 
   renderReview(days, today, month);
   renderStrategy(days, today);
+  renderWeeklyTrend(days, today);
   renderTable(days, today);
 }
 
@@ -849,6 +857,157 @@ function renderTable(days, today) {
   </tr>`;
 }
 
+
+function renderWeeklyTrend(days, today) {
+  const el = document.getElementById('weekly-trend-grid');
+  if (!el) return;
+
+  // 주차별 집계 (1주: 1~7일, 2주: 8~14일, ...)
+  const weekData = [1,2,3,4,5].map(w => {
+    const wDays = days.filter(d => Math.ceil(parseInt(d.date.slice(8)) / 7) === w);
+    if (wDays.length === 0) return null;
+    const prevSum  = wDays.reduce((s,d) => s + d.prev_actual, 0);
+    const doneDays = wDays.filter(d => d.actual > 0 && d.date <= today);
+    const actualSum = doneDays.reduce((s,d) => s + d.actual, 0);
+    const isComplete = doneDays.length === wDays.length;
+    const isPartial  = doneDays.length > 0 && !isComplete;
+    const hasAny     = doneDays.length > 0;
+    return { w, prevSum, actualSum, hasAny, isComplete, isPartial, total: wDays.length, done: doneDays.length };
+  }).filter(Boolean);
+
+  // 전년 1주차 기준 각 주차 비율 계산
+  const prev1 = weekData[0]?.prevSum || 0;
+  const prevRatios = weekData.map(w => prev1 > 0 ? w.prevSum / prev1 : null);
+
+  // 앵커: 완전히 마감된 가장 최근 주차의 당월 실적 사용 → 1주차 환산값 도출
+  // (당월 1주차 실적이 있으면 그걸 직접 사용, 없으면 완료 주차로 역산)
+  let anchor1 = null; // 당월 1주차 상당 예상값
+  for (let i = 0; i < weekData.length; i++) {
+    const w = weekData[i];
+    if (w.isComplete && prevRatios[i] > 0) {
+      anchor1 = w.actualSum / prevRatios[i];
+      break; // 가장 첫 완료 주차 기준 사용
+    }
+  }
+
+  // 주차별 예상 매출 (전년 비율 × anchor)
+  const projected = weekData.map((w, i) => {
+    if (w.isComplete) return { type: 'actual', value: w.actualSum };
+    if (w.isPartial)  return { type: 'partial', value: w.actualSum }; // 진행 중은 실적 그대로
+    if (anchor1 !== null && prevRatios[i] !== null)
+      return { type: 'projected', value: Math.round(anchor1 * prevRatios[i]) };
+    return { type: 'none', value: null };
+  });
+
+  // 전체 예상 월매출
+  const totalProjected = projected.reduce((s,p) => s + (p.value || 0), 0);
+  const monthTarget = days.reduce((s,d) => s + d.target, 0);
+  const projDiff    = totalProjected - monthTarget;
+  const projDiffPct = monthTarget > 0 ? (projDiff / monthTarget * 100).toFixed(1) : null;
+
+  const labels      = weekData.map(w => `${w.w}주차`);
+  const prevBars    = weekData.map(w => w.prevSum);
+  const actualBars  = projected.map(p => p.type === 'actual'  ? p.value : null);
+  const partialBars = projected.map(p => p.type === 'partial' ? p.value : null);
+  const projBars    = projected.map(p => p.type === 'projected' ? p.value : null);
+
+  el.innerHTML = `
+    <div class="strat-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">전년 주차 비율 기반 예상 월매출</div>
+          <div style="font-size:26px;font-weight:700;color:#fff;letter-spacing:-1px">${totalProjected > 0 ? totalProjected.toLocaleString('ko-KR') + '원' : '-'}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">
+            ${anchor1 ? `당월 1주차 환산 기준 ${fmtM(Math.round(anchor1))} × 전년 주차 비율 적용` : '1주차 완료 후 예상 가능'}
+          </div>
+        </div>
+        ${totalProjected > 0 && monthTarget > 0 ? `
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">vs 월 목표</div>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-0.5px" class="${projDiff >= 0 ? 'up' : 'dn'}">
+            ${projDiff >= 0 ? '▲' : '▼'} ${fmtM(Math.abs(projDiff))}
+          </div>
+          <div style="font-size:12px;margin-top:2px" class="${projDiff >= 0 ? 'up' : 'dn'}">${projDiff >= 0 ? '+' : ''}${projDiffPct}%</div>
+        </div>` : ''}
+      </div>
+
+      <div style="position:relative;height:200px;margin-bottom:20px">
+        <canvas id="weekly-chart"></canvas>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;min-width:420px">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg)">주차</th>
+              <th style="text-align:right;padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg)">전년 실적</th>
+              <th style="text-align:right;padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg)">전년 비율<br><span style="font-weight:400">(1주 대비)</span></th>
+              <th style="text-align:right;padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg)">당월 실적</th>
+              <th style="text-align:right;padding:8px 10px;font-size:11px;color:#6c8fff;font-weight:600;background:var(--bg)">전년 트렌드<br>예상</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${weekData.map((w, i) => {
+              const p = projected[i];
+              const ratio = prevRatios[i];
+              const ratioStr = ratio !== null ? (ratio * 100).toFixed(1) + '%' : '-';
+              const wLabel = w.isPartial
+                ? `${w.w}주차 <span style="color:var(--muted);font-size:11px">(${w.done}/${w.total}일)</span>`
+                : `${w.w}주차`;
+              const actualStr = w.hasAny ? fmt(w.actualSum) : '<span style="color:var(--border)">-</span>';
+              let projStr = '-';
+              if (p.type === 'actual')    projStr = `<span class="up" style="font-size:11px">✓ 확정</span>`;
+              else if (p.type === 'partial') projStr = `<span style="color:var(--yellow);font-size:11px">진행중</span>`;
+              else if (p.type === 'projected' && p.value) projStr = `<span style="color:#6c8fff;font-weight:600">${fmt(p.value)}</span>`;
+              return `<tr style="border-top:1px solid var(--border)">
+                <td style="padding:8px 10px;font-size:13px;color:var(--muted)">${wLabel}</td>
+                <td style="padding:8px 10px;font-size:13px;text-align:right">${fmt(w.prevSum)}</td>
+                <td style="padding:8px 10px;font-size:13px;text-align:right;color:var(--muted)">${ratioStr}</td>
+                <td style="padding:8px 10px;font-size:13px;text-align:right">${actualStr}</td>
+                <td style="padding:8px 10px;font-size:13px;text-align:right">${projStr}</td>
+              </tr>`;
+            }).join('')}
+            ${totalProjected > 0 ? `<tr style="border-top:2px solid var(--border);background:rgba(108,143,255,.06)">
+              <td colspan="3" style="padding:10px;font-size:13px;font-weight:700;color:var(--text)">예상 합계</td>
+              <td style="padding:10px;font-size:13px;font-weight:700;text-align:right">${fmt(weekData.filter((_,i)=>projected[i].type==='actual'||projected[i].type==='partial').reduce((s,w)=>s+w.actualSum,0))}</td>
+              <td style="padding:10px;font-size:14px;font-weight:700;text-align:right;color:#6c8fff">${fmt(totalProjected)}</td>
+            </tr>` : ''}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+
+  setTimeout(() => {
+    if (window._weeklyChartInst) { window._weeklyChartInst.destroy(); }
+    const ctx = document.getElementById('weekly-chart');
+    if (!ctx || !window.Chart) return;
+    window._weeklyChartInst = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: '전년 실적',   data: prevBars,    backgroundColor: 'rgba(255,255,255,0.10)', borderRadius: 4 },
+          { label: '당월 실적',   data: actualBars,  backgroundColor: '#6c8fff',                borderRadius: 4 },
+          { label: '진행중',      data: partialBars, backgroundColor: 'rgba(108,143,255,0.5)',  borderRadius: 4 },
+          { label: '전년비율 예상', data: projBars,  backgroundColor: 'rgba(108,143,255,0.25)', borderRadius: 4, borderDash: [4,4] },
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: true, position: 'top', align: 'start',
+            labels: { boxWidth: 10, boxHeight: 10, borderRadius: 2, useBorderRadius: true, color: '#7b7f93', font: { size: 11 }, padding: 12,
+              filter: item => item.text !== '진행중' || partialBars.some(v => v !== null) } },
+          tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${c.raw != null ? parseInt(c.raw).toLocaleString('ko-KR') + '원' : '-'}` } }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#7b7f93', font: { size: 12 } } },
+          y: { grid: { color: '#2a2d3a' }, ticks: { color: '#7b7f93', font: { size: 11 }, callback: v => fmtM(v) } }
+        }
+      }
+    });
+  }, 50);
+}
 
 loadData();
 </script>

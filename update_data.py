@@ -7,8 +7,13 @@ import os
 from datetime import datetime
 from openpyxl import load_workbook
 
-EXCEL_PATH = r"C:\Users\안태환\Desktop\OneDrive\01. 외식업 신규 ( 25.06 ~ )\00. 매출 & 손익\00. 매출\H.서울역 월간 매출 _ 26Y.xlsx"
-PNL_PATH = r"C:\Users\안태환\Desktop\OneDrive\01. 외식업 신규 ( 25.06 ~ )\00. 매출 & 손익\01. 실적\H.서울역 누적 실적 _ 23.11 ~.xlsx"
+if os.name == "nt":  # Windows
+    _ONEDRIVE = r"C:\Users\안태환\Desktop\OneDrive"
+else:  # macOS
+    _ONEDRIVE = os.path.expanduser("~/Library/CloudStorage/OneDrive-개인")
+
+EXCEL_PATH = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 25.06 ~ )", "00. 매출 & 손익", "00. 매출", "H.서울역 월간 매출 _ 26Y.xlsx")
+PNL_PATH   = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 25.06 ~ )", "00. 매출 & 손익", "01. 실적", "H.서울역 누적 실적 _ 23.11 ~.xlsx")
 OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "data", "data.json")
 
 WEEKDAY_KO = ["월", "화", "수", "목", "금", "토", "일"]
