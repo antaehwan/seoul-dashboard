@@ -243,12 +243,16 @@ function render(month) {
   const monthPrevActual = days.reduce((s,d) => s+d.prev_actual, 0);
   const yoyVal = yoy(cumActual, cumPrevActual);
 
-  // 예상 월말 매출 vs 계획/전년
-  const projRounded = Math.round(projected);
-  const projVsPlan = monthTarget > 0 ? (Math.abs(projected - monthTarget) / monthTarget * 100).toFixed(1) : '0.0';
-  const projVsPlanArr = projected >= monthTarget ? '▲' : '▼';
-  const projVsPrev = monthPrevActual > 0 ? (Math.abs(projected - monthPrevActual) / monthPrevActual * 100).toFixed(1) : '0.0';
-  const projVsPrevArr = projected >= monthPrevActual ? '▲' : '▼';
+  // 예상 월말 매출: 현재 페이스를 각 기준에 적용
+  const planRate = cumTarget > 0 ? cumActual / cumTarget : 0;
+  const planProj = Math.round(monthTarget * planRate);
+  const planDiff = (Math.abs(1 - planRate) * 100).toFixed(1);
+  const projVsPlanArr = planRate >= 1 ? '▲' : '▼';
+
+  const yoyRate = cumPrevActual > 0 ? cumActual / cumPrevActual : 0;
+  const yoyProj = Math.round(monthPrevActual * yoyRate);
+  const yoyDiff = (Math.abs(1 - yoyRate) * 100).toFixed(1);
+  const projVsPrevArr = yoyRate >= 1 ? '▲' : '▼';
 
   const cumCount = withData.reduce((s,d) => s+d.count, 0);
   const avgSpend = cumCount > 0 ? Math.round(cumActual / cumCount) : 0;
@@ -286,8 +290,8 @@ function render(month) {
     </div>
     <div class="card">
       <div class="label">예상 달성률</div>
-      <div class="sub-value" style="margin-bottom:6px">계획 <span style="color:var(--text);font-weight:600">${projRounded.toLocaleString('ko-KR')}원</span> <span class="${projVsPlanArr==='▲'?'up':'dn'}">(${projVsPlanArr} ${projVsPlan}%)</span></div>
-      <div class="sub-value">전년 <span style="color:var(--text);font-weight:600">${monthPrevActual.toLocaleString('ko-KR')}원</span> <span class="${projVsPrevArr==='▲'?'up':'dn'}">(${projVsPrevArr} ${projVsPrev}%)</span></div>
+      <div class="sub-value" style="margin-bottom:6px">계획 <span style="color:var(--text);font-weight:600">${planProj.toLocaleString('ko-KR')}원</span> <span class="${projVsPlanArr==='▲'?'up':'dn'}">(${projVsPlanArr} ${planDiff}%)</span></div>
+      <div class="sub-value">전년 <span style="color:var(--text);font-weight:600">${yoyProj.toLocaleString('ko-KR')}원</span> <span class="${projVsPrevArr==='▲'?'up':'dn'}">(${projVsPrevArr} ${yoyDiff}%)</span></div>
     </div>
     <div class="card">
       <div class="label">객수 / 객단가</div>
