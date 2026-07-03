@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>호우섬 서울역 매출현황</title>
 <style>
@@ -179,7 +180,7 @@
   <!-- 월별 손익 분석 -->
   <section id="pnl">
     <h2>월별 손익 분석</h2>
-    <p class="sub">재료비 · 노무비 · 일반관리비 · 영업이익률</p>
+    <p class="sub">월별 비용 구조 및 영업이익률 추이</p>
     <div id="pnl-grid" style="margin-top:12px"></div>
   </section>
 
@@ -693,7 +694,7 @@ function renderPnl() {
         labels,
         datasets: [
           { label:'재료비',   data: food,   backgroundColor:'#e34948', borderRadius:3, borderSkipped:false },
-          { label:'인건비',   data: labor,  backgroundColor:'#eda100', borderRadius:3, borderSkipped:false },
+          { label:'인건비',   data: labor,  backgroundColor:'#378add', borderRadius:3, borderSkipped:false },
           { label:'영업이익', data: profit, backgroundColor:'#1baf7a', borderRadius:3, borderSkipped:false },
         ]
       },
@@ -851,7 +852,5 @@ function renderTable(days, today) {
 
 loadData();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 </body>
 </html>
