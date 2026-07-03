@@ -151,11 +151,11 @@
             <th>날짜</th>
             <th>목표</th>
             <th>실적</th>
+            <th>런치</th>
+            <th>디너</th>
             <th>달성률</th>
             <th>객수</th>
             <th>객단가</th>
-            <th>홀</th>
-            <th>배달/포장</th>
             <th>전년 실적</th>
             <th>YoY</th>
           </tr>
@@ -215,9 +215,9 @@ function initMonthSelect() {
 
 function fmt(n) { return n ? Math.round(n).toLocaleString('ko-KR') : '-'; }
 function fmtM(n) { return n >= 1e8 ? (n/1e8).toFixed(2)+'억' : n >= 1e4 ? (n/1e4).toFixed(0)+'만' : fmt(n); }
-function pct(a, b) { return b ? Math.round(a/b*100) : 0; }
+function pct(a, b) { return b ? (a/b*100).toFixed(1) : '0.0'; }
 function yoy(cur, prev) { if (!prev) return null; return Math.round((cur-prev)/prev*100); }
-function colorPct(p) { return p >= 100 ? 'up' : p >= 90 ? 'neutral' : 'dn'; }
+function colorPct(p) { return parseFloat(p) >= 100 ? 'up' : parseFloat(p) >= 90 ? 'neutral' : 'dn'; }
 function colorYoy(y) { return y > 0 ? 'up' : y < 0 ? 'dn' : 'neutral'; }
 function signStr(n) { const a = Math.abs(n).toFixed(1); return n > 0 ? '▲ '+a+'%' : n < 0 ? '▼ '+a+'%' : '-'; }
 
@@ -355,13 +355,13 @@ function renderTable(days, today) {
       <td>${d.date.slice(5)} <span style="color:${isWeekend?'var(--accent)':'var(--muted)'}">${wdStr}</span></td>
       <td>${fmt(d.target)}</td>
       <td>${hasData ? fmt(d.actual) : '<span style="color:var(--border)">-</span>'}</td>
+      <td>${hasData ? fmtM(d.sales_l) : '-'}</td>
+      <td>${hasData ? fmtM(d.sales_d) : '-'}</td>
       <td>
-        ${achPct !== null ? `<span class="${colorPct(achPct)}">${achPct}%</span><span class="ach-bar" style="width:${Math.min(achPct,120)}px;background:${achColor}"></span>` : '-'}
+        ${achPct !== null ? `<span class="${colorPct(achPct)}">${achPct}%</span><span class="ach-bar" style="width:${Math.min(parseFloat(achPct),120)}px;background:${achColor}"></span>` : '-'}
       </td>
       <td>${hasData ? d.count.toLocaleString() : '-'}</td>
       <td>${hasData ? fmt(d.avg_spend) : '-'}</td>
-      <td>${hasData ? fmtM(d.sales_l) : '-'}</td>
-      <td>${hasData ? fmtM(d.sales_d) : '-'}</td>
       <td>${d.prev_actual ? fmt(d.prev_actual) : '-'}</td>
       <td>${yoyV !== null ? `<span class="${colorYoy(yoyV)}">${signStr(yoyV)}</span>` : '-'}</td>
     </tr>`;
@@ -373,11 +373,11 @@ function renderTable(days, today) {
     <td>누계</td>
     <td>${fmt(sumTarget)}</td>
     <td>${fmt(sumActual)}</td>
+    <td>${fmtM(sumL)}</td>
+    <td>${fmtM(sumD)}</td>
     <td class="${colorPct(totalAch)}">${totalAch}%</td>
     <td>${sumCount.toLocaleString()}</td>
     <td>${sumCount > 0 ? fmt(Math.round(sumActual/sumCount)) : '-'}</td>
-    <td>${fmtM(sumL)}</td>
-    <td>${fmtM(sumD)}</td>
     <td>${fmt(sumPrev)}</td>
     <td class="${totalYoy !== null ? colorYoy(totalYoy) : ''}">${totalYoy !== null ? signStr(totalYoy) : '-'}</td>
   </tr>`;
