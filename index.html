@@ -257,14 +257,14 @@ function render(month) {
     {
       label: '당월 누적 매출',
       value: cumActual.toLocaleString('ko-KR') + '원',
-      sub: `목표 ${monthTarget.toLocaleString('ko-KR')}원`,
-      delta: yoyVal !== null ? `전년 ${signStr(yoyVal)}` : null,
-      cls: yoyVal !== null ? colorYoy(yoyVal) : ''
+      sub: `누적 목표 ${cumTarget.toLocaleString('ko-KR')}원`,
+      delta: (() => { const diff = cumActual - cumTarget; return (diff >= 0 ? '+' : '') + diff.toLocaleString('ko-KR') + '원'; })(),
+      cls: cumActual >= cumTarget ? 'up' : 'dn'
     },
     {
-      label: '목표 달성률',
-      value: curAch + '%',
-      sub: `목표 ${cumTarget.toLocaleString('ko-KR')}원`,
+      label: '사업 계획 매출',
+      value: monthTarget.toLocaleString('ko-KR') + '원',
+      sub: `달성률 ${curAch}%`,
       delta: null, cls: colorPct(Number(curAch))
     },
     {
