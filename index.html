@@ -126,6 +126,13 @@
 
   <!-- 매출 차트 -->
   <!-- 전략 분석 -->
+  <!-- 이 달의 총평 -->
+  <section id="monthly-review">
+    <h2>이 달의 총평</h2>
+    <p class="sub">데이터 기반 자동 분석 요약</p>
+    <div id="review-card" style="margin-top:12px"></div>
+  </section>
+
   <section id="strategy">
     <h2>전략 분석</h2>
     <p class="sub">데이터 기반 이상 탐지 · 추세 · 전략 제안</p>
@@ -318,8 +325,119 @@ function render(month) {
     </div>
   `;
 
+  renderReview(days, today, month);
   renderStrategy(days, today);
   renderTable(days, today);
+}
+
+function renderReview(days, today, month) {
+  const el = document.getElementById('review-card');
+  if (!el) return;
+  const mNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  const mName = mNames[month-1];
+  const done = days.filter(d => d.actual > 0 && d.date <= today);
+  if (done.length === 0) {
+    el.innerHTML = `<div class="strat-card"><p class="strat-tip">아직 실적 데이터가 없습니다.</p></div>`;
+    return;
+  }
+
+  const cumActual = done.reduce((s,d)=>s+d.actual,0);
+  const cumTarget = done.reduce((s,d)=>s+d.target,0);
+  const monthTarget = days.reduce((s,d)=>s+d.target,0);
+  const cumPrev = done.reduce((s,d)=>s+d.prev_actual,0);
+  const pace = cumTarget > 0 ? cumActual/cumTarget : 0;
+  const planProj = Math.round(monthTarget * pace);
+  const achPct = (pace*100).toFixed(1);
+  const yoyVal = cumPrev > 0 ? ((cumActual-cumPrev)/cumPrev*100).toFixed(1) : null;
+  const remaining = days.filter(d=>d.date>today).length;
+  const avgDaily = Math.round(cumActual/done.length);
+  const needAvg = remaining > 0 ? Math.round((monthTarget-cumActual)/remaining) : 0;
+
+  // 요일 패턴
+  const wdMap = {};
+  done.forEach(d => {
+    const w = new Date(d.date).getDay();
+    if (!wdMap[w]) wdMap[w] = {sum:0,cnt:0};
+    wdMap[w].sum += d.target>0?d.actual/d.target:0;
+    wdMap[w].cnt++;
+  });
+  const wdNames = ['일','월','화','수','목','금','토'];
+  const wdRates = Object.entries(wdMap).map(([w,v])=>({w:parseInt(w),rate:v.sum/v.cnt})).sort((a,b)=>b.rate-a.rate);
+  const bestDay = wdRates[0];
+  const worstDay = wdRates[wdRates.length-1];
+
+  // 런치/디너
+  const totalL = done.reduce((s,d)=>s+d.sales_l,0);
+  const totalD = done.reduce((s,d)=>s+d.sales_d,0);
+  const total = totalL+totalD;
+  const lPct = total>0?(totalL/total*100).toFixed(0):0;
+  const dPct = total>0?(totalD/total*100).toFixed(0):0;
+
+  // 이상 탐지
+  const under = done.filter(d=>d.target>0&&d.actual/d.target<0.75);
+
+  // 추세 (마지막 3일)
+  const last3 = done.slice(-3);
+  let trendTxt = '';
+  if (last3.length >= 2) {
+    const rates = last3.map(d=>d.target>0?d.actual/d.target:0);
+    const rising = rates.every((r,i)=>i===0||r>=rates[i-1]);
+    const falling = rates.every((r,i)=>i===0||r<=rates[i-1]);
+    trendTxt = rising ? '상승세' : falling ? '하락세' : '혼조세';
+  }
+
+  // 문장 생성
+  const lines = [];
+
+  // 1. 전체 달성 현황
+  const achEmoji = pace>=1?'✅':pace>=0.9?'🟡':'🔴';
+  lines.push(`${achEmoji} <strong>${mName}</strong> 현재까지 목표 대비 <strong>${achPct}%</strong> 달성 중입니다. (누적 ${fmtM(cumActual)} / 목표 ${fmtM(cumTarget)})`);
+
+  // 2. 월말 예상
+  const projEmoji = planProj>=monthTarget?'📈':'📉';
+  lines.push(`${projEmoji} 현재 페이스 유지 시 월말 예상 매출은 <strong>${fmtM(planProj)}</strong>으로, 월 목표(${fmtM(monthTarget)}) 대비 <strong>${pace>=1?'초과 달성':'미달'}</strong>이 예상됩니다.`);
+
+  // 3. 전년비
+  if (yoyVal !== null) {
+    const yoyEmoji = parseFloat(yoyVal)>=0?'📊':'⚠️';
+    lines.push(`${yoyEmoji} 전년 동기 대비 <strong>${parseFloat(yoyVal)>=0?'▲':'▼'} ${Math.abs(parseFloat(yoyVal))}%</strong>로, 전년 대비 ${parseFloat(yoyVal)>=0?'개선':'부진'} 중입니다.`);
+  }
+
+  // 4. 요일 패턴
+  if (bestDay && worstDay && bestDay.w !== worstDay.w) {
+    lines.push(`📅 <strong>${wdNames[bestDay.w]}요일</strong>이 가장 강하고(${(bestDay.rate*100).toFixed(1)}%), <strong>${wdNames[worstDay.w]}요일</strong>이 가장 약합니다(${(worstDay.rate*100).toFixed(1)}%). ${wdNames[worstDay.w]}요일 집중 운영 전략이 필요합니다.`);
+  }
+
+  // 5. 런치/디너
+  const weakTime = parseInt(lPct)<parseInt(dPct)?'런치':'디너';
+  lines.push(`🍱 런치 <strong>${lPct}%</strong> / 디너 <strong>${dPct}%</strong> 비중으로, <strong>${weakTime}</strong> 타임 강화가 매출 개선 레버입니다.`);
+
+  // 6. 이상 탐지
+  if (under.length > 0) {
+    lines.push(`⚠️ 목표 대비 75% 미만 미달 일자가 <strong>${under.length}일</strong> 발생했습니다. (${under.map(d=>d.date.slice(8)+'일').join(', ')}) 원인 분석이 필요합니다.`);
+  }
+
+  // 7. 남은 기간 필요 일평균
+  if (remaining > 0) {
+    const needRatio = avgDaily > 0 ? ((needAvg-avgDaily)/avgDaily*100).toFixed(1) : null;
+    if (needRatio !== null) {
+      const action = parseFloat(needRatio) > 0
+        ? `현재 대비 <strong>+${needRatio}%</strong> 높은 일평균이 필요합니다.`
+        : `현재 페이스만 유지해도 목표 달성이 가능합니다.`;
+      lines.push(`🎯 잔여 <strong>${remaining}일</strong> 동안 필요 일평균은 <strong>${fmtM(needAvg)}</strong>으로, ${action}`);
+    }
+  }
+
+  // 8. 최근 추세
+  if (trendTxt) {
+    const trendEmoji = trendTxt==='상승세'?'📈':trendTxt==='하락세'?'📉':'↔️';
+    lines.push(`${trendEmoji} 최근 3일 실적은 <strong>${trendTxt}</strong>입니다.`);
+  }
+
+  el.innerHTML = `
+    <div class="strat-card" style="line-height:1.9">
+      ${lines.map(l=>`<div style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--border)">${l}</div>`).join('')}
+    </div>`;
 }
 
 function renderStrategy(days, today) {
