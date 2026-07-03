@@ -479,33 +479,53 @@ function renderPnl() {
     </tr>`;
   }).join('');
 
-  // SVG 영업이익률 추이
+  // SVG 4종 추이 차트
+  const series = [
+    { key: 'food_cost_pct',   label: '재료비',     color: '#ff6b6b' },
+    { key: 'labor_cost_pct',  label: '인건비',     color: '#ffd93d' },
+    { key: 'ga_cost_pct',     label: '일반관리비', color: '#6bcff6' },
+    { key: 'op_profit_pct',   label: '영업이익',   color: '#6bffb8' },
+  ];
+
   const W = el.clientWidth || 700;
-  const H = 140;
-  const PAD = { t: 20, r: 20, b: 30, l: 44 };
+  const H = 180;
+  const PAD = { t: 24, r: 20, b: 30, l: 44 };
   const cW = W - PAD.l - PAD.r;
   const cH = H - PAD.t - PAD.b;
   const n = months.length;
-  const rates = months.map(([,d]) => d.op_profit_pct);
-  const maxR = Math.max(...rates, 30);
-  const minR = Math.min(...rates, 0);
-  const range = maxR - minR || 1;
   const xS = i => PAD.l + (n > 1 ? i/(n-1)*cW : cW/2);
-  const yS = v => PAD.t + cH - ((v-minR)/range*cH);
 
-  const path = rates.map((r,i) => `${i===0?'M':'L'}${xS(i).toFixed(1)},${yS(r).toFixed(1)}`).join(' ');
-  const dots = rates.map((r,i) => {
-    const cls = r >= 25 ? 'var(--green)' : r >= 20 ? 'var(--yellow)' : 'var(--red)';
-    return `<circle cx="${xS(i).toFixed(1)}" cy="${yS(r).toFixed(1)}" r="4" fill="${cls}"/>
-            <text x="${xS(i).toFixed(1)}" y="${(yS(r)-8).toFixed(1)}" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">${r}%</text>`;
+  const allVals = series.flatMap(s => months.map(([,d]) => d[s.key]));
+  const maxV = Math.max(...allVals, 30);
+  const minV = Math.min(...allVals, 0);
+  const range = maxV - minV || 1;
+  const yS = v => PAD.t + cH - ((v - minV) / range * cH);
+
+  const lines = series.map(s => {
+    const pts = months.map(([,d], i) => `${i===0?'M':'L'}${xS(i).toFixed(1)},${yS(d[s.key]).toFixed(1)}`).join(' ');
+    const dots = months.map(([,d], i) =>
+      `<circle cx="${xS(i).toFixed(1)}" cy="${yS(d[s.key]).toFixed(1)}" r="3.5" fill="${s.color}"/>
+       <text x="${xS(i).toFixed(1)}" y="${(yS(d[s.key])-8).toFixed(1)}" text-anchor="middle" fill="${s.color}" font-size="9" font-weight="600">${d[s.key]}%</text>`
+    ).join('');
+    return `<path d="${pts}" fill="none" stroke="${s.color}" stroke-width="2"/>${dots}`;
   }).join('');
-  const xLabels = months.map(([m,],i) => `<text x="${xS(i).toFixed(1)}" y="${H-6}" text-anchor="middle" fill="#7b7f93" font-size="10">${mNames[parseInt(m)-1]}</text>`).join('');
-  const yTicks = [0,0.5,1].map(r => {
-    const v = minR + range*r;
+
+  const xLabels = months.map(([m,],i) =>
+    `<text x="${xS(i).toFixed(1)}" y="${H-6}" text-anchor="middle" fill="#7b7f93" font-size="10">${mNames[parseInt(m)-1]}</text>`
+  ).join('');
+
+  const yTicks = [0, 0.5, 1].map(r => {
+    const v = minV + range * r;
     const y = yS(v).toFixed(1);
     return `<line x1="${PAD.l}" x2="${PAD.l+cW}" y1="${y}" y2="${y}" stroke="#2a2d3a" stroke-width="1"/>
             <text x="${PAD.l-4}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="#7b7f93" font-size="10">${v.toFixed(0)}%</text>`;
   }).join('');
+
+  const legend = series.map((s, i) =>
+    `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:${s.color}">
+       <div style="width:16px;height:2px;background:${s.color};border-radius:1px"></div>${s.label}
+     </div>`
+  ).join('');
 
   el.innerHTML = `
     <div class="strat-card" style="padding:0;overflow:hidden">
@@ -515,21 +535,19 @@ function renderPnl() {
             <tr>
               <th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg)">월</th>
               <th style="padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg);text-align:right">매출</th>
-              <th style="padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg);text-align:right">재료비</th>
-              <th style="padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg);text-align:right">노무비</th>
-              <th style="padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg);text-align:right">일반관리비</th>
-              <th style="padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg);text-align:right">영업이익률</th>
+              <th style="padding:10px 12px;font-size:11px;color:#ff6b6b;font-weight:600;background:var(--bg);text-align:right">재료비</th>
+              <th style="padding:10px 12px;font-size:11px;color:#ffd93d;font-weight:600;background:var(--bg);text-align:right">인건비</th>
+              <th style="padding:10px 12px;font-size:11px;color:#6bcff6;font-weight:600;background:var(--bg);text-align:right">일반관리비</th>
+              <th style="padding:10px 12px;font-size:11px;color:#6bffb8;font-weight:600;background:var(--bg);text-align:right">영업이익률</th>
             </tr>
           </thead>
           <tbody style="font-size:13px">${tableRows}</tbody>
         </table>
       </div>
       <div style="padding:16px 20px;border-top:1px solid var(--border)">
-        <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">영업이익률 추이</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px">${legend}</div>
         <svg width="100%" height="${H}" style="display:block">
-          ${yTicks}${xLabels}
-          <path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2"/>
-          ${dots}
+          ${yTicks}${xLabels}${lines}
         </svg>
       </div>
     </div>`;
