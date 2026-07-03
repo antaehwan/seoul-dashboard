@@ -256,6 +256,8 @@ function render(month) {
   const projVsPrevArr = yoyRate >= 1 ? '▲' : '▼';
 
   const cumCount = withData.reduce((s,d) => s+d.count, 0);
+  const cumCountL = withData.reduce((s,d) => s+d.count_l, 0);
+  const cumCountD = withData.reduce((s,d) => s+d.count_d, 0);
   const avgSpend = cumCount > 0 ? Math.round(cumActual / cumCount) : 0;
 
   // sub text
@@ -290,13 +292,14 @@ function render(month) {
       <div class="sub-value" style="margin-top:6px;font-size:12px">${monthTarget.toLocaleString('ko-KR')}원</div>
     </div>
     <div class="card">
-      <div class="label">예상 달성률</div>
+      <div class="label">예상</div>
       <div class="sub-value" style="margin-bottom:6px">계획 <span class="value-num">${planProj.toLocaleString('ko-KR')}원</span> <span class="${projVsPlanArr==='▲'?'up':'dn'}">(${projVsPlanArr} ${planDiff}%)</span></div>
       <div class="sub-value">전년 <span class="value-num">${yoyProj.toLocaleString('ko-KR')}원</span> <span class="${projVsPrevArr==='▲'?'up':'dn'}">(${projVsPrevArr} ${yoyDiff}%)</span></div>
     </div>
     <div class="card">
       <div class="label">객수 / 객단가</div>
       <div class="value">${cumCount.toLocaleString('ko-KR')}명</div>
+      <div class="sub-value" style="margin-top:6px">런치 ${cumCountL.toLocaleString('ko-KR')}명 · 디너 ${cumCountD.toLocaleString('ko-KR')}명</div>
       <div class="sub-value">객단가 ${fmt(avgSpend)}원</div>
     </div>
   `;
