@@ -252,7 +252,6 @@ function render(month) {
   const mName = monthNames[month-1];
   const dateRange = dataCount > 0 ? `${mName} (${withData[0].date.slice(5)} ~ ${withData[withData.length-1].date.slice(5)})` : mName;
   document.getElementById('summary-sub').textContent = dateRange;
-  document.getElementById('chart-sub').textContent = `${mName} · 일별`;
 
   // 실적 차질
   const diff1 = cumActual - cumTarget;
