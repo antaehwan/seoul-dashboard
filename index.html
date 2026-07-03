@@ -44,7 +44,8 @@
   .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
   .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
   .card .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
-  .card .value { font-size: 26px; font-weight: 700; letter-spacing: -1px; }
+  .card .value { font-size: 26px; font-weight: 700; letter-spacing: -1px; color: #ffffff; }
+  .card .value-num { font-size: 26px; font-weight: 700; letter-spacing: -1px; color: #ffffff; }
   .card .sub-value { font-size: 12px; color: var(--muted); margin-top: 4px; }
   .card .delta { font-size: 13px; font-weight: 600; margin-top: 4px; }
   .up { color: var(--green); }
@@ -280,18 +281,18 @@ function render(month) {
   cardEl.innerHTML = `
     <div class="card">
       <div class="label">실적</div>
-      <div class="value ${diff1 >= 0 ? 'up' : 'dn'}">${cumActual.toLocaleString('ko-KR')}원</div>
+      <div class="value">${cumActual.toLocaleString('ko-KR')}원</div>
       <div class="delta ${diff1 >= 0 ? 'up' : 'dn'}" style="margin-top:8px">${diffStr}</div>
     </div>
     <div class="card">
-      <div class="label">사업 계획</div>
-      <div class="value ${diff2 >= 0 ? 'up' : 'dn'}">${cumTarget.toLocaleString('ko-KR')}원</div>
+      <div class="label">계획</div>
+      <div class="value">${cumTarget.toLocaleString('ko-KR')}원</div>
       <div class="sub-value" style="margin-top:6px;font-size:12px">${monthTarget.toLocaleString('ko-KR')}원</div>
     </div>
     <div class="card">
       <div class="label">예상 달성률</div>
-      <div class="sub-value" style="margin-bottom:6px">계획 <span style="color:var(--text);font-weight:600">${planProj.toLocaleString('ko-KR')}원</span> <span class="${projVsPlanArr==='▲'?'up':'dn'}">(${projVsPlanArr} ${planDiff}%)</span></div>
-      <div class="sub-value">전년 <span style="color:var(--text);font-weight:600">${yoyProj.toLocaleString('ko-KR')}원</span> <span class="${projVsPrevArr==='▲'?'up':'dn'}">(${projVsPrevArr} ${yoyDiff}%)</span></div>
+      <div class="sub-value" style="margin-bottom:6px">계획 <span class="value-num">${planProj.toLocaleString('ko-KR')}원</span> <span class="${projVsPlanArr==='▲'?'up':'dn'}">(${projVsPlanArr} ${planDiff}%)</span></div>
+      <div class="sub-value">전년 <span class="value-num">${yoyProj.toLocaleString('ko-KR')}원</span> <span class="${projVsPrevArr==='▲'?'up':'dn'}">(${projVsPrevArr} ${yoyDiff}%)</span></div>
     </div>
     <div class="card">
       <div class="label">객수 / 객단가</div>
