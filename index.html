@@ -675,15 +675,15 @@ function renderMonthlyHistory() {
   const svg = document.getElementById('monthly-svg');
   if (!svg) return;
   const mNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
-  const history = Object.entries(DATA.months)
-    .map(([m, mDays]) => {
-      const actual = mDays.reduce((s,d)=>s+d.actual,0);
-      const target = mDays.reduce((s,d)=>s+d.target,0);
-      const prev = mDays.reduce((s,d)=>s+d.prev_actual,0);
-      const rate = target > 0 ? actual/target*100 : 0;
-      return { m: parseInt(m), name: mNames[parseInt(m)-1], actual, target, prev, rate };
-    })
-    .sort((a,b) => a.m - b.m);
+  const history = Array.from({length:12}, (_,i) => {
+    const m = i + 1;
+    const mDays = DATA.months[String(m)] || [];
+    const actual = mDays.reduce((s,d)=>s+d.actual,0);
+    const target = mDays.reduce((s,d)=>s+d.target,0);
+    const prev = mDays.reduce((s,d)=>s+d.prev_actual,0);
+    const rate = target > 0 ? actual/target*100 : 0;
+    return { m, name: mNames[i], actual, target, prev, rate };
+  });
 
   const W = svg.parentElement.clientWidth - 48;
   const H = 220;
