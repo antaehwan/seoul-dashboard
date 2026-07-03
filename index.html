@@ -155,6 +155,8 @@
             <th>디너</th>
             <th>달성률</th>
             <th>객수</th>
+            <th>런치(객)</th>
+            <th>디너(객)</th>
             <th>객단가</th>
             <th>전년 실적</th>
             <th>YoY</th>
@@ -361,6 +363,8 @@ function renderTable(days, today) {
         ${achPct !== null ? `<span class="${colorPct(achPct)}">${achPct}%</span><span class="ach-bar" style="width:${Math.min(parseFloat(achPct),120)}px;background:${achColor}"></span>` : '-'}
       </td>
       <td>${hasData ? d.count.toLocaleString() : '-'}</td>
+      <td>${hasData ? d.count_l.toLocaleString() : '-'}</td>
+      <td>${hasData ? d.count_d.toLocaleString() : '-'}</td>
       <td>${hasData ? fmt(d.avg_spend) : '-'}</td>
       <td>${d.prev_actual ? fmt(d.prev_actual) : '-'}</td>
       <td>${yoyV !== null ? `<span class="${colorYoy(yoyV)}">${signStr(yoyV)}</span>` : '-'}</td>
@@ -377,6 +381,8 @@ function renderTable(days, today) {
     <td>${fmtM(sumD)}</td>
     <td class="${colorPct(totalAch)}">${totalAch}%</td>
     <td>${sumCount.toLocaleString()}</td>
+    <td>${days.filter(d=>d.actual>0).reduce((s,d)=>s+d.count_l,0).toLocaleString()}</td>
+    <td>${days.filter(d=>d.actual>0).reduce((s,d)=>s+d.count_d,0).toLocaleString()}</td>
     <td>${sumCount > 0 ? fmt(Math.round(sumActual/sumCount)) : '-'}</td>
     <td>${fmt(sumPrev)}</td>
     <td class="${totalYoy !== null ? colorYoy(totalYoy) : ''}">${totalYoy !== null ? signStr(totalYoy) : '-'}</td>
