@@ -8,6 +8,7 @@ from datetime import datetime
 from openpyxl import load_workbook
 
 EXCEL_PATH = r"C:\Users\안태환\Desktop\OneDrive\01. 외식업 신규 ( 25.06 ~ )\00. 매출 & 손익\00. 매출\H.서울역 월간 매출 _ 26Y.xlsx"
+PNL_PATH = r"C:\Users\안태환\Desktop\OneDrive\01. 외식업 신규 ( 25.06 ~ )\00. 매출 & 손익\01. 실적\H.서울역 누적 실적 _ 23.11 ~.xlsx"
 OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "data", "data.json")
 
 WEEKDAY_KO = ["월", "화", "수", "목", "금", "토", "일"]
@@ -62,6 +63,55 @@ def parse_sheet(ws, month):
         })
     return days
 
+def parse_pnl():
+    wb = load_workbook(PNL_PATH, data_only=True)
+    ws = wb['26Y 실적']
+    rows = list(ws.iter_rows(min_row=1, max_row=200, max_col=20, values_only=True))
+
+    # 행 찾기
+    idx = {}
+    for i, row in enumerate(rows):
+        label = row[1]
+        if label == '매출': idx['매출'] = i
+        elif label == '재료비': idx['재료비'] = i
+        elif label == '노무비': idx['노무비'] = i
+        elif label == '일반관리비': idx['일반관리비'] = i
+        elif label == '영업이익(매장)': idx['영업이익'] = i
+
+    pnl = {}
+    for m in range(1, 13):
+        vc = 4 + (m - 1) * 2  # value col index
+        rc = vc + 1             # ratio col index
+
+        def v(key):
+            if key not in idx: return None
+            row = rows[idx[key]]
+            return row[vc] if vc < len(row) else None
+
+        def r(key):
+            if key not in idx: return None
+            row = rows[idx[key]]
+            return row[rc] if rc < len(row) else None
+
+        revenue = v('매출')
+        if not revenue:
+            continue
+
+        pnl[str(m)] = {
+            "revenue": int(revenue) if revenue else 0,
+            "food_cost": int(v('재료비') or 0),
+            "food_cost_pct": round((r('재료비') or 0) * 100, 1),
+            "labor_cost": int(v('노무비') or 0),
+            "labor_cost_pct": round((r('노무비') or 0) * 100, 1),
+            "ga_cost": int(v('일반관리비') or 0),
+            "ga_cost_pct": round((r('일반관리비') or 0) * 100, 1),
+            "op_profit": int(v('영업이익') or 0),
+            "op_profit_pct": round((r('영업이익') or 0) * 100, 1),
+        }
+        print(f"  P&L {m}월: 매출 {revenue:,.0f}원, 영업이익 {pnl[str(m)]['op_profit_pct']}%")
+
+    return pnl
+
 def main():
     print(f"엑셀 파일 읽는 중...")
     wb = load_workbook(EXCEL_PATH, data_only=True)
@@ -77,11 +127,15 @@ def main():
             all_data[sheet_name] = days
             print(f"  {month}월: {len(days)}일 데이터 읽음")
 
+    print(f"\nP&L 파일 읽는 중...")
+    pnl_data = parse_pnl()
+
     output = {
         "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "store": "서울역",
         "store_code": "4018",
-        "months": all_data
+        "months": all_data,
+        "pnl": pnl_data
     }
 
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)

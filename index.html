@@ -169,6 +169,13 @@
     </div>
   </section>
 
+  <!-- 월별 손익 분석 -->
+  <section id="pnl">
+    <h2>월별 손익 분석</h2>
+    <p class="sub">재료비 · 노무비 · 일반관리비 · 영업이익률</p>
+    <div id="pnl-grid" style="margin-top:12px"></div>
+  </section>
+
 </main>
 
 <footer style="text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border)">
@@ -207,6 +214,7 @@ function initMonthSelect() {
   sel.addEventListener('change', () => render(Number(sel.value)));
   render(defaultMonth);
   renderMonthlyHistory();
+  renderPnl();
 }
 
 function fmt(n) { return n ? Math.round(n).toLocaleString('ko-KR') : '-'; }
@@ -449,6 +457,82 @@ function renderStrategy(days, today) {
     })()}
 
   `;
+}
+
+function renderPnl() {
+  const el = document.getElementById('pnl-grid');
+  if (!el || !DATA.pnl) return;
+  const mNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  const months = Object.entries(DATA.pnl).sort((a,b) => parseInt(a[0])-parseInt(b[0]));
+  if (months.length === 0) { el.innerHTML = '<p style="color:var(--muted);font-size:13px">P&L 데이터 없음</p>'; return; }
+
+  // 상단 테이블
+  const tableRows = months.map(([m, d]) => {
+    const profitCls = d.op_profit >= 0 ? 'up' : 'dn';
+    return `<tr>
+      <td style="text-align:left;color:var(--muted)">${mNames[parseInt(m)-1]}</td>
+      <td>${fmtM(d.revenue)}</td>
+      <td><span class="dn">${d.food_cost_pct}%</span></td>
+      <td><span class="dn">${d.labor_cost_pct}%</span></td>
+      <td><span class="dn">${d.ga_cost_pct}%</span></td>
+      <td><span class="${profitCls}" style="font-weight:700">${d.op_profit_pct}%</span></td>
+    </tr>`;
+  }).join('');
+
+  // SVG 영업이익률 추이
+  const W = el.clientWidth || 700;
+  const H = 140;
+  const PAD = { t: 20, r: 20, b: 30, l: 44 };
+  const cW = W - PAD.l - PAD.r;
+  const cH = H - PAD.t - PAD.b;
+  const n = months.length;
+  const rates = months.map(([,d]) => d.op_profit_pct);
+  const maxR = Math.max(...rates, 30);
+  const minR = Math.min(...rates, 0);
+  const range = maxR - minR || 1;
+  const xS = i => PAD.l + (n > 1 ? i/(n-1)*cW : cW/2);
+  const yS = v => PAD.t + cH - ((v-minR)/range*cH);
+
+  const path = rates.map((r,i) => `${i===0?'M':'L'}${xS(i).toFixed(1)},${yS(r).toFixed(1)}`).join(' ');
+  const dots = rates.map((r,i) => {
+    const cls = r >= 25 ? 'var(--green)' : r >= 20 ? 'var(--yellow)' : 'var(--red)';
+    return `<circle cx="${xS(i).toFixed(1)}" cy="${yS(r).toFixed(1)}" r="4" fill="${cls}"/>
+            <text x="${xS(i).toFixed(1)}" y="${(yS(r)-8).toFixed(1)}" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">${r}%</text>`;
+  }).join('');
+  const xLabels = months.map(([m,],i) => `<text x="${xS(i).toFixed(1)}" y="${H-6}" text-anchor="middle" fill="#7b7f93" font-size="10">${mNames[parseInt(m)-1]}</text>`).join('');
+  const yTicks = [0,0.5,1].map(r => {
+    const v = minR + range*r;
+    const y = yS(v).toFixed(1);
+    return `<line x1="${PAD.l}" x2="${PAD.l+cW}" y1="${y}" y2="${y}" stroke="#2a2d3a" stroke-width="1"/>
+            <text x="${PAD.l-4}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="#7b7f93" font-size="10">${v.toFixed(0)}%</text>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="strat-card" style="padding:0;overflow:hidden">
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;min-width:500px">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg)">월</th>
+              <th style="padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg);text-align:right">매출</th>
+              <th style="padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg);text-align:right">재료비</th>
+              <th style="padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg);text-align:right">노무비</th>
+              <th style="padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg);text-align:right">일반관리비</th>
+              <th style="padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg);text-align:right">영업이익률</th>
+            </tr>
+          </thead>
+          <tbody style="font-size:13px">${tableRows}</tbody>
+        </table>
+      </div>
+      <div style="padding:16px 20px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">영업이익률 추이</div>
+        <svg width="100%" height="${H}" style="display:block">
+          ${yTicks}${xLabels}
+          <path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2"/>
+          ${dots}
+        </svg>
+      </div>
+    </div>`;
 }
 
 function renderMonthlyHistory() {

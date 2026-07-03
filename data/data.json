@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-03 10:53",
+  "updated_at": "2026-07-03 12:54",
   "store": "서울역",
   "store_code": "4018",
   "months": {
@@ -5035,5 +5035,73 @@
         "prev_count": 392
       }
     ]
+  },
+  "pnl": {
+    "1": {
+      "revenue": 184700997,
+      "food_cost": 38422559,
+      "food_cost_pct": 20.8,
+      "labor_cost": 51110037,
+      "labor_cost_pct": 27.7,
+      "ga_cost": 47963285,
+      "ga_cost_pct": 26.0,
+      "op_profit": 47205114,
+      "op_profit_pct": 25.6
+    },
+    "2": {
+      "revenue": 167994933,
+      "food_cost": 35145036,
+      "food_cost_pct": 20.9,
+      "labor_cost": 45936459,
+      "labor_cost_pct": 27.3,
+      "ga_cost": 46051780,
+      "ga_cost_pct": 27.4,
+      "op_profit": 40861657,
+      "op_profit_pct": 24.3
+    },
+    "3": {
+      "revenue": 161327945,
+      "food_cost": 34959056,
+      "food_cost_pct": 21.7,
+      "labor_cost": 45833717,
+      "labor_cost_pct": 28.4,
+      "ga_cost": 43601064,
+      "ga_cost_pct": 27.0,
+      "op_profit": 36934108,
+      "op_profit_pct": 22.9
+    },
+    "4": {
+      "revenue": 160798437,
+      "food_cost": 32299568,
+      "food_cost_pct": 20.1,
+      "labor_cost": 46813267,
+      "labor_cost_pct": 29.1,
+      "ga_cost": 44737459,
+      "ga_cost_pct": 27.8,
+      "op_profit": 36948143,
+      "op_profit_pct": 23.0
+    },
+    "5": {
+      "revenue": 193487013,
+      "food_cost": 41023773,
+      "food_cost_pct": 21.2,
+      "labor_cost": 52362842,
+      "labor_cost_pct": 27.1,
+      "ga_cost": 49258635,
+      "ga_cost_pct": 25.5,
+      "op_profit": 50841762,
+      "op_profit_pct": 26.3
+    },
+    "6": {
+      "revenue": 178255815,
+      "food_cost": 37651150,
+      "food_cost_pct": 21.1,
+      "labor_cost": 48449909,
+      "labor_cost_pct": 27.2,
+      "ga_cost": 47943133,
+      "ga_cost_pct": 26.9,
+      "op_profit": 44211622,
+      "op_profit_pct": 24.8
+    }
   }
 }
