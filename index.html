@@ -273,9 +273,9 @@ function render(month) {
     </div>
     <div class="card">
       <div class="label">사업 계획</div>
-      <div class="sub-value" style="margin-bottom:4px">진행 현황 매출 <span style="color:var(--text);font-weight:600">${cumActual.toLocaleString('ko-KR')}원</span></div>
-      <div class="sub-value" style="margin-bottom:6px">사업 계획 매출 <span style="color:var(--text);font-weight:600">${cumTarget.toLocaleString('ko-KR')}원</span></div>
-      <div class="delta ${diff2 >= 0 ? 'up' : 'dn'}">${diffStr2}</div>
+      <div class="value ${diff2 >= 0 ? 'up' : 'dn'}">${cumTarget.toLocaleString('ko-KR')}원</div>
+      <div class="sub-value" style="margin-top:4px">총 사업계획 (월간) ${monthTarget.toLocaleString('ko-KR')}원</div>
+      <div class="delta ${diff2 >= 0 ? 'up' : 'dn'}" style="margin-top:8px">${diffStr2}</div>
     </div>
     <div class="card">
       <div class="label">예상 달성률</div>
