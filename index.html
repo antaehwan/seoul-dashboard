@@ -642,7 +642,6 @@ function renderPnl() {
   const months = Object.entries(DATA.pnl).sort((a,b) => parseInt(a[0])-parseInt(b[0]));
   if (months.length === 0) { el.innerHTML = '<p style="color:var(--muted);font-size:13px">P&L 데이터 없음</p>'; return; }
 
-  // 상단 테이블
   const tableRows = months.map(([m, d]) => {
     const profitCls = d.op_profit >= 0 ? 'up' : 'dn';
     return `<tr>
@@ -650,83 +649,82 @@ function renderPnl() {
       <td>${fmtM(d.revenue)}</td>
       <td><span class="dn">${d.food_cost_pct}%</span></td>
       <td><span class="dn">${d.labor_cost_pct}%</span></td>
-      <td><span class="dn">${d.ga_cost_pct}%</span></td>
       <td><span class="${profitCls}" style="font-weight:700">${d.op_profit_pct}%</span></td>
     </tr>`;
   }).join('');
 
-  // SVG 4종 추이 차트
-  const series = [
-    { key: 'food_cost_pct',   label: '재료비',     color: '#ff6b6b' },
-    { key: 'labor_cost_pct',  label: '인건비',     color: '#ffd93d' },
-    { key: 'ga_cost_pct',     label: '일반관리비', color: '#6bcff6' },
-    { key: 'op_profit_pct',   label: '영업이익',   color: '#6bffb8' },
-  ];
-
-  const W = el.clientWidth || 700;
-  const H = 260;
-  const PAD = { t: 24, r: 20, b: 30, l: 44 };
-  const cW = W - PAD.l - PAD.r;
-  const cH = H - PAD.t - PAD.b;
-  const n = months.length;
-  const xS = i => PAD.l + (n > 1 ? i/(n-1)*cW : cW/2);
-
-  const allVals = series.flatMap(s => months.map(([,d]) => d[s.key]));
-  const maxV = Math.max(...allVals, 30);
-  const minV = Math.min(...allVals, 0);
-  const range = maxV - minV || 1;
-  const yS = v => PAD.t + cH - ((v - minV) / range * cH);
-
-  const lines = series.map(s => {
-    const pts = months.map(([,d], i) => `${i===0?'M':'L'}${xS(i).toFixed(1)},${yS(d[s.key]).toFixed(1)}`).join(' ');
-    const dots = months.map(([,d], i) =>
-      `<circle cx="${xS(i).toFixed(1)}" cy="${yS(d[s.key]).toFixed(1)}" r="3.5" fill="${s.color}"/>
-       <text x="${xS(i).toFixed(1)}" y="${(yS(d[s.key])-8).toFixed(1)}" text-anchor="middle" fill="${s.color}" font-size="9" font-weight="600">${d[s.key]}%</text>`
-    ).join('');
-    return `<path d="${pts}" fill="none" stroke="${s.color}" stroke-width="2"/>${dots}`;
-  }).join('');
-
-  const xLabels = months.map(([m,],i) =>
-    `<text x="${xS(i).toFixed(1)}" y="${H-6}" text-anchor="middle" fill="#7b7f93" font-size="10">${mNames[parseInt(m)-1]}</text>`
-  ).join('');
-
-  const yTicks = [0, 0.5, 1].map(r => {
-    const v = minV + range * r;
-    const y = yS(v).toFixed(1);
-    return `<line x1="${PAD.l}" x2="${PAD.l+cW}" y1="${y}" y2="${y}" stroke="#2a2d3a" stroke-width="1"/>
-            <text x="${PAD.l-4}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="#7b7f93" font-size="10">${v.toFixed(0)}%</text>`;
-  }).join('');
-
-  const legend = series.map((s, i) =>
-    `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:${s.color}">
-       <div style="width:16px;height:2px;background:${s.color};border-radius:1px"></div>${s.label}
-     </div>`
-  ).join('');
+  const labels = months.map(([m]) => mNames[parseInt(m)-1]);
+  const food   = months.map(([,d]) => d.food_cost_pct);
+  const labor  = months.map(([,d]) => d.labor_cost_pct);
+  const profit = months.map(([,d]) => d.op_profit_pct);
 
   el.innerHTML = `
     <div class="strat-card" style="padding:0;overflow:hidden">
       <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;min-width:500px">
+        <table style="width:100%;border-collapse:collapse;min-width:400px">
           <thead>
             <tr>
               <th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg)">월</th>
               <th style="padding:10px 12px;font-size:11px;color:var(--muted);font-weight:600;background:var(--bg);text-align:right">매출</th>
-              <th style="padding:10px 12px;font-size:11px;color:#ff6b6b;font-weight:600;background:var(--bg);text-align:right">재료비</th>
-              <th style="padding:10px 12px;font-size:11px;color:#ffd93d;font-weight:600;background:var(--bg);text-align:right">인건비</th>
-              <th style="padding:10px 12px;font-size:11px;color:#6bcff6;font-weight:600;background:var(--bg);text-align:right">일반관리비</th>
-              <th style="padding:10px 12px;font-size:11px;color:#6bffb8;font-weight:600;background:var(--bg);text-align:right">영업이익률</th>
+              <th style="padding:10px 12px;font-size:11px;color:#e34948;font-weight:600;background:var(--bg);text-align:right">재료비</th>
+              <th style="padding:10px 12px;font-size:11px;color:#eda100;font-weight:600;background:var(--bg);text-align:right">인건비</th>
+              <th style="padding:10px 12px;font-size:11px;color:#1baf7a;font-weight:600;background:var(--bg);text-align:right">영업이익률</th>
             </tr>
           </thead>
           <tbody style="font-size:13px">${tableRows}</tbody>
         </table>
       </div>
       <div style="padding:16px 20px;border-top:1px solid var(--border)">
-        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px">${legend}</div>
-        <svg width="100%" height="${H}" style="display:block">
-          ${yTicks}${xLabels}${lines}
-        </svg>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;font-size:11px;color:var(--muted)">
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#e34948;display:inline-block"></span>재료비</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#eda100;display:inline-block"></span>인건비</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#1baf7a;display:inline-block"></span>영업이익</span>
+        </div>
+        <div style="position:relative;width:100%;height:260px">
+          <canvas id="pnl-chart" role="img" aria-label="월별 재료비·인건비·영업이익 누적 막대 차트">재료비, 인건비, 영업이익 비율 추이</canvas>
+        </div>
       </div>
     </div>`;
+
+  if (window._pnlChartInst) { window._pnlChartInst.destroy(); }
+
+  function buildChart() {
+    if (!window.Chart) { setTimeout(buildChart, 100); return; }
+    if (!window.ChartDataLabels) { setTimeout(buildChart, 100); return; }
+    Chart.register(ChartDataLabels);
+    const ctx = document.getElementById('pnl-chart');
+    if (!ctx) return;
+    window._pnlChartInst = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label:'재료비',   data: food,   backgroundColor:'#e34948', borderRadius:{topLeft:0,topRight:0,bottomLeft:4,bottomRight:4}, borderSkipped:'top' },
+          { label:'인건비',   data: labor,  backgroundColor:'#eda100', borderRadius:0, borderSkipped:false },
+          { label:'영업이익', data: profit, backgroundColor:'#1baf7a', borderRadius:{topLeft:4,topRight:4,bottomLeft:0,bottomRight:0}, borderSkipped:'bottom' },
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          datalabels: {
+            color: '#fff',
+            font: { size: 11, weight: '600' },
+            formatter: v => v.toFixed(1) + '%',
+            display: ctx => ctx.dataset.data[ctx.dataIndex] >= 5
+          },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw.toFixed(1)}%` } }
+        },
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { color: '#7b7f93', font: { size: 12 } } },
+          y: { stacked: true, min: 0, max: 100, grid: { color: '#2a2d3a' }, ticks: { color: '#7b7f93', font: { size: 11 }, callback: v => v + '%' } }
+        }
+      }
+    });
+  }
+  buildChart();
 }
 
 function renderMonthlyHistory() {
@@ -861,5 +859,7 @@ function renderTable(days, today) {
 
 loadData();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 </body>
 </html>
