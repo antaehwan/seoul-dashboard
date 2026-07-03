@@ -132,6 +132,15 @@
     <div id="strategy-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px"></div>
   </section>
 
+  <!-- 월별 성과 히스토리 -->
+  <section id="monthly-history">
+    <h2>월별 성과 히스토리</h2>
+    <p class="sub">월별 목표 달성률 · 매출 실적 추이</p>
+    <div class="strat-card" style="margin-top:12px;padding:20px 24px">
+      <svg id="monthly-svg" width="100%" height="260"></svg>
+    </div>
+  </section>
+
   <!-- 일별 테이블 -->
   <section id="daily">
     <h2>일별 현황</h2>
@@ -197,6 +206,7 @@ function initMonthSelect() {
 
   sel.addEventListener('change', () => render(Number(sel.value)));
   render(defaultMonth);
+  renderMonthlyHistory();
 }
 
 function fmt(n) { return n ? Math.round(n).toLocaleString('ko-KR') : '-'; }
@@ -430,39 +440,77 @@ function renderStrategy(days, today) {
       </div>`;
     })()}
 
-    ${(() => {
-      // 월별 성과 히스토리
-      const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
-      const history = Object.entries(DATA.months)
-        .map(([m, mDays]) => {
-          const mActual = mDays.reduce((s,d)=>s+d.actual,0);
-          const mTarget = mDays.reduce((s,d)=>s+d.target,0);
-          const rate = mTarget > 0 ? (mActual/mTarget*100) : 0;
-          return { m: parseInt(m), name: monthNames[parseInt(m)-1], actual: mActual, target: mTarget, rate };
-        })
-        .filter(r => r.actual > 0)
-        .sort((a,b) => a.m - b.m);
-      if (history.length === 0) return '';
-      const maxRate = Math.max(...history.map(r=>r.rate));
-      return `<div class="strat-card">
-        <h3>📊 월별 성과 히스토리</h3>
-        ${history.map(r => {
-          const barW = Math.round(r.rate / Math.max(maxRate, 110) * 100);
-          const cls = r.rate >= 100 ? 'up' : r.rate >= 90 ? 'neutral' : 'dn';
-          return `<div style="margin-bottom:8px">
-            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
-              <span style="color:var(--muted)">${r.name}</span>
-              <span class="${cls}" style="font-weight:600">${r.rate.toFixed(1)}%</span>
-            </div>
-            <div style="background:var(--border);border-radius:3px;height:5px">
-              <div style="width:${barW}%;height:100%;border-radius:3px;background:${r.rate>=100?'var(--green)':r.rate>=90?'var(--yellow)':'var(--red)'}"></div>
-            </div>
-          </div>`;
-        }).join('')}
-        <p class="strat-tip">연간 최고 달성률: <strong>${history.reduce((a,b)=>a.rate>b.rate?a:b).name} ${history.reduce((a,b)=>a.rate>b.rate?a:b).rate.toFixed(1)}%</strong></p>
-      </div>`;
-    })()}
   `;
+}
+
+function renderMonthlyHistory() {
+  const svg = document.getElementById('monthly-svg');
+  if (!svg) return;
+  const mNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  const history = Object.entries(DATA.months)
+    .map(([m, mDays]) => {
+      const actual = mDays.reduce((s,d)=>s+d.actual,0);
+      const target = mDays.reduce((s,d)=>s+d.target,0);
+      const prev = mDays.reduce((s,d)=>s+d.prev_actual,0);
+      const rate = target > 0 ? actual/target*100 : 0;
+      return { m: parseInt(m), name: mNames[parseInt(m)-1], actual, target, prev, rate };
+    })
+    .sort((a,b) => a.m - b.m);
+
+  const W = svg.parentElement.clientWidth - 48;
+  const H = 220;
+  const PAD = { t: 30, r: 20, b: 50, l: 58 };
+  const cW = W - PAD.l - PAD.r;
+  const cH = H - PAD.t - PAD.b;
+  const n = history.length;
+  if (n === 0) return;
+
+  const maxVal = Math.max(...history.map(r => Math.max(r.actual, r.target, r.prev))) * 1.08;
+  const barW = Math.floor(cW / n * 0.55);
+  const gap = cW / n;
+
+  const xC = i => PAD.l + gap * i + gap / 2;
+  const yV = v => PAD.t + cH - (v / maxVal * cH);
+
+  const bars = history.map((r, i) => {
+    const cx = xC(i);
+    const hasActual = r.actual > 0;
+    const color = !hasActual ? 'var(--border)' : r.rate >= 100 ? 'var(--green)' : r.rate >= 90 ? 'var(--yellow)' : 'var(--red)';
+    const tH = Math.max(2, r.target / maxVal * cH);
+    const aH = hasActual ? Math.max(2, r.actual / maxVal * cH) : 0;
+    const pH = r.prev > 0 ? Math.max(2, r.prev / maxVal * cH) : 0;
+    const tY = yV(r.target);
+    const aY = hasActual ? yV(r.actual) : PAD.t + cH;
+    const pY = r.prev > 0 ? yV(r.prev) : PAD.t + cH;
+    const rateLbl = hasActual ? r.rate.toFixed(1)+'%' : '-';
+    const lblY = hasActual ? aY - 8 : tY - 8;
+    return `
+      <rect x="${cx - barW/2 - 1}" y="${tY}" width="${barW+2}" height="${tH}" fill="var(--border)" rx="3"/>
+      ${r.prev > 0 ? `<rect x="${cx - barW/2}" y="${pY}" width="${barW}" height="${pH}" fill="rgba(255,255,255,0.08)" rx="3"/>` : ''}
+      ${hasActual ? `<rect x="${cx - barW/2}" y="${aY}" width="${barW}" height="${aH}" fill="${color}" rx="3" opacity="0.9"/>` : ''}
+      <text x="${cx}" y="${PAD.t+cH+16}" text-anchor="middle" fill="#7b7f93" font-size="11">${r.name}</text>
+      <text x="${cx}" y="${lblY}" text-anchor="middle" fill="${hasActual ? '#fff' : '#7b7f93'}" font-size="10" font-weight="600">${rateLbl}</text>`;
+  }).join('');
+
+  const yTicks = [0, 0.25, 0.5, 0.75, 1].map(r => {
+    const v = maxVal * r;
+    const y = yV(v).toFixed(1);
+    return `<line x1="${PAD.l}" x2="${PAD.l+cW}" y1="${y}" y2="${y}" stroke="#2a2d3a" stroke-width="1"/>
+            <text x="${PAD.l-6}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="#7b7f93" font-size="10">${fmtM(v)}</text>`;
+  }).join('');
+
+  const legend = `
+    <rect x="${PAD.l}" y="${H-14}" width="10" height="4" fill="var(--border)" rx="2"/>
+    <text x="${PAD.l+14}" y="${H-10}" fill="#7b7f93" font-size="10">목표</text>
+    <rect x="${PAD.l+44}" y="${H-14}" width="10" height="4" fill="rgba(255,255,255,0.15)" rx="2"/>
+    <text x="${PAD.l+58}" y="${H-10}" fill="#7b7f93" font-size="10">전년</text>
+    <rect x="${PAD.l+90}" y="${H-14}" width="10" height="4" fill="var(--green)" rx="2"/>
+    <text x="${PAD.l+104}" y="${H-10}" fill="#7b7f93" font-size="10">달성</text>
+    <rect x="${PAD.l+130}" y="${H-14}" width="10" height="4" fill="var(--red)" rx="2"/>
+    <text x="${PAD.l+144}" y="${H-10}" fill="#7b7f93" font-size="10">미달</text>`;
+
+  svg.setAttribute('height', H);
+  svg.innerHTML = yTicks + bars + legend;
 }
 
 function renderTable(days, today) {
