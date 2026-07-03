@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>호우섬 서울역 매출현황</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --border: #2a2d3a;
+    --text: #e8eaf0;
+    --muted: #7b7f93;
+    --accent: #6c8fff;
+    --green: #4caf7d;
+    --red: #f06060;
+    --yellow: #f0b429;
+    --font: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.5; }
+  a { color: inherit; text-decoration: none; }
+
+  /* Layout */
+  header { padding: 20px 24px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .header-title { flex: 1; }
+  .header-title h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+  .header-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+  .badge { font-size: 11px; color: var(--muted); background: var(--card); border: 1px solid var(--border); padding: 2px 8px; border-radius: 20px; }
+  .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  select { background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 13px; cursor: pointer; outline: none; }
+  select:hover { border-color: var(--accent); }
+
+  nav { padding: 0 24px; border-bottom: 1px solid var(--border); display: flex; gap: 0; }
+  nav a { padding: 10px 16px; font-size: 13px; color: var(--muted); border-bottom: 2px solid transparent; transition: all .15s; }
+  nav a.active, nav a:hover { color: var(--text); border-color: var(--accent); }
+
+  main { padding: 20px 24px; max-width: 1100px; margin: 0 auto; }
+  section { margin-bottom: 32px; }
+  section h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  section .sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+
+  /* Cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .card .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .card .value { font-size: 26px; font-weight: 700; letter-spacing: -1px; }
+  .card .sub-value { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .card .delta { font-size: 13px; font-weight: 600; margin-top: 4px; }
+  .up { color: var(--green); }
+  .dn { color: var(--red); }
+  .neutral { color: var(--muted); }
+
+  /* Bar chart */
+  .chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; overflow-x: auto; }
+  .bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 180px; min-width: 600px; }
+  .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; height: 100%; justify-content: flex-end; }
+  .bars { display: flex; gap: 2px; align-items: flex-end; width: 100%; }
+  .bar { flex: 1; border-radius: 3px 3px 0 0; min-height: 2px; transition: opacity .2s; }
+  .bar:hover { opacity: .8; }
+  .bar-target { background: var(--border); }
+  .bar-actual { background: var(--accent); }
+  .bar-actual.achieved { background: var(--green); }
+  .bar-actual.nodata { background: var(--border); opacity: .3; }
+  .bar-label { font-size: 9px; color: var(--muted); margin-top: 4px; text-align: center; }
+  .bar-legend { display: flex; gap: 16px; margin-bottom: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+  /* Table */
+  .table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 600px; }
+  thead th { background: var(--bg); padding: 10px 12px; font-size: 11px; font-weight: 600; color: var(--muted); text-align: right; letter-spacing: .3px; white-space: nowrap; }
+  thead th:first-child { text-align: left; }
+  tbody tr { border-top: 1px solid var(--border); transition: background .1s; }
+  tbody tr:hover { background: rgba(255,255,255,.03); }
+  tbody td { padding: 8px 12px; text-align: right; font-size: 13px; white-space: nowrap; }
+  tbody td:first-child { text-align: left; color: var(--muted); font-size: 12px; }
+  .ach-bar { display: inline-block; height: 4px; border-radius: 2px; margin-left: 6px; vertical-align: middle; }
+  tfoot td { background: rgba(108,143,255,.08); font-weight: 700; font-size: 13px; padding: 10px 12px; text-align: right; border-top: 2px solid var(--border); }
+  tfoot td:first-child { text-align: left; }
+
+  /* Trend chart */
+  .trend-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; overflow-x: auto; }
+  svg text { font-family: var(--font); }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    header, main { padding: 14px 16px; }
+    nav { padding: 0 16px; }
+    .cards { grid-template-columns: 1fr 1fr; }
+    .card .value { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">
+    <h1>🍜 호우섬 서울역 매출현황</h1>
+    <div class="header-meta">
+      <span class="badge" id="badge-store">4018 · 서울역</span>
+      <span class="badge" id="badge-date">—</span>
+      <span class="badge">SRC · 엑셀 매출데이터</span>
+      <span class="badge">일 1회 수동 갱신</span>
+    </div>
+  </div>
+  <div class="controls">
+    <select id="month-select"></select>
+  </div>
+</header>
+
+<nav>
+  <a href="#summary" class="active">요약</a>
+  <a href="#daily">일별 현황</a>
+  <a href="#trend">추세</a>
+</nav>
+
+<main>
+  <!-- 요약 -->
+  <section id="summary">
+    <h2>전체 현황 요약</h2>
+    <p class="sub" id="summary-sub">—</p>
+    <div class="cards" id="summary-cards"></div>
+  </section>
+
+  <!-- 매출 차트 -->
+  <section>
+    <h2>일별 매출 추이</h2>
+    <p class="sub" id="chart-sub">목표 vs 실적</p>
+    <div class="chart-wrap">
+      <div class="bar-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--border)"></div> 목표</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> 실적</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> 목표 달성</div>
+      </div>
+      <div class="bar-chart" id="bar-chart"></div>
+    </div>
+  </section>
+
+  <!-- 일별 테이블 -->
+  <section id="daily">
+    <h2>일별 현황</h2>
+    <p class="sub">날짜별 목표·실적·달성률·전년비</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>날짜</th>
+            <th>목표</th>
+            <th>실적</th>
+            <th>달성률</th>
+            <th>객수</th>
+            <th>객단가</th>
+            <th>홀</th>
+            <th>배달/포장</th>
+            <th>전년 실적</th>
+            <th>YoY</th>
+          </tr>
+        </thead>
+        <tbody id="daily-tbody"></tbody>
+        <tfoot id="daily-tfoot"></tfoot>
+      </table>
+    </div>
+  </section>
+
+  <!-- 추세 -->
+  <section id="trend">
+    <h2>전년 대비 추세</h2>
+    <p class="sub">당월 누적 매출 vs 전년 동기</p>
+    <div class="trend-wrap">
+      <svg id="trend-svg" width="100%" height="220"></svg>
+    </div>
+  </section>
+</main>
+
+<footer style="text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border)">
+  추정값 · 일별 목표 = cloudpos 등록 목표 · 달성률 = Σ실적 ÷ Σ목표
+</footer>
+
+<script>
+let DATA = null;
+let currentMonth = null;
+
+async function loadData() {
+  const res = await fetch('data/data.json');
+  DATA = await res.json();
+  document.getElementById('badge-date').textContent = 'DATA · ' + DATA.updated_at;
+  initMonthSelect();
+}
+
+function initMonthSelect() {
+  const sel = document.getElementById('month-select');
+  const months = Object.keys(DATA.months).map(Number).sort((a,b)=>a-b);
+  const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+
+  // 기본값: 데이터가 있는 가장 최근 월
+  const today = new Date();
+  let defaultMonth = today.getMonth() + 1;
+  if (!DATA.months[String(defaultMonth)]) defaultMonth = months[months.length - 1];
+
+  months.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = monthNames[m-1];
+    if (m === defaultMonth) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  sel.addEventListener('change', () => render(Number(sel.value)));
+  render(defaultMonth);
+}
+
+function fmt(n) { return n ? Math.round(n).toLocaleString('ko-KR') : '-'; }
+function fmtM(n) { return n >= 1e8 ? (n/1e8).toFixed(2)+'억' : n >= 1e4 ? (n/1e4).toFixed(0)+'만' : fmt(n); }
+function pct(a, b) { return b ? Math.round(a/b*100) : 0; }
+function yoy(cur, prev) { if (!prev) return null; return Math.round((cur-prev)/prev*100); }
+function colorPct(p) { return p >= 100 ? 'up' : p >= 90 ? 'neutral' : 'dn'; }
+function colorYoy(y) { return y > 0 ? 'up' : y < 0 ? 'dn' : 'neutral'; }
+function signStr(n) { return n > 0 ? '▲'+n+'%' : n < 0 ? '▼'+Math.abs(n)+'%' : '-'; }
+
+function render(month) {
+  currentMonth = month;
+  const days = DATA.months[String(month)] || [];
+  const today = new Date().toISOString().slice(0,10);
+
+  // 실적 있는 일자만 (actual > 0)
+  const withData = days.filter(d => d.actual > 0 && d.date <= today);
+  const dataCount = withData.length;
+  const totalDays = days.length;
+
+  const cumActual = withData.reduce((s,d) => s+d.actual, 0);
+  const cumTarget = withData.reduce((s,d) => s+d.target, 0);
+  const monthTarget = days.reduce((s,d) => s+d.target, 0);
+
+  // 예상 달성률: 현재 일평균으로 월말 예측
+  const dailyAvg = dataCount > 0 ? cumActual / dataCount : 0;
+  const projected = dailyAvg * totalDays;
+  const projectedAch = monthTarget > 0 ? Math.round(projected / monthTarget * 100) : 0;
+  const curAch = pct(cumActual, cumTarget);
+
+  const cumPrevActual = withData.reduce((s,d) => s+d.prev_actual, 0);
+  const yoyVal = yoy(cumActual, cumPrevActual);
+
+  const cumCount = withData.reduce((s,d) => s+d.count, 0);
+  const avgSpend = cumCount > 0 ? Math.round(cumActual / cumCount) : 0;
+
+  // sub text
+  const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  const mName = monthNames[month-1];
+  const dateRange = dataCount > 0 ? `${mName} (${withData[0].date.slice(5)} ~ ${withData[withData.length-1].date.slice(5)})` : mName;
+  document.getElementById('summary-sub').textContent = `매일 아침 5초 파악 · ${dateRange}`;
+  document.getElementById('chart-sub').textContent = `${mName} · 일별`;
+
+  // Cards
+  const cards = [
+    {
+      label: '당월 누적 매출',
+      value: fmtM(cumActual),
+      sub: `목표 ${fmtM(monthTarget)}`,
+      delta: yoyVal !== null ? `전년 ${signStr(yoyVal)}` : null,
+      cls: yoyVal !== null ? colorYoy(yoyVal) : ''
+    },
+    {
+      label: '목표 달성률',
+      value: curAch + '%',
+      sub: `Σ실적 ÷ Σ목표 (${dataCount}일)`,
+      delta: null, cls: colorPct(curAch)
+    },
+    {
+      label: '예상 달성률',
+      value: projectedAch + '%',
+      sub: `월말 예상 ${fmtM(Math.round(projected))}`,
+      delta: null, cls: colorPct(projectedAch)
+    },
+    {
+      label: '객수 / 객단가',
+      value: cumCount.toLocaleString('ko-KR') + '명',
+      sub: `객단가 ${fmt(avgSpend)}원`,
+      delta: null, cls: ''
+    },
+  ];
+
+  const cardEl = document.getElementById('summary-cards');
+  cardEl.innerHTML = cards.map(c => `
+    <div class="card">
+      <div class="label">${c.label}</div>
+      <div class="value ${c.cls}">${c.value}</div>
+      <div class="sub-value">${c.sub}</div>
+      ${c.delta ? `<div class="delta ${c.cls}">${c.delta}</div>` : ''}
+    </div>
+  `).join('');
+
+  renderBarChart(days, today);
+  renderTable(days, today);
+  renderTrend(days, today);
+}
+
+function renderBarChart(days, today) {
+  const maxVal = Math.max(...days.map(d => Math.max(d.target, d.actual)));
+  const H = 160;
+  const chartEl = document.getElementById('bar-chart');
+  chartEl.innerHTML = days.map(d => {
+    const hasData = d.actual > 0 && d.date <= today;
+    const tH = Math.round((d.target / maxVal) * H);
+    const aH = hasData ? Math.round((d.actual / maxVal) * H) : 4;
+    const achClass = hasData ? (d.actual >= d.target ? 'achieved' : '') : 'nodata';
+    const dayNum = d.date.slice(8);
+    return `
+      <div class="bar-group" title="${d.date} 목표:${fmt(d.target)} 실적:${hasData ? fmt(d.actual) : '-'}">
+        <div class="bars">
+          <div class="bar bar-target" style="height:${tH}px"></div>
+          <div class="bar bar-actual ${achClass}" style="height:${aH}px"></div>
+        </div>
+        <div class="bar-label">${dayNum}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderTable(days, today) {
+  const tbody = document.getElementById('daily-tbody');
+  const tfoot = document.getElementById('daily-tfoot');
+  const weekdays = ['일','월','화','수','목','금','토'];
+
+  let sumTarget=0, sumActual=0, sumPrev=0, sumCount=0, sumL=0, sumD=0;
+
+  tbody.innerHTML = days.map(d => {
+    const hasData = d.actual > 0 && d.date <= today;
+    if (hasData) { sumTarget+=d.target; sumActual+=d.actual; sumPrev+=d.prev_actual; sumCount+=d.count; sumL+=d.sales_l; sumD+=d.sales_d; }
+
+    const achPct = hasData ? pct(d.actual, d.target) : null;
+    const yoyV = hasData ? yoy(d.actual, d.prev_actual) : null;
+    const wd = new Date(d.date).getDay();
+    const wdStr = weekdays[wd];
+    const isWeekend = wd === 0 || wd === 6;
+    const achColor = achPct !== null ? (achPct >= 100 ? 'var(--green)' : achPct >= 90 ? 'var(--yellow)' : 'var(--red)') : 'var(--border)';
+
+    return `<tr>
+      <td>${d.date.slice(5)} <span style="color:${isWeekend?'var(--accent)':'var(--muted)'}">${wdStr}</span></td>
+      <td>${fmt(d.target)}</td>
+      <td>${hasData ? fmt(d.actual) : '<span style="color:var(--border)">-</span>'}</td>
+      <td>
+        ${achPct !== null ? `<span class="${colorPct(achPct)}">${achPct}%</span><span class="ach-bar" style="width:${Math.min(achPct,120)}px;background:${achColor}"></span>` : '-'}
+      </td>
+      <td>${hasData ? d.count.toLocaleString() : '-'}</td>
+      <td>${hasData ? fmt(d.avg_spend) : '-'}</td>
+      <td>${hasData ? fmtM(d.sales_l) : '-'}</td>
+      <td>${hasData ? fmtM(d.sales_d) : '-'}</td>
+      <td>${d.prev_actual ? fmt(d.prev_actual) : '-'}</td>
+      <td>${yoyV !== null ? `<span class="${colorYoy(yoyV)}">${signStr(yoyV)}</span>` : '-'}</td>
+    </tr>`;
+  }).join('');
+
+  const totalAch = pct(sumActual, sumTarget);
+  const totalYoy = yoy(sumActual, sumPrev);
+  tfoot.innerHTML = `<tr>
+    <td>누계</td>
+    <td>${fmt(sumTarget)}</td>
+    <td>${fmt(sumActual)}</td>
+    <td class="${colorPct(totalAch)}">${totalAch}%</td>
+    <td>${sumCount.toLocaleString()}</td>
+    <td>${sumCount > 0 ? fmt(Math.round(sumActual/sumCount)) : '-'}</td>
+    <td>${fmtM(sumL)}</td>
+    <td>${fmtM(sumD)}</td>
+    <td>${fmt(sumPrev)}</td>
+    <td class="${totalYoy !== null ? colorYoy(totalYoy) : ''}">${totalYoy !== null ? signStr(totalYoy) : '-'}</td>
+  </tr>`;
+}
+
+function renderTrend(days, today) {
+  const svg = document.getElementById('trend-svg');
+  const W = svg.parentElement.clientWidth - 32;
+  const H = 200;
+  const PAD = { t: 20, r: 20, b: 30, l: 50 };
+  const cW = W - PAD.l - PAD.r;
+  const cH = H - PAD.t - PAD.b;
+
+  const withData = days.filter(d => d.actual > 0 && d.date <= today);
+  if (withData.length === 0) { svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="#7b7f93" font-size="13">데이터 없음</text>'; return; }
+
+  // 누적 actual vs prev
+  let cumA = 0, cumP = 0;
+  const points26 = [], points25 = [];
+  withData.forEach((d, i) => {
+    cumA += d.actual;
+    cumP += d.prev_actual;
+    points26.push({ x: i, v: cumA });
+    points25.push({ x: i, v: cumP });
+  });
+
+  const maxV = Math.max(...points26.map(p=>p.v), ...points25.map(p=>p.v));
+  const n = withData.length;
+  const xScale = i => PAD.l + (n > 1 ? i / (n-1) * cW : cW/2);
+  const yScale = v => PAD.t + cH - (v / maxV) * cH;
+
+  const toPath = pts => pts.map((p,i) => `${i===0?'M':'L'}${xScale(p.x).toFixed(1)},${yScale(p.v).toFixed(1)}`).join(' ');
+
+  const labels = withData.map((d,i) => {
+    if (n <= 10 || i % Math.ceil(n/8) === 0 || i === n-1) {
+      return `<text x="${xScale(i).toFixed(1)}" y="${H-6}" text-anchor="middle" fill="#7b7f93" font-size="10">${d.date.slice(8)}</text>`;
+    }
+    return '';
+  }).join('');
+
+  const yTicks = [0, 0.25, 0.5, 0.75, 1].map(r => {
+    const v = Math.round(maxV * r);
+    const y = yScale(v).toFixed(1);
+    return `<line x1="${PAD.l}" x2="${W - PAD.r}" y1="${y}" y2="${y}" stroke="#2a2d3a" stroke-width="1"/>
+            <text x="${PAD.l-6}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="#7b7f93" font-size="10">${fmtM(v)}</text>`;
+  }).join('');
+
+  svg.setAttribute('height', H);
+  svg.innerHTML = `
+    ${yTicks}
+    ${labels}
+    <path d="${toPath(points25)}" fill="none" stroke="#3a3d4a" stroke-width="2" stroke-dasharray="4,3"/>
+    <path d="${toPath(points26)}" fill="none" stroke="#6c8fff" stroke-width="2.5"/>
+    ${points26.map((p,i) => i===points26.length-1 ? `<circle cx="${xScale(p.x)}" cy="${yScale(p.v)}" r="4" fill="#6c8fff"/>` : '').join('')}
+    <text x="${xScale(n-1)}" y="${yScale(points26[n-1].v)-10}" text-anchor="middle" fill="#6c8fff" font-size="11" font-weight="600">${fmtM(points26[n-1].v)}</text>
+    <text x="${W-PAD.r}" y="${PAD.t+12}" text-anchor="end" fill="#6c8fff" font-size="11">── 26Y</text>
+    <text x="${W-PAD.r}" y="${PAD.t+26}" text-anchor="end" fill="#3a3d4a" font-size="11">- - 25Y</text>
+  `;
+}
+
+loadData();
+</script>
+</body>
+</html>
