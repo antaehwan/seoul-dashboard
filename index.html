@@ -53,21 +53,19 @@
   .dn { color: var(--red); }
   .neutral { color: var(--muted); }
 
-  /* Bar chart */
-  .chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; overflow-x: auto; }
-  .bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 180px; min-width: 600px; }
-  .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; height: 100%; justify-content: flex-end; }
-  .bars { display: flex; gap: 2px; align-items: flex-end; width: 100%; }
-  .bar { flex: 1; border-radius: 3px 3px 0 0; min-height: 2px; transition: opacity .2s; }
-  .bar:hover { opacity: .8; }
-  .bar-target { background: var(--border); }
-  .bar-actual { background: var(--accent); }
-  .bar-actual.achieved { background: var(--green); }
-  .bar-actual.nodata { background: var(--border); opacity: .3; }
-  .bar-label { font-size: 9px; color: var(--muted); margin-top: 4px; text-align: center; }
-  .bar-legend { display: flex; gap: 16px; margin-bottom: 10px; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
-  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  /* Strategy cards */
+  .strat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .strat-card h3 { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+  .strat-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .strat-row:last-child { border-bottom: none; }
+  .strat-label { color: var(--muted); }
+  .strat-val { font-weight: 600; color: #fff; }
+  .strat-badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .badge-warn { background: rgba(255,193,7,.15); color: #ffc107; }
+  .badge-ok { background: rgba(76,175,80,.15); color: var(--green); }
+  .badge-danger { background: rgba(240,96,96,.15); color: var(--red); }
+  .strat-tip { font-size: 12px; color: var(--muted); line-height: 1.6; margin-top: 6px; }
+  .strat-tip strong { color: #fff; }
 
   /* Table */
   .table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; overflow-x: auto; }
@@ -127,17 +125,11 @@
   </section>
 
   <!-- 매출 차트 -->
-  <section>
-    <h2>일별 매출 추이</h2>
-    <p class="sub" id="chart-sub">목표 vs 실적</p>
-    <div class="chart-wrap">
-      <div class="bar-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:var(--border)"></div> 목표</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> 실적</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> 목표 달성</div>
-      </div>
-      <div class="bar-chart" id="bar-chart"></div>
-    </div>
+  <!-- 전략 분석 -->
+  <section id="strategy">
+    <h2>전략 분석</h2>
+    <p class="sub">데이터 기반 이상 탐지 · 추세 · 전략 제안</p>
+    <div id="strategy-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px"></div>
   </section>
 
   <!-- 일별 테이블 -->
@@ -168,14 +160,6 @@
     </div>
   </section>
 
-  <!-- 추세 -->
-  <section id="trend">
-    <h2>전년 대비 추세</h2>
-    <p class="sub">당월 누적 매출 vs 전년 동기</p>
-    <div class="trend-wrap">
-      <svg id="trend-svg" width="100%" height="220"></svg>
-    </div>
-  </section>
 </main>
 
 <footer style="text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border)">
@@ -309,30 +293,94 @@ function render(month) {
     </div>
   `;
 
-  renderBarChart(days, today);
+  renderStrategy(days, today);
   renderTable(days, today);
-  renderTrend(days, today);
 }
 
-function renderBarChart(days, today) {
-  const maxVal = Math.max(...days.map(d => Math.max(d.target, d.actual)));
-  const H = 160;
-  const chartEl = document.getElementById('bar-chart');
-  chartEl.innerHTML = days.map(d => {
-    const hasData = d.actual > 0 && d.date <= today;
-    const tH = Math.round((d.target / maxVal) * H);
-    const aH = hasData ? Math.round((d.actual / maxVal) * H) : 4;
-    const achClass = hasData ? (d.actual >= d.target ? 'achieved' : '') : 'nodata';
-    const dayNum = d.date.slice(8);
-    return `
-      <div class="bar-group" title="${d.date} 목표:${fmt(d.target)} 실적:${hasData ? fmt(d.actual) : '-'}">
-        <div class="bars">
-          <div class="bar bar-target" style="height:${tH}px"></div>
-          <div class="bar bar-actual ${achClass}" style="height:${aH}px"></div>
-        </div>
-        <div class="bar-label">${dayNum}</div>
-      </div>`;
-  }).join('');
+function renderStrategy(days, today) {
+  const el = document.getElementById('strategy-grid');
+  const done = days.filter(d => d.actual > 0 && d.date <= today);
+  if (done.length === 0) { el.innerHTML = '<p style="color:var(--muted);font-size:13px">실적 데이터 없음</p>'; return; }
+
+  const monthTarget = days.reduce((s,d) => s+d.target, 0);
+  const cumActual = done.reduce((s,d) => s+d.actual, 0);
+  const cumTarget = done.reduce((s,d) => s+d.target, 0);
+  const remaining = days.filter(d => d.date > today);
+  const remainTarget = remaining.reduce((s,d) => s+d.target, 0);
+  const pace = cumTarget > 0 ? cumActual / cumTarget : 0;
+  const projected = Math.round(monthTarget * pace);
+  const avgDaily = Math.round(cumActual / done.length);
+
+  // 요일별 평균 달성률
+  const wdNames = ['일','월','화','수','목','금','토'];
+  const wdMap = {};
+  done.forEach(d => {
+    const w = new Date(d.date).getDay();
+    if (!wdMap[w]) wdMap[w] = { sum: 0, cnt: 0 };
+    wdMap[w].sum += d.target > 0 ? d.actual / d.target : 0;
+    wdMap[w].cnt++;
+  });
+  const wdRates = Object.entries(wdMap).map(([w, v]) => ({ w: parseInt(w), rate: v.sum / v.cnt }));
+  wdRates.sort((a,b) => b.rate - a.rate);
+  const bestDay = wdRates[0];
+  const worstDay = wdRates[wdRates.length - 1];
+
+  // 이상 탐지: 목표 대비 ±25% 이상 벗어난 날
+  const anomalies = done.filter(d => d.target > 0 && Math.abs(d.actual - d.target) / d.target > 0.25);
+  const over = anomalies.filter(d => d.actual > d.target);
+  const under = anomalies.filter(d => d.actual < d.target);
+
+  // 전일 대비 추세 (마지막 3일)
+  const last3 = done.slice(-3);
+  let trendStr = '-', trendClass = '';
+  if (last3.length >= 2) {
+    const rates = last3.map(d => d.target > 0 ? d.actual/d.target : 0);
+    const rising = rates.every((r,i) => i === 0 || r >= rates[i-1]);
+    const falling = rates.every((r,i) => i === 0 || r <= rates[i-1]);
+    trendStr = rising ? '상승 중' : falling ? '하락 중' : '혼조';
+    trendClass = rising ? 'badge-ok' : falling ? 'badge-danger' : 'badge-warn';
+  }
+
+  // 목표 달성을 위해 남은 기간 필요 일평균
+  const needAvg = remaining.length > 0 ? Math.round((monthTarget - cumActual) / remaining.length) : 0;
+  const needVsAvg = avgDaily > 0 ? ((needAvg - avgDaily) / avgDaily * 100).toFixed(1) : null;
+
+  el.innerHTML = `
+    <div class="strat-card">
+      <h3>📈 페이스 분석</h3>
+      <div class="strat-row"><span class="strat-label">현재 페이스</span><span class="strat-val ${pace>=1?'up':'dn'}">${(pace*100).toFixed(1)}%</span></div>
+      <div class="strat-row"><span class="strat-label">월말 예상 매출</span><span class="strat-val">${fmtM(projected)}</span></div>
+      <div class="strat-row"><span class="strat-label">월 사업계획</span><span class="strat-val">${fmtM(monthTarget)}</span></div>
+      <div class="strat-row"><span class="strat-label">최근 3일 추세</span><span class="strat-badge ${trendClass}">${trendStr}</span></div>
+    </div>
+    <div class="strat-card">
+      <h3>🎯 목표 달성 전략</h3>
+      <div class="strat-row"><span class="strat-label">현재 일평균 매출</span><span class="strat-val">${fmtM(avgDaily)}</span></div>
+      <div class="strat-row"><span class="strat-label">잔여 일수</span><span class="strat-val">${remaining.length}일</span></div>
+      <div class="strat-row"><span class="strat-label">필요 일평균</span><span class="strat-val ${needAvg > avgDaily ? 'dn' : 'up'}">${fmtM(needAvg)}</span></div>
+      ${needVsAvg !== null ? `<p class="strat-tip">목표 달성을 위해 현재 대비 <strong>${needVsAvg > 0 ? '+' : ''}${needVsAvg}%</strong> 더 높은 일평균이 필요합니다.</p>` : ''}
+    </div>
+    <div class="strat-card">
+      <h3>📅 요일별 패턴</h3>
+      ${wdRates.map(w => `
+        <div class="strat-row">
+          <span class="strat-label">${wdNames[w.w]}요일</span>
+          <span class="strat-val ${w.rate >= 1 ? 'up' : w.rate >= 0.9 ? '' : 'dn'}">${(w.rate*100).toFixed(1)}%</span>
+        </div>`).join('')}
+      ${bestDay ? `<p class="strat-tip"><strong>${wdNames[bestDay.w]}요일</strong>이 가장 강한 요일, <strong>${wdNames[worstDay.w]}요일</strong>이 가장 약한 요일입니다.</p>` : ''}
+    </div>
+    <div class="strat-card">
+      <h3>⚠️ 이상 탐지</h3>
+      ${anomalies.length === 0
+        ? '<p class="strat-tip" style="margin-top:0">이상 일자 없음 (±25% 기준)</p>'
+        : `
+          ${over.length > 0 ? `<div class="strat-row"><span class="strat-label">초과 달성일</span><span class="strat-badge badge-ok">${over.map(d=>d.date.slice(5)).join(', ')}</span></div>` : ''}
+          ${under.length > 0 ? `<div class="strat-row"><span class="strat-label">미달 일자</span><span class="strat-badge badge-danger">${under.map(d=>d.date.slice(5)).join(', ')}</span></div>` : ''}
+          <p class="strat-tip">미달 일자의 원인(날씨·행사·운영)을 파악해 반복 방지 전략이 필요합니다.</p>`
+      }
+      <div class="strat-row" style="margin-top:8px"><span class="strat-label">전년 대비 누적</span><span class="strat-val ${done.reduce((s,d)=>s+d.actual,0) >= done.reduce((s,d)=>s+d.prev_actual,0)?'up':'dn'}">${signStr(yoy(done.reduce((s,d)=>s+d.actual,0), done.reduce((s,d)=>s+d.prev_actual,0)))}</span></div>
+    </div>
+  `;
 }
 
 function renderTable(days, today) {
@@ -389,60 +437,6 @@ function renderTable(days, today) {
   </tr>`;
 }
 
-function renderTrend(days, today) {
-  const svg = document.getElementById('trend-svg');
-  const W = svg.parentElement.clientWidth - 32;
-  const H = 200;
-  const PAD = { t: 20, r: 20, b: 30, l: 50 };
-  const cW = W - PAD.l - PAD.r;
-  const cH = H - PAD.t - PAD.b;
-
-  const withData = days.filter(d => d.actual > 0 && d.date <= today);
-  if (withData.length === 0) { svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="#7b7f93" font-size="13">데이터 없음</text>'; return; }
-
-  // 누적 actual vs prev
-  let cumA = 0, cumP = 0;
-  const points26 = [], points25 = [];
-  withData.forEach((d, i) => {
-    cumA += d.actual;
-    cumP += d.prev_actual;
-    points26.push({ x: i, v: cumA });
-    points25.push({ x: i, v: cumP });
-  });
-
-  const maxV = Math.max(...points26.map(p=>p.v), ...points25.map(p=>p.v));
-  const n = withData.length;
-  const xScale = i => PAD.l + (n > 1 ? i / (n-1) * cW : cW/2);
-  const yScale = v => PAD.t + cH - (v / maxV) * cH;
-
-  const toPath = pts => pts.map((p,i) => `${i===0?'M':'L'}${xScale(p.x).toFixed(1)},${yScale(p.v).toFixed(1)}`).join(' ');
-
-  const labels = withData.map((d,i) => {
-    if (n <= 10 || i % Math.ceil(n/8) === 0 || i === n-1) {
-      return `<text x="${xScale(i).toFixed(1)}" y="${H-6}" text-anchor="middle" fill="#7b7f93" font-size="10">${d.date.slice(8)}</text>`;
-    }
-    return '';
-  }).join('');
-
-  const yTicks = [0, 0.25, 0.5, 0.75, 1].map(r => {
-    const v = Math.round(maxV * r);
-    const y = yScale(v).toFixed(1);
-    return `<line x1="${PAD.l}" x2="${W - PAD.r}" y1="${y}" y2="${y}" stroke="#2a2d3a" stroke-width="1"/>
-            <text x="${PAD.l-6}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="#7b7f93" font-size="10">${fmtM(v)}</text>`;
-  }).join('');
-
-  svg.setAttribute('height', H);
-  svg.innerHTML = `
-    ${yTicks}
-    ${labels}
-    <path d="${toPath(points25)}" fill="none" stroke="#3a3d4a" stroke-width="2" stroke-dasharray="4,3"/>
-    <path d="${toPath(points26)}" fill="none" stroke="#6c8fff" stroke-width="2.5"/>
-    ${points26.map((p,i) => i===points26.length-1 ? `<circle cx="${xScale(p.x)}" cy="${yScale(p.v)}" r="4" fill="#6c8fff"/>` : '').join('')}
-    <text x="${xScale(n-1)}" y="${yScale(points26[n-1].v)-10}" text-anchor="middle" fill="#6c8fff" font-size="11" font-weight="600">${fmtM(points26[n-1].v)}</text>
-    <text x="${W-PAD.r}" y="${PAD.t+12}" text-anchor="end" fill="#6c8fff" font-size="11">── 26Y</text>
-    <text x="${W-PAD.r}" y="${PAD.t+26}" text-anchor="end" fill="#3a3d4a" font-size="11">- - 25Y</text>
-  `;
-}
 
 loadData();
 </script>
