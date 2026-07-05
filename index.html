@@ -868,7 +868,10 @@ function renderPmix(month) {
         ${qtyRows}
       </div>
       <div class="strat-card">
-        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px">🧮 예상 이론원가</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;font-weight:600;color:var(--muted)">🧮 예상 이론원가</span>
+          ${avgPct ? `<span style="font-size:12px;font-weight:700;color:var(--accent)">평균 ${avgPct}%</span>` : ''}
+        </div>
         ${theoryCostRows}
       </div>
     </div>`;
