@@ -653,12 +653,13 @@ function renderPnl() {
 
   const tableRows = months.map(([m, d]) => {
     const profitCls = d.op_profit >= 0 ? 'up' : 'dn';
+    const won = v => v.toLocaleString('ko-KR') + '원';
     return `<tr>
       <td style="text-align:left;color:var(--muted)">${mNames[parseInt(m)-1]}</td>
       <td>${fmtM(d.revenue)}</td>
-      <td><span class="dn">${d.food_cost_pct}%</span></td>
-      <td><span class="dn">${d.labor_cost_pct}%</span></td>
-      <td><span class="${profitCls}" style="font-weight:700">${d.op_profit_pct}%</span></td>
+      <td><span class="dn">${d.food_cost_pct}%</span><br><span style="font-size:11px;color:var(--muted)">${won(d.food_cost)}</span></td>
+      <td><span class="dn">${d.labor_cost_pct}%</span><br><span style="font-size:11px;color:var(--muted)">${won(d.labor_cost)}</span></td>
+      <td><span class="${profitCls}" style="font-weight:700">${d.op_profit_pct}%</span><br><span style="font-size:11px;color:var(--muted)">${won(d.op_profit)}</span></td>
     </tr>`;
   }).join('');
 
