@@ -127,31 +127,31 @@ def parse_pmix():
         except ValueError:
             continue
         ws = wb[sheet_name]
-        rows = list(ws.iter_rows(min_row=1, max_row=50, max_col=15, values_only=True))
+        rows = list(ws.iter_rows(min_row=1, max_row=60, max_col=15, values_only=True))
 
-        # 전체 합계: 데이터 rows 4~끝 col G(6)=판매건수, H(7)=판매금액
-        total_qty = 0; total_revenue = 0
-        for i in range(3, len(rows)):
-            row = rows[i]
-            g = row[6]; h = row[7]
-            if isinstance(g, (int, float)) and g > 0: total_qty += int(g)
-            if isinstance(h, (int, float)) and h > 0: total_revenue += int(h)
+        def clean_name(s):
+            if not s: return ""
+            return str(s).replace("(H.CD)", "").replace("(H.CD", "").strip()
 
-        # 전체 메뉴: col C(2)=상품명, G(6)=판매수량, H(7)=판매금액 (row 4~)
-        # 예상이론원가 섹션(col J에 '예상 이론원가' 등장) 이전까지
+        # 전체 메뉴: col C(2)=상품명, G(6)=판매수량, H(7)=판매금액 (row 4~끝)
+        # col J 이론원가 섹션과 무관하게 col C/G/H 데이터 모두 수집
         all_menus = []
+        total_qty = 0; total_revenue = 0
+        EXCLUDE_KEYWORDS = ['[아침]', '사이다', '펩시', '맥주', '밀크티', '레몬티', '홍차', '포장용기', '고수추가']
+        seen = set()
         for i in range(3, len(rows)):
             row = rows[i]
-            # col J(9)에 '이론원가' 관련 텍스트 나오면 메뉴 데이터 끝
-            if row[9] and '이론원가' in str(row[9]):
-                break
-            name = row[2]  # col C
-            qty  = row[6]  # col G
-            rev  = row[7]  # col H
-            clean = lambda s: str(s).replace("(H.CD)", "").replace("(H.C", "").strip() if s else ""
-            n = clean(name)
-            if n and isinstance(qty, (int, float)) and qty > 0 and isinstance(rev, (int, float)) and rev > 0:
-                all_menus.append({"name": n, "qty": int(qty), "revenue": int(rev)})
+            name = row[2]; qty = row[6]; rev = row[7]
+            n = clean_name(name)
+            if not n: continue
+            if any(k in n for k in EXCLUDE_KEYWORDS): continue
+            if not (isinstance(qty, (int, float)) and qty > 0): continue
+            if not (isinstance(rev, (int, float)) and rev > 0): continue
+            if n in seen: continue
+            seen.add(n)
+            all_menus.append({"name": n, "qty": int(qty), "revenue": int(rev)})
+            total_qty += int(qty)
+            total_revenue += int(rev)
 
         # TOP 10: col J(9)/K(10) 판매수량, col M(12)/N(13) 매출
         sales_top10, revenue_top10 = [], []
