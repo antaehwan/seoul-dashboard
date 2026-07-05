@@ -908,7 +908,7 @@ function renderMenuMatrix(month) {
     else m.q = 'dogs';
   });
 
-  const W = 560, H = 400, PAD = 48;
+  const W = 580, H = 420, PAD = 48;
   const maxQty = Math.max(...menus.map(m=>m.qty)) * 1.15;
   const maxRev = Math.max(...menus.map(m=>m.revenue)) * 1.15;
   const minQty = Math.min(...menus.map(m=>m.qty)) * 0.85;
@@ -916,15 +916,17 @@ function renderMenuMatrix(month) {
 
   const sx = q => PAD + (q - minQty) / (maxQty - minQty) * (W - PAD*2);
   const sy = r => H - PAD - (r - minRev) / (maxRev - minRev) * (H - PAD*2);
-  const cx = sx(avgQty), cy = sy(avgRev);
 
-  const colors = { stars:'#1baf7a', puzzles:'#2a78d6', plowhorse:'#2a78d6', dogs:'#e34948' };
-  const qLabels = { stars:'1.Stars', puzzles:'2.Puzzles', plowhorse:'3.PlowHorses', dogs:'4.Dogs' };
-  const qPos = {
-    stars:    { x: W-PAD-4, y: PAD+16, anchor:'end' },
-    puzzles:  { x: W-PAD-4, y: H-PAD-8, anchor:'end' },
-    plowhorse:{ x: PAD+4,   y: PAD+16, anchor:'start' },
-    dogs:     { x: PAD+4,   y: H-PAD-8, anchor:'start' },
+  // 중심선: 시각적으로 동일한 크기의 4분면 (플롯 영역 정중앙)
+  const cx = PAD + (W - PAD*2) / 2;
+  const cy = PAD + (H - PAD*2) / 2;
+
+  const colors = { stars:'#1baf7a', puzzles:'#e8a020', plowhorse:'#2a78d6', dogs:'#e34948' };
+  const qInfo = {
+    stars:     { label:'1.Stars',      sub:'판매량 ▲  수익성 ▲', x: W-PAD-8, y: PAD+18,    anchor:'end'   },
+    plowhorse: { label:'3.PlowHorses', sub:'판매량 ▲  수익성 ▼', x: PAD+8,   y: PAD+18,    anchor:'start' },
+    puzzles:   { label:'2.Puzzles',    sub:'판매량 ▼  수익성 ▲', x: W-PAD-8, y: H-PAD-22,  anchor:'end'   },
+    dogs:      { label:'4.Dogs',       sub:'판매량 ▼  수익성 ▼', x: PAD+8,   y: H-PAD-22,  anchor:'start' },
   };
 
   // 점 위치 계산
@@ -974,9 +976,10 @@ function renderMenuMatrix(month) {
       <text x="${lbl.x}" y="${lbl.y}" text-anchor="${lbl.anchor}" font-size="9" fill="var(--text)" font-family="inherit">${p.name}</text>`;
   }).join('');
 
-  const qLabelsSvg = Object.entries(qLabels).map(([q, label]) => {
-    const p = qPos[q]; const c = colors[q];
-    return `<text x="${p.x}" y="${p.y}" text-anchor="${p.anchor}" font-size="12" font-weight="700" fill="${c}" opacity="0.7" font-family="inherit">${label}</text>`;
+  const qLabelsSvg = Object.entries(qInfo).map(([q, info]) => {
+    const c = colors[q];
+    return `<text x="${info.x}" y="${info.y}" text-anchor="${info.anchor}" font-size="12" font-weight="700" fill="${c}" opacity="0.85" font-family="inherit">${info.label}</text>
+      <text x="${info.x}" y="${info.y+14}" text-anchor="${info.anchor}" font-size="9" fill="${c}" opacity="0.6" font-family="inherit">${info.sub}</text>`;
   }).join('');
 
   el.innerHTML = `
@@ -986,11 +989,11 @@ function renderMenuMatrix(month) {
         <span style="font-size:11px;color:var(--muted)">X: 판매수량 · Y: 매출금액</span>
       </div>
       <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
-        <!-- 사분면 배경 -->
-        <rect x="${PAD}" y="${PAD}" width="${cx-PAD}" height="${cy-PAD}" fill="#2a78d6" opacity="0.04"/>
-        <rect x="${cx}" y="${PAD}" width="${W-PAD-cx}" height="${cy-PAD}" fill="#1baf7a" opacity="0.06"/>
-        <rect x="${PAD}" y="${cy}" width="${cx-PAD}" height="${H-PAD-cy}" fill="#e34948" opacity="0.05"/>
-        <rect x="${cx}" y="${cy}" width="${W-PAD-cx}" height="${H-PAD-cy}" fill="#2a78d6" opacity="0.04"/>
+        <!-- 사분면 배경 (동일 크기) -->
+        <rect x="${PAD}"  y="${PAD}"  width="${cx-PAD}"   height="${cy-PAD}"   fill="#2a78d6" opacity="0.05"/>
+        <rect x="${cx}"   y="${PAD}"  width="${W-PAD-cx}"  height="${cy-PAD}"   fill="#1baf7a" opacity="0.07"/>
+        <rect x="${PAD}"  y="${cy}"   width="${cx-PAD}"   height="${H-PAD-cy}"  fill="#e34948" opacity="0.06"/>
+        <rect x="${cx}"   y="${cy}"   width="${W-PAD-cx}"  height="${H-PAD-cy}"  fill="#e8a020" opacity="0.05"/>
         <!-- 중심선 -->
         <line x1="${cx}" y1="${PAD}" x2="${cx}" y2="${H-PAD}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
         <line x1="${PAD}" y1="${cy}" x2="${W-PAD}" y2="${cy}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
