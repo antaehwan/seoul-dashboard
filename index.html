@@ -927,10 +927,51 @@ function renderMenuMatrix(month) {
     dogs:     { x: PAD+4,   y: H-PAD-8, anchor:'start' },
   };
 
-  const dots = menus.map(m => {
-    const x = sx(m.qty), y = sy(m.revenue), c = colors[m.q];
-    return `<circle cx="${x}" cy="${y}" r="5" fill="${c}" opacity="0.85"/>
-      <text x="${x}" y="${y-9}" text-anchor="middle" font-size="11" fill="var(--text)" font-family="inherit">${m.name}</text>`;
+  // 점 위치 계산
+  const pts = menus.map(m => ({ ...m, x: sx(m.qty), y: sy(m.revenue) }));
+
+  // 겹치는 점들을 살짝 분산 (동일/근접 위치)
+  const DOT_R = 5, SEP = DOT_R * 2 + 2;
+  for (let iter = 0; iter < 30; iter++) {
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i+1; j < pts.length; j++) {
+        const dx = pts[j].x - pts[i].x, dy = pts[j].y - pts[i].y;
+        const dist = Math.sqrt(dx*dx+dy*dy);
+        if (dist < SEP && dist > 0) {
+          const push = (SEP - dist) / 2;
+          const nx = dx/dist*push, ny = dy/dist*push;
+          pts[i].x -= nx; pts[i].y -= ny;
+          pts[j].x += nx; pts[j].y += ny;
+        } else if (dist === 0) {
+          pts[i].x -= SEP/2; pts[j].x += SEP/2;
+        }
+      }
+    }
+  }
+
+  // 레이블 위치: 점 위쪽 시작, 충돌 시 반복 밀기
+  const labels = pts.map(p => ({ x: p.x, y: p.y - 10, name: p.name, anchor: 'middle' }));
+  const LW = 70, LH = 13; // 레이블 추정 너비/높이
+  for (let iter = 0; iter < 40; iter++) {
+    for (let i = 0; i < labels.length; i++) {
+      for (let j = i+1; j < labels.length; j++) {
+        const a = labels[i], b = labels[j];
+        const ox = Math.abs(a.x - b.x), oy = Math.abs(a.y - b.y);
+        if (ox < LW && oy < LH) {
+          const shift = (LH - oy) / 2 + 1;
+          if (a.y <= b.y) { a.y -= shift; b.y += shift; }
+          else { a.y += shift; b.y -= shift; }
+        }
+      }
+    }
+  }
+
+  const dots = pts.map((p, i) => {
+    const c = colors[p.q];
+    const lbl = labels[i];
+    return `<line x1="${p.x}" y1="${p.y}" x2="${lbl.x}" y2="${lbl.y+LH*0.8}" stroke="${c}" stroke-width="0.8" opacity="0.4"/>
+      <circle cx="${p.x}" cy="${p.y}" r="${DOT_R}" fill="${c}" opacity="0.9"/>
+      <text x="${lbl.x}" y="${lbl.y}" text-anchor="${lbl.anchor}" font-size="11" fill="var(--text)" font-family="inherit">${p.name}</text>`;
   }).join('');
 
   const qLabelsSvg = Object.entries(qLabels).map(([q, label]) => {
