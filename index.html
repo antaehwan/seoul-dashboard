@@ -908,18 +908,17 @@ function renderMenuMatrix(month) {
     else m.q = 'dogs';
   });
 
-  const W = 520, H = 370, PAD = 40;
-  const maxQty = Math.max(...menus.map(m=>m.qty)) * 1.15;
-  const maxRev = Math.max(...menus.map(m=>m.revenue)) * 1.15;
-  const minQty = Math.min(...menus.map(m=>m.qty)) * 0.85;
-  const minRev = Math.min(...menus.map(m=>m.revenue)) * 0.85;
+  const W = 480, H = 360, PAD = 40;
+  // 축 범위: 0부터 시작, 최댓값 * 1.2
+  const maxQty = Math.max(...menus.map(m=>m.qty)) * 1.2;
+  const maxRev = Math.max(...menus.map(m=>m.revenue)) * 1.2;
+  const minQty = 0, minRev = 0;
 
   const sx = q => PAD + (q - minQty) / (maxQty - minQty) * (W - PAD*2);
   const sy = r => H - PAD - (r - minRev) / (maxRev - minRev) * (H - PAD*2);
 
-  // 중심선: 시각적으로 동일한 크기의 4분면 (플롯 영역 정중앙)
-  const cx = PAD + (W - PAD*2) / 2;
-  const cy = PAD + (H - PAD*2) / 2;
+  // 중심선: 평균값 위치 (실제 데이터 기준 분류선)
+  const cx = sx(avgQty), cy = sy(avgRev);
 
   const colors = { stars:'#1baf7a', puzzles:'#e8a020', plowhorse:'#2a78d6', dogs:'#e34948' };
   const qInfo = {
@@ -997,13 +996,22 @@ function renderMenuMatrix(month) {
       <text x="${info.x}" y="${info.y+12}" text-anchor="${info.anchor}" font-size="9" fill="${c}" opacity="0.6" font-family="inherit">${info.sub}</text>`;
   }).join('');
 
+  const dogMenus = menus.filter(m => m.q === 'dogs');
+  const dogActions = [
+    { icon:'🗑️', title:'판매 중단 검토', desc:'수요·수익 모두 낮아 운영 효율 저하 요인' },
+    { icon:'💰', title:'가격 인상 테스트', desc:'소량 판매 시 마진 확보로 수익성 보완' },
+    { icon:'📦', title:'세트 번들 구성', desc:'인기 메뉴와 묶어 판매량 견인' },
+    { icon:'🎯', title:'타깃 프로모션', desc:'특정 시간대·고객층 대상 집중 판촉' },
+  ];
+
   el.innerHTML = `
     <div class="strat-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <span style="font-size:12px;font-weight:600;color:var(--muted)">📊 메뉴 엔지니어링 매트릭스</span>
-        <span style="font-size:11px;color:var(--muted)">X: 판매수량 · Y: 매출금액</span>
+        <span style="font-size:11px;color:var(--muted)">X: 판매수량 · Y: 매출금액 · 기준선: 평균값</span>
       </div>
-      <svg viewBox="0 0 ${W} ${H}" style="width:${W}px;max-width:100%;height:auto;display:block">
+      <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+      <svg viewBox="0 0 ${W} ${H}" style="width:${W}px;max-width:100%;height:auto;display:block;flex-shrink:0">
         <!-- 사분면 배경 (동일 크기) -->
         <rect x="${PAD}"  y="${PAD}"  width="${cx-PAD}"   height="${cy-PAD}"   fill="#2a78d6" opacity="0.05"/>
         <rect x="${cx}"   y="${PAD}"  width="${W-PAD-cx}"  height="${cy-PAD}"   fill="#1baf7a" opacity="0.07"/>
@@ -1028,6 +1036,20 @@ function renderMenuMatrix(month) {
         <text x="${W-PAD+10}" y="${H-PAD+4}" font-size="8" fill="var(--muted)" font-family="inherit">수량</text>
         <text x="${PAD-4}" y="${PAD-10}" font-size="8" fill="var(--muted)" font-family="inherit">매출</text>
       </svg>
+      <div style="flex:1;min-width:180px">
+        <div style="font-size:11px;font-weight:700;color:#e34948;margin-bottom:8px">🐕 Dogs 메뉴 개선 방향</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+          ${dogMenus.map(m=>`<span style="display:inline-block;background:#e3494820;color:#e34948;border-radius:3px;padding:1px 6px;margin:2px 2px 2px 0;font-size:10px">${m.name}</span>`).join('')}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${dogActions.map(a=>`
+          <div style="background:var(--bg);border-radius:6px;padding:8px 10px;border-left:2px solid #e34948">
+            <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px">${a.icon} ${a.title}</div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.4">${a.desc}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+      </div>
     </div>`;
 }
 
