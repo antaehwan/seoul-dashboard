@@ -909,16 +909,17 @@ function renderMenuMatrix(month) {
   });
 
   const W = 480, H = 360, PAD = 40;
-  // 축 범위: 0부터 시작, 최댓값 * 1.2
-  const maxQty = Math.max(...menus.map(m=>m.qty)) * 1.2;
-  const maxRev = Math.max(...menus.map(m=>m.revenue)) * 1.2;
+  // 축 범위: [0, 평균×2] → 평균이 정중앙에 위치, 4분면 동일 크기
+  const maxQty = avgQty * 2;
+  const maxRev = avgRev * 2;
   const minQty = 0, minRev = 0;
 
-  const sx = q => PAD + (q - minQty) / (maxQty - minQty) * (W - PAD*2);
-  const sy = r => H - PAD - (r - minRev) / (maxRev - minRev) * (H - PAD*2);
+  const sx = q => PAD + Math.min(q, maxQty) / maxQty * (W - PAD*2);
+  const sy = r => H - PAD - Math.min(r, maxRev) / maxRev * (H - PAD*2);
 
-  // 중심선: 평균값 위치 (실제 데이터 기준 분류선)
-  const cx = sx(avgQty), cy = sy(avgRev);
+  // 중심선: 평균값 = 플롯 정중앙
+  const cx = PAD + (W - PAD*2) / 2;
+  const cy = PAD + (H - PAD*2) / 2;
 
   const colors = { stars:'#1baf7a', puzzles:'#e8a020', plowhorse:'#2a78d6', dogs:'#e34948' };
   const qInfo = {
