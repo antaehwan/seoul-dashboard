@@ -908,7 +908,7 @@ function renderMenuMatrix(month) {
     else m.q = 'dogs';
   });
 
-  const W = 480, H = 340, PAD = 38;
+  const W = 520, H = 370, PAD = 40;
   const maxQty = Math.max(...menus.map(m=>m.qty)) * 1.15;
   const maxRev = Math.max(...menus.map(m=>m.revenue)) * 1.15;
   const minQty = Math.min(...menus.map(m=>m.qty)) * 0.85;
@@ -973,13 +973,13 @@ function renderMenuMatrix(month) {
     const lbl = labels[i];
     return `<line x1="${p.x}" y1="${p.y}" x2="${lbl.x}" y2="${lbl.y+LH*0.8}" stroke="${c}" stroke-width="0.8" opacity="0.4"/>
       <circle cx="${p.x}" cy="${p.y}" r="${DOT_R}" fill="${c}" opacity="0.9"/>
-      <text x="${lbl.x}" y="${lbl.y}" text-anchor="${lbl.anchor}" font-size="9" fill="var(--text)" font-family="inherit">${p.name}</text>`;
+      <text x="${lbl.x}" y="${lbl.y}" text-anchor="${lbl.anchor}" font-size="12" fill="var(--text)" font-family="inherit">${p.name}</text>`;
   }).join('');
 
   const qLabelsSvg = Object.entries(qInfo).map(([q, info]) => {
     const c = colors[q];
-    return `<text x="${info.x}" y="${info.y}" text-anchor="${info.anchor}" font-size="10" font-weight="700" fill="${c}" opacity="0.85" font-family="inherit">${info.label}</text>
-      <text x="${info.x}" y="${info.y+11}" text-anchor="${info.anchor}" font-size="8" fill="${c}" opacity="0.6" font-family="inherit">${info.sub}</text>`;
+    return `<text x="${info.x}" y="${info.y}" text-anchor="${info.anchor}" font-size="11" font-weight="700" fill="${c}" opacity="0.85" font-family="inherit">${info.label}</text>
+      <text x="${info.x}" y="${info.y+12}" text-anchor="${info.anchor}" font-size="9" fill="${c}" opacity="0.6" font-family="inherit">${info.sub}</text>`;
   }).join('');
 
   el.innerHTML = `
@@ -988,7 +988,7 @@ function renderMenuMatrix(month) {
         <span style="font-size:12px;font-weight:600;color:var(--muted)">📊 메뉴 엔지니어링 매트릭스</span>
         <span style="font-size:11px;color:var(--muted)">X: 판매수량 · Y: 매출금액</span>
       </div>
-      <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+      <svg viewBox="0 0 ${W} ${H}" style="width:${W}px;max-width:100%;height:auto;display:block">
         <!-- 사분면 배경 (동일 크기) -->
         <rect x="${PAD}"  y="${PAD}"  width="${cx-PAD}"   height="${cy-PAD}"   fill="#2a78d6" opacity="0.05"/>
         <rect x="${cx}"   y="${PAD}"  width="${W-PAD-cx}"  height="${cy-PAD}"   fill="#1baf7a" opacity="0.07"/>
