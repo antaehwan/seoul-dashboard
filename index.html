@@ -822,15 +822,17 @@ function renderPmix(month) {
   const maxRev = revenue_top10.length ? revenue_top10[0].revenue : 1;
   const maxQty = sales_top10.length ? sales_top10[0].qty : 1;
 
+  const rowStyle = 'style="padding:4px 0;vertical-align:middle"';
+
   const revRows = revenue_top10.map((item, i) => {
     const bar = Math.round(item.revenue / maxRev * 100);
-    return `<tr>
-      <td style="color:var(--muted);font-size:12px;width:20px">${i+1}</td>
-      <td style="font-size:13px">${item.name}</td>
-      <td style="text-align:right;font-size:13px;font-weight:600;white-space:nowrap">${won(item.revenue)}원</td>
-      <td style="width:80px;padding-left:8px">
-        <div style="height:6px;background:var(--border);border-radius:3px">
-          <div style="height:6px;width:${bar}%;background:#2a78d6;border-radius:3px"></div>
+    return `<tr ${rowStyle}>
+      <td style="color:var(--muted);font-size:11px;width:16px;padding-right:6px">${i+1}</td>
+      <td style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0;width:100%">${item.name}</td>
+      <td style="text-align:right;font-size:12px;font-weight:600;white-space:nowrap;padding-left:6px">${won(item.revenue)}원</td>
+      <td style="width:50px;padding-left:6px">
+        <div style="height:5px;background:var(--border);border-radius:3px">
+          <div style="height:5px;width:${bar}%;background:#2a78d6;border-radius:3px"></div>
         </div>
       </td>
     </tr>`;
@@ -838,39 +840,40 @@ function renderPmix(month) {
 
   const qtyRows = sales_top10.map((item, i) => {
     const bar = Math.round(item.qty / maxQty * 100);
-    return `<tr>
-      <td style="color:var(--muted);font-size:12px;width:20px">${i+1}</td>
-      <td style="font-size:13px">${item.name}</td>
-      <td style="text-align:right;font-size:13px;font-weight:600;white-space:nowrap">${item.qty}건</td>
-      <td style="width:80px;padding-left:8px">
-        <div style="height:6px;background:var(--border);border-radius:3px">
-          <div style="height:6px;width:${bar}%;background:#1baf7a;border-radius:3px"></div>
+    return `<tr ${rowStyle}>
+      <td style="color:var(--muted);font-size:11px;width:16px;padding-right:6px">${i+1}</td>
+      <td style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0;width:100%">${item.name}</td>
+      <td style="text-align:right;font-size:12px;font-weight:600;white-space:nowrap;padding-left:6px">${item.qty}건</td>
+      <td style="width:50px;padding-left:6px">
+        <div style="height:5px;background:var(--border);border-radius:3px">
+          <div style="height:5px;width:${bar}%;background:#1baf7a;border-radius:3px"></div>
         </div>
       </td>
     </tr>`;
   }).join('');
 
   const theoryCostRows = Object.entries(theory_cost).map(([label, pct]) => {
-    const cls = label === '이론원가' ? 'up' : '';
-    const style = label === '이론원가' ? 'font-weight:700;border-top:1px solid var(--border);padding-top:8px' : '';
-    return `<tr style="${style}">
-      <td style="color:var(--muted);font-size:12px">${label}</td>
-      <td style="text-align:right;font-size:13px"><span class="${cls}">${pct}%</span></td>
+    const isTotal = label === '이론원가';
+    return `<tr style="padding:4px 0;${isTotal ? 'border-top:1px solid var(--border)' : ''}">
+      <td style="color:var(--muted);font-size:12px;padding:${isTotal?'8px':'4px'} 0 4px">${isTotal ? '전체 이론원가' : label}</td>
+      <td style="text-align:right;font-size:12px;font-weight:${isTotal?'700':'400'};padding:${isTotal?'8px':'4px'} 0 4px">
+        <span class="${isTotal?'up':''}">${pct}%</span>
+      </td>
     </tr>`;
   }).join('');
 
   el.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;align-items:start">
-      <div class="strat-card">
-        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px">💰 매출 TOP 10</div>
-        <table style="width:100%;border-collapse:collapse">${revRows}</table>
+    <div style="display:grid;grid-template-columns:1fr 1fr 200px;gap:12px;align-items:start;min-width:0">
+      <div class="strat-card" style="min-width:0;overflow:hidden">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px">💰 매출 TOP 10</div>
+        <table style="width:100%;border-collapse:collapse;table-layout:fixed">${revRows}</table>
       </div>
-      <div class="strat-card">
-        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px">📦 판매수량 TOP 10</div>
-        <table style="width:100%;border-collapse:collapse">${qtyRows}</table>
+      <div class="strat-card" style="min-width:0;overflow:hidden">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px">📦 판매수량 TOP 10</div>
+        <table style="width:100%;border-collapse:collapse;table-layout:fixed">${qtyRows}</table>
       </div>
-      <div class="strat-card">
-        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px">🧮 예상 이론원가</div>
+      <div class="strat-card" style="min-width:0;overflow:hidden">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px">🧮 예상 이론원가</div>
         <table style="width:100%;border-collapse:collapse">${theoryCostRows}</table>
       </div>
     </div>`;
