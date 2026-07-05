@@ -151,6 +151,7 @@
     <h2>메뉴 P-MIX</h2>
     <p class="sub">매출 · 판매수량 TOP 10 및 예상 이론원가</p>
     <div id="pmix-grid" style="margin-top:12px"></div>
+    <div id="menu-matrix" style="margin-top:16px"></div>
   </section>
 
   <!-- 일별 테이블 -->
@@ -344,6 +345,7 @@ function render(month) {
   renderStrategy(days, today);
   renderWeeklyTrend(days, today);
   renderPmix(month);
+  renderMenuMatrix(month);
   renderTable(days, today);
 }
 
@@ -874,6 +876,99 @@ function renderPmix(month) {
         </div>
         ${theoryCostRows}
       </div>
+    </div>`;
+}
+
+function renderMenuMatrix(month) {
+  const el = document.getElementById('menu-matrix');
+  if (!el) return;
+  const pmix = DATA.pmix && DATA.pmix[String(month)];
+  if (!pmix) { el.innerHTML = ''; return; }
+
+  const { sales_top10, revenue_top10 } = pmix;
+
+  // name으로 merge: qty + revenue 모두 있는 메뉴만
+  const map = {};
+  sales_top10.forEach(m => { map[m.name] = { name: m.name, qty: m.qty }; });
+  revenue_top10.forEach(m => {
+    if (map[m.name]) map[m.name].revenue = m.revenue;
+    else map[m.name] = { name: m.name, revenue: m.revenue };
+  });
+  const menus = Object.values(map).filter(m => m.qty && m.revenue);
+  if (!menus.length) { el.innerHTML = ''; return; }
+
+  const avgQty = menus.reduce((s,m)=>s+m.qty,0) / menus.length;
+  const avgRev = menus.reduce((s,m)=>s+m.revenue,0) / menus.length;
+
+  menus.forEach(m => {
+    const hi_qty = m.qty >= avgQty, hi_rev = m.revenue >= avgRev;
+    if (hi_qty && hi_rev)  m.q = 'stars';
+    else if (!hi_qty && hi_rev) m.q = 'puzzles';
+    else if (hi_qty && !hi_rev) m.q = 'plowhorse';
+    else m.q = 'dogs';
+  });
+
+  const W = 560, H = 400, PAD = 48;
+  const maxQty = Math.max(...menus.map(m=>m.qty)) * 1.15;
+  const maxRev = Math.max(...menus.map(m=>m.revenue)) * 1.15;
+  const minQty = Math.min(...menus.map(m=>m.qty)) * 0.85;
+  const minRev = Math.min(...menus.map(m=>m.revenue)) * 0.85;
+
+  const sx = q => PAD + (q - minQty) / (maxQty - minQty) * (W - PAD*2);
+  const sy = r => H - PAD - (r - minRev) / (maxRev - minRev) * (H - PAD*2);
+  const cx = sx(avgQty), cy = sy(avgRev);
+
+  const colors = { stars:'#1baf7a', puzzles:'#2a78d6', plowhorse:'#2a78d6', dogs:'#e34948' };
+  const qLabels = { stars:'1.Stars', puzzles:'2.Puzzles', plowhorse:'3.PlowHorses', dogs:'4.Dogs' };
+  const qPos = {
+    stars:    { x: W-PAD-4, y: PAD+16, anchor:'end' },
+    puzzles:  { x: W-PAD-4, y: H-PAD-8, anchor:'end' },
+    plowhorse:{ x: PAD+4,   y: PAD+16, anchor:'start' },
+    dogs:     { x: PAD+4,   y: H-PAD-8, anchor:'start' },
+  };
+
+  const dots = menus.map(m => {
+    const x = sx(m.qty), y = sy(m.revenue), c = colors[m.q];
+    return `<circle cx="${x}" cy="${y}" r="5" fill="${c}" opacity="0.85"/>
+      <text x="${x}" y="${y-9}" text-anchor="middle" font-size="11" fill="var(--text)" font-family="inherit">${m.name}</text>`;
+  }).join('');
+
+  const qLabelsSvg = Object.entries(qLabels).map(([q, label]) => {
+    const p = qPos[q]; const c = colors[q];
+    return `<text x="${p.x}" y="${p.y}" text-anchor="${p.anchor}" font-size="12" font-weight="700" fill="${c}" opacity="0.7" font-family="inherit">${label}</text>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="strat-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:12px;font-weight:600;color:var(--muted)">📊 메뉴 엔지니어링 매트릭스</span>
+        <span style="font-size:11px;color:var(--muted)">X: 판매수량 · Y: 매출금액</span>
+      </div>
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+        <!-- 사분면 배경 -->
+        <rect x="${PAD}" y="${PAD}" width="${cx-PAD}" height="${cy-PAD}" fill="#2a78d6" opacity="0.04"/>
+        <rect x="${cx}" y="${PAD}" width="${W-PAD-cx}" height="${cy-PAD}" fill="#1baf7a" opacity="0.06"/>
+        <rect x="${PAD}" y="${cy}" width="${cx-PAD}" height="${H-PAD-cy}" fill="#e34948" opacity="0.05"/>
+        <rect x="${cx}" y="${cy}" width="${W-PAD-cx}" height="${H-PAD-cy}" fill="#2a78d6" opacity="0.04"/>
+        <!-- 중심선 -->
+        <line x1="${cx}" y1="${PAD}" x2="${cx}" y2="${H-PAD}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
+        <line x1="${PAD}" y1="${cy}" x2="${W-PAD}" y2="${cy}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
+        <!-- 축 -->
+        <line x1="${PAD}" y1="${H-PAD}" x2="${W-PAD+8}" y2="${H-PAD}" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="${PAD}" y1="${H-PAD}" x2="${PAD}" y2="${PAD-8}" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr)"/>
+        <defs>
+          <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="var(--muted)"/>
+          </marker>
+        </defs>
+        <!-- 사분면 레이블 -->
+        ${qLabelsSvg}
+        <!-- 데이터 포인트 -->
+        ${dots}
+        <!-- 축 레이블 -->
+        <text x="${W-PAD+10}" y="${H-PAD+4}" font-size="10" fill="var(--muted)" font-family="inherit">수량</text>
+        <text x="${PAD-4}" y="${PAD-12}" font-size="10" fill="var(--muted)" font-family="inherit">매출</text>
+      </svg>
     </div>`;
 }
 
