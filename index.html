@@ -887,14 +887,19 @@ function renderMenuMatrix(month) {
 
   const { sales_top10, revenue_top10 } = pmix;
 
-  // name으로 merge: qty + revenue 모두 있는 메뉴만
-  const map = {};
-  sales_top10.forEach(m => { map[m.name] = { name: m.name, qty: m.qty }; });
-  revenue_top10.forEach(m => {
-    if (map[m.name]) map[m.name].revenue = m.revenue;
-    else map[m.name] = { name: m.name, revenue: m.revenue };
-  });
-  const menus = Object.values(map).filter(m => m.qty && m.revenue);
+  // 전체 메뉴 데이터 사용 (menus_all 우선, 없으면 TOP10 merge 폴백)
+  let menus;
+  if (pmix.menus_all && pmix.menus_all.length) {
+    menus = pmix.menus_all;
+  } else {
+    const map = {};
+    sales_top10.forEach(m => { map[m.name] = { name: m.name, qty: m.qty }; });
+    revenue_top10.forEach(m => {
+      if (map[m.name]) map[m.name].revenue = m.revenue;
+      else map[m.name] = { name: m.name, revenue: m.revenue };
+    });
+    menus = Object.values(map).filter(m => m.qty && m.revenue);
+  }
   if (!menus.length) { el.innerHTML = ''; return; }
 
   const avgQty = menus.reduce((s,m)=>s+m.qty,0) / menus.length;
@@ -917,10 +922,10 @@ function renderMenuMatrix(month) {
   };
 
   const dogActions = [
-    { icon:'🗑️', title:'판매 중단 검토', desc:'수요·수익 모두 낮아 운영 효율 저하 요인' },
-    { icon:'💰', title:'가격 인상 테스트', desc:'소량 판매 시 마진 확보로 수익성 보완' },
-    { icon:'📦', title:'세트 번들 구성', desc:'인기 메뉴와 묶어 판매량 견인' },
-    { icon:'🎯', title:'타깃 프로모션', desc:'특정 시간대·고객층 대상 집중 판촉' },
+    { icon:'🔬', title:'원가 구조 재검토', desc:'재료비·레시피 개선으로 수익성 끌어올리기' },
+    { icon:'🍱', title:'세트 번들 구성', desc:'Stars/PlowHorses 메뉴와 묶어 함께 판매' },
+    { icon:'🎯', title:'시간대별 집중 판촉', desc:'수요가 몰리는 시간대·요일 타깃 프로모션' },
+    { icon:'✨', title:'메뉴 리뉴얼', desc:'비주얼·레시피 개선으로 재인식 유도' },
   ];
 
   const mkCell = (q) => {

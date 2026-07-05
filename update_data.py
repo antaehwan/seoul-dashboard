@@ -137,18 +137,34 @@ def parse_pmix():
             if isinstance(g, (int, float)) and g > 0: total_qty += int(g)
             if isinstance(h, (int, float)) and h > 0: total_revenue += int(h)
 
-        # TOP 10: 헤더 row 4(idx3), 데이터 rows 5~14(idx4~13)
-        # 판매수량TOP10: col J(9), K(10) / 매출TOP10: col M(12), N(13)
+        # 전체 메뉴: col C(2)=상품명, G(6)=판매수량, H(7)=판매금액 (row 4~)
+        # 예상이론원가 섹션(col J에 '예상 이론원가' 등장) 이전까지
+        all_menus = []
+        for i in range(3, len(rows)):
+            row = rows[i]
+            # col J(9)에 '이론원가' 관련 텍스트 나오면 메뉴 데이터 끝
+            if row[9] and '이론원가' in str(row[9]):
+                break
+            name = row[2]  # col C
+            qty  = row[6]  # col G
+            rev  = row[7]  # col H
+            clean = lambda s: str(s).replace("(H.CD)", "").replace("(H.C", "").strip() if s else ""
+            n = clean(name)
+            if n and isinstance(qty, (int, float)) and qty > 0 and isinstance(rev, (int, float)) and rev > 0:
+                all_menus.append({"name": n, "qty": int(qty), "revenue": int(rev)})
+
+        # TOP 10: col J(9)/K(10) 판매수량, col M(12)/N(13) 매출
         sales_top10, revenue_top10 = [], []
         for i in range(4, 14):
             if i >= len(rows): break
             row = rows[i]
             name_s = row[9]; qty = row[10]
             name_r = row[12]; rev = row[13]
+            clean = lambda s: str(s).replace("(H.CD)", "").replace("(H.C", "").strip() if s else ""
             if name_s and isinstance(qty, (int, float)) and qty > 0:
-                sales_top10.append({"name": str(name_s).replace("(H.CD)", "").strip(), "qty": int(qty)})
+                sales_top10.append({"name": clean(name_s), "qty": int(qty)})
             if name_r and isinstance(rev, (int, float)) and rev > 0:
-                revenue_top10.append({"name": str(name_r).replace("(H.CD)", "").strip(), "revenue": int(rev)})
+                revenue_top10.append({"name": clean(name_r), "revenue": int(rev)})
 
         # 예상 이론원가: col J(9), K(10), 행16(idx15)부터
         theory_cost = {}
@@ -159,8 +175,9 @@ def parse_pmix():
             if label and isinstance(val, (int, float)):
                 theory_cost[str(label)] = round(float(val) * 100, 1)
 
-        if sales_top10 or revenue_top10:
+        if sales_top10 or revenue_top10 or all_menus:
             pmix[str(m)] = {
+                "menus_all": all_menus,
                 "sales_top10": sales_top10,
                 "revenue_top10": revenue_top10,
                 "theory_cost": theory_cost,
