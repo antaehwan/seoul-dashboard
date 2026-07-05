@@ -908,96 +908,14 @@ function renderMenuMatrix(month) {
     else m.q = 'dogs';
   });
 
-  const W = 480, H = 360, PAD = 40;
-  // 축 범위: [0, 평균×2] → 평균이 정중앙에 위치, 4분면 동일 크기
-  const maxQty = avgQty * 2;
-  const maxRev = avgRev * 2;
-  const minQty = 0, minRev = 0;
-
-  const sx = q => PAD + Math.min(q, maxQty) / maxQty * (W - PAD*2);
-  const sy = r => H - PAD - Math.min(r, maxRev) / maxRev * (H - PAD*2);
-
-  // 중심선: 평균값 = 플롯 정중앙
-  const cx = PAD + (W - PAD*2) / 2;
-  const cy = PAD + (H - PAD*2) / 2;
-
   const colors = { stars:'#1baf7a', puzzles:'#e8a020', plowhorse:'#2a78d6', dogs:'#e34948' };
   const qInfo = {
-    stars:     { label:'1.Stars',      sub:'판매량 ▲  수익성 ▲', x: W-PAD-8, y: PAD+18,    anchor:'end'   },
-    plowhorse: { label:'3.PlowHorses', sub:'판매량 ▲  수익성 ▼', x: PAD+8,   y: PAD+18,    anchor:'start' },
-    puzzles:   { label:'2.Puzzles',    sub:'판매량 ▼  수익성 ▲', x: W-PAD-8, y: H-PAD-22,  anchor:'end'   },
-    dogs:      { label:'4.Dogs',       sub:'판매량 ▼  수익성 ▼', x: PAD+8,   y: H-PAD-22,  anchor:'start' },
+    plowhorse: { label:'3. PlowHorses', sub:'판매량 ▲  수익성 ▼', col: 0, row: 0 },
+    stars:     { label:'1. Stars',      sub:'판매량 ▲  수익성 ▲', col: 1, row: 0 },
+    dogs:      { label:'4. Dogs',       sub:'판매량 ▼  수익성 ▼', col: 0, row: 1 },
+    puzzles:   { label:'2. Puzzles',    sub:'판매량 ▼  수익성 ▲', col: 1, row: 1 },
   };
 
-  // 점 위치 계산
-  const pts = menus.map(m => ({ ...m, x: sx(m.qty), y: sy(m.revenue) }));
-
-  // 점 분산: 2D repulsion
-  const DOT_R = 4, SEP = DOT_R * 2 + 6;
-  for (let iter = 0; iter < 60; iter++) {
-    for (let i = 0; i < pts.length; i++) {
-      for (let j = i+1; j < pts.length; j++) {
-        const dx = pts[j].x - pts[i].x, dy = pts[j].y - pts[i].y;
-        const dist = Math.sqrt(dx*dx+dy*dy) || 0.01;
-        if (dist < SEP) {
-          const push = (SEP - dist) / 2;
-          const nx = dx/dist*push, ny = dy/dist*push;
-          pts[i].x -= nx; pts[i].y -= ny;
-          pts[j].x += nx; pts[j].y += ny;
-        }
-      }
-    }
-  }
-
-  // 레이블: 한국어 글자폭 추정 (12px × 글자수 × 0.75)
-  const charW = 8; // 12px 한글 평균
-  const LH = 14;
-  const labels = pts.map(p => ({
-    x: p.x, y: p.y - 12,
-    name: p.name,
-    lw: p.name.length * charW,
-    anchor: 'middle'
-  }));
-
-  // 레이블 2D repulsion
-  for (let iter = 0; iter < 80; iter++) {
-    for (let i = 0; i < labels.length; i++) {
-      for (let j = i+1; j < labels.length; j++) {
-        const a = labels[i], b = labels[j];
-        const minX = (a.lw + b.lw) / 2;
-        const ox = Math.abs(a.x - b.x), oy = Math.abs(a.y - b.y);
-        if (ox < minX && oy < LH) {
-          // x 겹침이 적으면 x로, 아니면 y로 분리
-          const overlapX = minX - ox, overlapY = LH - oy;
-          if (overlapY <= overlapX) {
-            const s = overlapY / 2 + 1;
-            if (a.y <= b.y) { a.y -= s; b.y += s; }
-            else { a.y += s; b.y -= s; }
-          } else {
-            const s = overlapX / 2 + 1;
-            if (a.x <= b.x) { a.x -= s; b.x += s; }
-            else { a.x += s; b.x -= s; }
-          }
-        }
-      }
-    }
-  }
-
-  const dots = pts.map((p, i) => {
-    const c = colors[p.q];
-    const lbl = labels[i];
-    return `<line x1="${p.x}" y1="${p.y}" x2="${lbl.x}" y2="${lbl.y+LH*0.8}" stroke="${c}" stroke-width="0.8" opacity="0.4"/>
-      <circle cx="${p.x}" cy="${p.y}" r="${DOT_R}" fill="${c}" opacity="0.9"/>
-      <text x="${lbl.x}" y="${lbl.y}" text-anchor="${lbl.anchor}" font-size="12" fill="var(--text)" font-family="inherit">${p.name}</text>`;
-  }).join('');
-
-  const qLabelsSvg = Object.entries(qInfo).map(([q, info]) => {
-    const c = colors[q];
-    return `<text x="${info.x}" y="${info.y}" text-anchor="${info.anchor}" font-size="11" font-weight="700" fill="${c}" opacity="0.85" font-family="inherit">${info.label}</text>
-      <text x="${info.x}" y="${info.y+12}" text-anchor="${info.anchor}" font-size="9" fill="${c}" opacity="0.6" font-family="inherit">${info.sub}</text>`;
-  }).join('');
-
-  const dogMenus = menus.filter(m => m.q === 'dogs');
   const dogActions = [
     { icon:'🗑️', title:'판매 중단 검토', desc:'수요·수익 모두 낮아 운영 효율 저하 요인' },
     { icon:'💰', title:'가격 인상 테스트', desc:'소량 판매 시 마진 확보로 수익성 보완' },
@@ -1005,51 +923,36 @@ function renderMenuMatrix(month) {
     { icon:'🎯', title:'타깃 프로모션', desc:'특정 시간대·고객층 대상 집중 판촉' },
   ];
 
+  const mkCell = (q) => {
+    const info = qInfo[q], c = colors[q];
+    const items = menus.filter(m => m.q === q);
+    const menuTags = items.map(m =>
+      `<span style="display:inline-block;background:${c}18;color:${c};border-radius:3px;padding:2px 7px;margin:2px 3px 2px 0;font-size:11px;font-weight:500">${m.name}</span>`
+    ).join('');
+    const actions = q === 'dogs' ? `
+      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px">
+        ${dogActions.map(a=>`<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px">
+          <span style="font-size:11px;flex-shrink:0">${a.icon}</span>
+          <div><span style="font-size:11px;font-weight:600;color:var(--text)">${a.title}</span>
+          <span style="font-size:10px;color:var(--muted)"> — ${a.desc}</span></div>
+        </div>`).join('')}
+      </div>` : '';
+    return `<div style="border:1px solid ${c}40;border-radius:8px;padding:10px 12px;background:${c}08">
+      <div style="font-size:11px;font-weight:700;color:${c};margin-bottom:2px">${info.label}</div>
+      <div style="font-size:10px;color:${c};opacity:0.7;margin-bottom:8px">${info.sub}</div>
+      <div style="line-height:1.8">${menuTags || '<span style="font-size:11px;color:var(--muted)">해당 없음</span>'}</div>
+      ${actions}
+    </div>`;
+  };
+
   el.innerHTML = `
     <div class="strat-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <span style="font-size:12px;font-weight:600;color:var(--muted)">📊 메뉴 엔지니어링 매트릭스</span>
-        <span style="font-size:11px;color:var(--muted)">X: 판매수량 · Y: 매출금액 · 기준선: 평균값</span>
-      </div>
-      <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
-      <svg viewBox="0 0 ${W} ${H}" style="width:${W}px;max-width:100%;height:auto;display:block;flex-shrink:0">
-        <!-- 사분면 배경 (동일 크기) -->
-        <rect x="${PAD}"  y="${PAD}"  width="${cx-PAD}"   height="${cy-PAD}"   fill="#2a78d6" opacity="0.05"/>
-        <rect x="${cx}"   y="${PAD}"  width="${W-PAD-cx}"  height="${cy-PAD}"   fill="#1baf7a" opacity="0.07"/>
-        <rect x="${PAD}"  y="${cy}"   width="${cx-PAD}"   height="${H-PAD-cy}"  fill="#e34948" opacity="0.06"/>
-        <rect x="${cx}"   y="${cy}"   width="${W-PAD-cx}"  height="${H-PAD-cy}"  fill="#e8a020" opacity="0.05"/>
-        <!-- 중심선 -->
-        <line x1="${cx}" y1="${PAD}" x2="${cx}" y2="${H-PAD}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
-        <line x1="${PAD}" y1="${cy}" x2="${W-PAD}" y2="${cy}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
-        <!-- 축 -->
-        <line x1="${PAD}" y1="${H-PAD}" x2="${W-PAD+8}" y2="${H-PAD}" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr)"/>
-        <line x1="${PAD}" y1="${H-PAD}" x2="${PAD}" y2="${PAD-8}" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr)"/>
-        <defs>
-          <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-            <path d="M0,0 L6,3 L0,6 Z" fill="var(--muted)"/>
-          </marker>
-        </defs>
-        <!-- 사분면 레이블 -->
-        ${qLabelsSvg}
-        <!-- 데이터 포인트 -->
-        ${dots}
-        <!-- 축 레이블 -->
-        <text x="${W-PAD+10}" y="${H-PAD+4}" font-size="8" fill="var(--muted)" font-family="inherit">수량</text>
-        <text x="${PAD-4}" y="${PAD-10}" font-size="8" fill="var(--muted)" font-family="inherit">매출</text>
-      </svg>
-      <div style="flex:1;min-width:180px">
-        <div style="font-size:11px;font-weight:700;color:#e34948;margin-bottom:8px">🐕 Dogs 메뉴 개선 방향</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5">
-          ${dogMenus.map(m=>`<span style="display:inline-block;background:#e3494820;color:#e34948;border-radius:3px;padding:1px 6px;margin:2px 2px 2px 0;font-size:10px">${m.name}</span>`).join('')}
+      <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px">📊 메뉴 엔지니어링 매트릭스 <span style="font-weight:400;font-size:10px">· 기준: 판매수량·매출 평균</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="display:contents">
+          ${mkCell('plowhorse')}${mkCell('stars')}
+          ${mkCell('dogs')}${mkCell('puzzles')}
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          ${dogActions.map(a=>`
-          <div style="background:var(--bg);border-radius:6px;padding:8px 10px;border-left:2px solid #e34948">
-            <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px">${a.icon} ${a.title}</div>
-            <div style="font-size:10px;color:var(--muted);line-height:1.4">${a.desc}</div>
-          </div>`).join('')}
-        </div>
-      </div>
       </div>
     </div>`;
 }
