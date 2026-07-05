@@ -129,6 +129,14 @@ def parse_pmix():
         ws = wb[sheet_name]
         rows = list(ws.iter_rows(min_row=1, max_row=50, max_col=15, values_only=True))
 
+        # 전체 합계: 데이터 rows 4~끝 col G(6)=판매건수, H(7)=판매금액
+        total_qty = 0; total_revenue = 0
+        for i in range(3, len(rows)):
+            row = rows[i]
+            g = row[6]; h = row[7]
+            if isinstance(g, (int, float)) and g > 0: total_qty += int(g)
+            if isinstance(h, (int, float)) and h > 0: total_revenue += int(h)
+
         # TOP 10: 헤더 row 4(idx3), 데이터 rows 5~14(idx4~13)
         # 판매수량TOP10: col J(9), K(10) / 매출TOP10: col M(12), N(13)
         sales_top10, revenue_top10 = [], []
@@ -156,6 +164,8 @@ def parse_pmix():
                 "sales_top10": sales_top10,
                 "revenue_top10": revenue_top10,
                 "theory_cost": theory_cost,
+                "total_revenue": total_revenue,
+                "total_qty": total_qty,
             }
             print(f"  P-MIX {m}월: 판매TOP{len(sales_top10)} 매출TOP{len(revenue_top10)}")
     return pmix

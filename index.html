@@ -816,19 +816,20 @@ function renderPmix(month) {
   const pmix = DATA.pmix && DATA.pmix[String(month)];
   if (!pmix) { el.innerHTML = '<p style="color:var(--muted);font-size:13px">P-MIX 데이터 없음</p>'; return; }
 
-  const { sales_top10, revenue_top10, theory_cost } = pmix;
+  const { sales_top10, revenue_top10, theory_cost, total_revenue, total_qty } = pmix;
   const won = v => Number(v).toLocaleString('ko-KR');
+  const p1 = (a, b) => b ? (a/b*100).toFixed(1) : '0.0';
 
   const maxRev = revenue_top10.length ? revenue_top10[0].revenue : 1;
   const maxQty = sales_top10.length ? sales_top10[0].qty : 1;
 
-  const mkRow = (rank, name, val, bar, color) => `
+  const mkRow = (rank, name, val, share, bar, color) => `
     <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
       <span style="color:var(--muted);font-size:11px;width:16px;flex-shrink:0;text-align:right">${rank}</span>
       <div style="flex:1;min-width:0">
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:4px;margin-bottom:3px">
           <span style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</span>
-          <span style="font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0">${val}</span>
+          <span style="font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0">${val} <span style="font-size:11px;font-weight:400;color:var(--muted)">(${share}%)</span></span>
         </div>
         <div style="height:3px;background:var(--border);border-radius:2px">
           <div style="height:3px;width:${bar}%;background:${color};border-radius:2px"></div>
@@ -837,18 +838,23 @@ function renderPmix(month) {
     </div>`;
 
   const revRows = revenue_top10.map((item, i) =>
-    mkRow(i+1, item.name, won(item.revenue)+'원', Math.round(item.revenue/maxRev*100), '#2a78d6')
+    mkRow(i+1, item.name, won(item.revenue)+'원', p1(item.revenue, total_revenue), Math.round(item.revenue/maxRev*100), '#2a78d6')
   ).join('');
 
   const qtyRows = sales_top10.map((item, i) =>
-    mkRow(i+1, item.name, item.qty+'건', Math.round(item.qty/maxQty*100), '#1baf7a')
+    mkRow(i+1, item.name, item.qty+'건', p1(item.qty, total_qty), Math.round(item.qty/maxQty*100), '#1baf7a')
   ).join('');
 
+  // 예상 이론원가: pct × total_revenue = 예상 원가 금액
   const theoryCostRows = Object.entries(theory_cost).map(([label, pct]) => {
     const isTotal = label === '이론원가';
+    const estCost = total_revenue ? Math.round(total_revenue * pct / 100) : null;
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;${isTotal?'border-top:1px solid var(--border);margin-top:4px;':''}border-bottom:1px solid var(--border)">
       <span style="font-size:12px;color:${isTotal?'var(--text)':'var(--muted)'};font-weight:${isTotal?'600':'400'}">${isTotal?'전체 이론원가':label}</span>
-      <span style="font-size:12px;font-weight:${isTotal?'700':'400'}" class="${isTotal?'up':''}">${pct}%</span>
+      <div style="text-align:right">
+        <span style="font-size:12px;font-weight:${isTotal?'700':'500'}" class="${isTotal?'up':''}">${pct}%</span>
+        ${estCost ? `<div style="font-size:11px;color:var(--muted)">${won(estCost)}원</div>` : ''}
+      </div>
     </div>`;
   }).join('');
 
