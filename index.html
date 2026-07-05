@@ -928,19 +928,12 @@ function renderMenuMatrix(month) {
     { title:'메뉴 리뉴얼', desc:'비주얼·레시피 개선으로 재인식 유도' },
   ];
 
-  const wonK = v => (v/10000).toFixed(0)+'만';
   const mkCell = (q) => {
     const info = qInfo[q], c = colors[q];
     const items = menus.filter(m => m.q === q);
-    const menuTags = items.map(m => {
-      if (q === 'dogs') {
-        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid ${c}20">
-          <span style="font-size:11px;font-weight:500;color:var(--text)">${m.name}</span>
-          <span style="font-size:10px;color:var(--muted);white-space:nowrap;margin-left:8px">${m.qty.toLocaleString()}건 · ${wonK(m.revenue)}</span>
-        </div>`;
-      }
-      return `<span style="display:inline-block;background:${c}18;color:${c};border-radius:3px;padding:2px 7px;margin:2px 3px 2px 0;font-size:11px;font-weight:500">${m.name}</span>`;
-    }).join('');
+    const menuTags = items.map(m =>
+      `<span style="display:inline-block;background:${c}18;color:${c};border-radius:3px;padding:2px 7px;margin:2px 3px 2px 0;font-size:11px;font-weight:500">${m.name}</span>`
+    ).join('');
     const actions = q === 'dogs' ? `
       <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px">
         ${dogActions.map(a=>`<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px">
@@ -950,9 +943,7 @@ function renderMenuMatrix(month) {
       </div>` : '';
     return `<div style="border:1px solid ${c}40;border-radius:8px;padding:10px 12px;background:${c}08">
       <div style="font-size:11px;font-weight:700;color:${c};margin-bottom:2px">${info.label}</div>
-      <div style="font-size:10px;color:${c};opacity:0.7;margin-bottom:${q==='dogs'?4:8}px">${info.sub}</div>
-      ${q==='dogs'?`<div style="font-size:10px;color:var(--muted);margin-bottom:8px;padding:4px 6px;background:var(--bg);border-radius:4px">기준 — 판매수량 중앙값 <strong>${medQty.toLocaleString()}건</strong> · 매출 중앙값 <strong>${wonK(medRev)}</strong> 미만</div>`:''}
-
+      <div style="font-size:10px;color:${c};opacity:0.7;margin-bottom:8px">${info.sub}</div>
       <div style="line-height:1.8">${menuTags || '<span style="font-size:11px;color:var(--muted)">해당 없음</span>'}</div>
       ${actions}
     </div>`;
