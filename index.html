@@ -971,7 +971,7 @@ function renderMenuMatrix(month) {
     const lbl = labels[i];
     return `<line x1="${p.x}" y1="${p.y}" x2="${lbl.x}" y2="${lbl.y+LH*0.8}" stroke="${c}" stroke-width="0.8" opacity="0.4"/>
       <circle cx="${p.x}" cy="${p.y}" r="${DOT_R}" fill="${c}" opacity="0.9"/>
-      <text x="${lbl.x}" y="${lbl.y}" text-anchor="${lbl.anchor}" font-size="11" fill="var(--text)" font-family="inherit">${p.name}</text>`;
+      <text x="${lbl.x}" y="${lbl.y}" text-anchor="${lbl.anchor}" font-size="9" fill="var(--text)" font-family="inherit">${p.name}</text>`;
   }).join('');
 
   const qLabelsSvg = Object.entries(qLabels).map(([q, label]) => {
