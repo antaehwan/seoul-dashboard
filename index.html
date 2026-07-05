@@ -932,37 +932,52 @@ function renderMenuMatrix(month) {
   // 점 위치 계산
   const pts = menus.map(m => ({ ...m, x: sx(m.qty), y: sy(m.revenue) }));
 
-  // 겹치는 점들을 살짝 분산 (동일/근접 위치)
-  const DOT_R = 5, SEP = DOT_R * 2 + 2;
-  for (let iter = 0; iter < 30; iter++) {
+  // 점 분산: 2D repulsion
+  const DOT_R = 4, SEP = DOT_R * 2 + 6;
+  for (let iter = 0; iter < 60; iter++) {
     for (let i = 0; i < pts.length; i++) {
       for (let j = i+1; j < pts.length; j++) {
         const dx = pts[j].x - pts[i].x, dy = pts[j].y - pts[i].y;
-        const dist = Math.sqrt(dx*dx+dy*dy);
-        if (dist < SEP && dist > 0) {
+        const dist = Math.sqrt(dx*dx+dy*dy) || 0.01;
+        if (dist < SEP) {
           const push = (SEP - dist) / 2;
           const nx = dx/dist*push, ny = dy/dist*push;
           pts[i].x -= nx; pts[i].y -= ny;
           pts[j].x += nx; pts[j].y += ny;
-        } else if (dist === 0) {
-          pts[i].x -= SEP/2; pts[j].x += SEP/2;
         }
       }
     }
   }
 
-  // 레이블 위치: 점 위쪽 시작, 충돌 시 반복 밀기
-  const labels = pts.map(p => ({ x: p.x, y: p.y - 10, name: p.name, anchor: 'middle' }));
-  const LW = 70, LH = 13; // 레이블 추정 너비/높이
-  for (let iter = 0; iter < 40; iter++) {
+  // 레이블: 한국어 글자폭 추정 (12px × 글자수 × 0.75)
+  const charW = 8; // 12px 한글 평균
+  const LH = 14;
+  const labels = pts.map(p => ({
+    x: p.x, y: p.y - 12,
+    name: p.name,
+    lw: p.name.length * charW,
+    anchor: 'middle'
+  }));
+
+  // 레이블 2D repulsion
+  for (let iter = 0; iter < 80; iter++) {
     for (let i = 0; i < labels.length; i++) {
       for (let j = i+1; j < labels.length; j++) {
         const a = labels[i], b = labels[j];
+        const minX = (a.lw + b.lw) / 2;
         const ox = Math.abs(a.x - b.x), oy = Math.abs(a.y - b.y);
-        if (ox < LW && oy < LH) {
-          const shift = (LH - oy) / 2 + 1;
-          if (a.y <= b.y) { a.y -= shift; b.y += shift; }
-          else { a.y += shift; b.y -= shift; }
+        if (ox < minX && oy < LH) {
+          // x 겹침이 적으면 x로, 아니면 y로 분리
+          const overlapX = minX - ox, overlapY = LH - oy;
+          if (overlapY <= overlapX) {
+            const s = overlapY / 2 + 1;
+            if (a.y <= b.y) { a.y -= s; b.y += s; }
+            else { a.y += s; b.y -= s; }
+          } else {
+            const s = overlapX / 2 + 1;
+            if (a.x <= b.x) { a.x -= s; b.x += s; }
+            else { a.x += s; b.x -= s; }
+          }
         }
       }
     }
