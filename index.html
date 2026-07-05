@@ -902,14 +902,22 @@ function renderMenuMatrix(month) {
   if (!menus.length) { el.innerHTML = ''; return; }
 
   const median = arr => { const s = [...arr].sort((a,b)=>a-b); const m = Math.floor(s.length/2); return s.length%2 ? s[m] : (s[m-1]+s[m])/2; };
+
+  // 공헌이익 = 매출 × (1 - 이론원가율)
+  const tc = pmix.theory_cost || {};
+  menus.forEach(m => {
+    const rate = (tc[m.category] || 0) / 100;
+    m.contribution = Math.round(m.revenue * (1 - rate));
+  });
+
   const medQty = median(menus.map(m=>m.qty));
-  const medRev = median(menus.map(m=>m.revenue));
+  const medCon = median(menus.map(m=>m.contribution));
 
   menus.forEach(m => {
-    const hi_qty = m.qty >= medQty, hi_rev = m.revenue >= medRev;
-    if (hi_qty && hi_rev)  m.q = 'stars';
-    else if (!hi_qty && hi_rev) m.q = 'puzzles';
-    else if (hi_qty && !hi_rev) m.q = 'plowhorse';
+    const hi_qty = m.qty >= medQty, hi_con = m.contribution >= medCon;
+    if (hi_qty && hi_con)  m.q = 'stars';
+    else if (!hi_qty && hi_con) m.q = 'puzzles';
+    else if (hi_qty && !hi_con) m.q = 'plowhorse';
     else m.q = 'dogs';
   });
 

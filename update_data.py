@@ -137,10 +137,15 @@ def parse_pmix():
         # col J 이론원가 섹션과 무관하게 col C/G/H 데이터 모두 수집
         all_menus = []
         total_qty = 0; total_revenue = 0
-        EXCLUDE_KEYWORDS = ['[아침]', '사이다', '펩시', '맥주', '밀크티', '레몬티', '홍차', '포장용기', '고수추가']
+        EXCLUDE_CATEGORIES = {'조식', '음료', '추가메뉴'}
+        EXCLUDE_KEYWORDS   = ['[아침]', '사이다', '펩시', '맥주', '밀크티', '레몬티', '홍차', '포장용기', '고수추가']
         seen = set()
+        current_cat = ''
         for i in range(3, len(rows)):
             row = rows[i]
+            cat_cell = row[1]  # col B = 분류
+            if cat_cell: current_cat = str(cat_cell).strip()
+            if current_cat in EXCLUDE_CATEGORIES: continue
             name = row[2]; qty = row[6]; rev = row[7]
             n = clean_name(name)
             if not n: continue
@@ -149,7 +154,7 @@ def parse_pmix():
             if not (isinstance(rev, (int, float)) and rev > 0): continue
             if n in seen: continue
             seen.add(n)
-            all_menus.append({"name": n, "qty": int(qty), "revenue": int(rev)})
+            all_menus.append({"name": n, "qty": int(qty), "revenue": int(rev), "category": current_cat})
             total_qty += int(qty)
             total_revenue += int(rev)
 
