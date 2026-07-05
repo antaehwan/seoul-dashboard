@@ -146,6 +146,13 @@
     <div id="weekly-trend-grid" style="margin-top:12px"></div>
   </section>
 
+  <!-- P-MIX -->
+  <section id="pmix">
+    <h2>메뉴 P-MIX</h2>
+    <p class="sub">매출 · 판매수량 TOP 10 및 예상 이론원가</p>
+    <div id="pmix-grid" style="margin-top:12px"></div>
+  </section>
+
   <!-- 일별 테이블 -->
   <section id="daily">
     <h2>일별 현황</h2>
@@ -336,6 +343,7 @@ function render(month) {
   renderReview(days, today, month);
   renderStrategy(days, today);
   renderWeeklyTrend(days, today);
+  renderPmix(month);
   renderTable(days, today);
 }
 
@@ -800,6 +808,72 @@ function renderMonthlyHistory() {
 
   svg.setAttribute('height', H);
   svg.innerHTML = yTicks + bars + legend;
+}
+
+function renderPmix(month) {
+  const el = document.getElementById('pmix-grid');
+  if (!el) return;
+  const pmix = DATA.pmix && DATA.pmix[String(month)];
+  if (!pmix) { el.innerHTML = '<p style="color:var(--muted);font-size:13px">P-MIX 데이터 없음</p>'; return; }
+
+  const { sales_top10, revenue_top10, theory_cost } = pmix;
+  const won = v => Number(v).toLocaleString('ko-KR');
+
+  const maxRev = revenue_top10.length ? revenue_top10[0].revenue : 1;
+  const maxQty = sales_top10.length ? sales_top10[0].qty : 1;
+
+  const revRows = revenue_top10.map((item, i) => {
+    const bar = Math.round(item.revenue / maxRev * 100);
+    return `<tr>
+      <td style="color:var(--muted);font-size:12px;width:20px">${i+1}</td>
+      <td style="font-size:13px">${item.name}</td>
+      <td style="text-align:right;font-size:13px;font-weight:600;white-space:nowrap">${won(item.revenue)}원</td>
+      <td style="width:80px;padding-left:8px">
+        <div style="height:6px;background:var(--border);border-radius:3px">
+          <div style="height:6px;width:${bar}%;background:#2a78d6;border-radius:3px"></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const qtyRows = sales_top10.map((item, i) => {
+    const bar = Math.round(item.qty / maxQty * 100);
+    return `<tr>
+      <td style="color:var(--muted);font-size:12px;width:20px">${i+1}</td>
+      <td style="font-size:13px">${item.name}</td>
+      <td style="text-align:right;font-size:13px;font-weight:600;white-space:nowrap">${item.qty}건</td>
+      <td style="width:80px;padding-left:8px">
+        <div style="height:6px;background:var(--border);border-radius:3px">
+          <div style="height:6px;width:${bar}%;background:#1baf7a;border-radius:3px"></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const theoryCostRows = Object.entries(theory_cost).map(([label, pct]) => {
+    const cls = label === '이론원가' ? 'up' : '';
+    const style = label === '이론원가' ? 'font-weight:700;border-top:1px solid var(--border);padding-top:8px' : '';
+    return `<tr style="${style}">
+      <td style="color:var(--muted);font-size:12px">${label}</td>
+      <td style="text-align:right;font-size:13px"><span class="${cls}">${pct}%</span></td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;align-items:start">
+      <div class="strat-card">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px">💰 매출 TOP 10</div>
+        <table style="width:100%;border-collapse:collapse">${revRows}</table>
+      </div>
+      <div class="strat-card">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px">📦 판매수량 TOP 10</div>
+        <table style="width:100%;border-collapse:collapse">${qtyRows}</table>
+      </div>
+      <div class="strat-card">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px">🧮 예상 이론원가</div>
+        <table style="width:100%;border-collapse:collapse">${theoryCostRows}</table>
+      </div>
+    </div>`;
 }
 
 function renderTable(days, today) {

@@ -14,6 +14,7 @@ else:  # macOS
 
 EXCEL_PATH = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 25.06 ~ )", "00. 매출 & 손익", "00. 매출", "H.서울역 월간 매출 _ 26Y.xlsx")
 PNL_PATH   = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 25.06 ~ )", "00. 매출 & 손익", "01. 실적", "H.서울역 누적 실적 _ 23.11 ~.xlsx")
+PMIX_PATH  = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 25.06 ~ )", "00. 매출 & 손익", "01. 실적", "H.서울역 P-MIX.xlsx")
 OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "data", "data.json")
 
 WEEKDAY_KO = ["월", "화", "수", "목", "금", "토", "일"]
@@ -117,6 +118,48 @@ def parse_pnl():
 
     return pnl
 
+def parse_pmix():
+    wb = load_workbook(PMIX_PATH, data_only=True)
+    pmix = {}
+    for sheet_name in wb.sheetnames:
+        try:
+            m = int(sheet_name)
+        except ValueError:
+            continue
+        ws = wb[sheet_name]
+        rows = list(ws.iter_rows(min_row=1, max_row=50, max_col=15, values_only=True))
+
+        # TOP 10: 헤더 row 4(idx3), 데이터 rows 5~14(idx4~13)
+        # 판매수량TOP10: col J(9), K(10) / 매출TOP10: col M(12), N(13)
+        sales_top10, revenue_top10 = [], []
+        for i in range(4, 14):
+            if i >= len(rows): break
+            row = rows[i]
+            name_s = row[9]; qty = row[10]
+            name_r = row[12]; rev = row[13]
+            if name_s and isinstance(qty, (int, float)) and qty > 0:
+                sales_top10.append({"name": str(name_s).replace("(H.CD)", "").strip(), "qty": int(qty)})
+            if name_r and isinstance(rev, (int, float)) and rev > 0:
+                revenue_top10.append({"name": str(name_r).replace("(H.CD)", "").strip(), "revenue": int(rev)})
+
+        # 예상 이론원가: col J(9), K(10), 행16(idx15)부터
+        theory_cost = {}
+        for i in range(15, 35):
+            if i >= len(rows): break
+            row = rows[i]
+            label = row[9]; val = row[10]
+            if label and isinstance(val, (int, float)):
+                theory_cost[str(label)] = round(float(val) * 100, 1)
+
+        if sales_top10 or revenue_top10:
+            pmix[str(m)] = {
+                "sales_top10": sales_top10,
+                "revenue_top10": revenue_top10,
+                "theory_cost": theory_cost,
+            }
+            print(f"  P-MIX {m}월: 판매TOP{len(sales_top10)} 매출TOP{len(revenue_top10)}")
+    return pmix
+
 def main():
     print(f"엑셀 파일 읽는 중...")
     wb = load_workbook(EXCEL_PATH, data_only=True)
@@ -135,12 +178,16 @@ def main():
     print(f"\nP&L 파일 읽는 중...")
     pnl_data = parse_pnl()
 
+    print(f"\nP-MIX 파일 읽는 중...")
+    pmix_data = parse_pmix()
+
     output = {
         "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "store": "서울역",
         "store_code": "4018",
         "months": all_data,
-        "pnl": pnl_data
+        "pnl": pnl_data,
+        "pmix": pmix_data,
     }
 
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
