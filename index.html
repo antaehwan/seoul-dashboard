@@ -846,15 +846,14 @@ function renderPmix(month) {
   ).join('');
 
   // 예상 이론원가: pct × total_revenue = 예상 원가 금액
+  const catEntries = Object.entries(theory_cost).filter(([l]) => l !== '이론원가');
+  const avgPct = catEntries.length ? (catEntries.reduce((s,[,v])=>s+v,0)/catEntries.length).toFixed(1) : null;
+
   const theoryCostRows = Object.entries(theory_cost).map(([label, pct]) => {
     const isTotal = label === '이론원가';
-    const estCost = total_revenue ? Math.round(total_revenue * pct / 100) : null;
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;${isTotal?'border-top:1px solid var(--border);margin-top:4px;':''}border-bottom:1px solid var(--border)">
       <span style="font-size:12px;color:${isTotal?'var(--text)':'var(--muted)'};font-weight:${isTotal?'600':'400'}">${isTotal?'전체 이론원가':label}</span>
-      <div style="text-align:right">
-        <span style="font-size:12px;font-weight:${isTotal?'700':'500'}" class="${isTotal?'up':''}">${pct}%</span>
-        ${estCost ? `<div style="font-size:11px;color:var(--muted)">${won(estCost)}원</div>` : ''}
-      </div>
+      <span style="font-size:12px;font-weight:${isTotal?'700':'500'}" class="${isTotal?'up':''}">${isTotal && avgPct ? `${pct}% <span style="font-size:11px;font-weight:400;color:var(--muted)">(평균 ${avgPct}%)</span>` : pct+'%'}</span>
     </div>`;
   }).join('');
 
