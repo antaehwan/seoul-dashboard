@@ -140,11 +140,6 @@
     <div id="strategy-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px"></div>
   </section>
 
-  <section id="weekly-trend">
-    <h2>전년 트렌드 기반 당월 분석</h2>
-    <p class="sub">전년 동월 주차별 매출 흐름을 기반으로 당월 트렌드 분석 및 예상 매출 산출</p>
-    <div id="weekly-trend-grid" style="margin-top:12px"></div>
-  </section>
 
   <!-- P-MIX -->
   <section id="pmix">
@@ -314,7 +309,7 @@ function render(month) {
     else if (anchor1 !== null && ratio !== null) weeklyProjected += Math.round(anchor1 * ratio);
   });
   const projected = weeklyProjected > 0 ? weeklyProjected : (dataCount > 0 ? cumActual / dataCount * totalDays : 0);
-  const projectedAch = monthTarget > 0 ? Math.round(projected / monthTarget * 100) : 0;
+  const projectedAch = monthTarget > 0 ? (projected / monthTarget * 100).toFixed(1) : '0.0';
 
   // 예상 월말 매출: 목표 페이스 vs 전년 페이스
   const planRate = cumTarget > 0 ? cumActual / cumTarget : 0;
@@ -379,7 +374,6 @@ function render(month) {
 
   renderReview(days, today, month);
   renderStrategy(days, today);
-  renderWeeklyTrend(days, today);
   renderPmix(month);
   renderMenuMatrix(month);
   renderTable(days, today);
@@ -1060,8 +1054,7 @@ function renderTable(days, today) {
 
 
 function renderWeeklyTrend(days, today) {
-  const el = document.getElementById('weekly-trend-grid');
-  if (!el) return;
+  return;
 
   // 주차별 집계 (1주: 1~7일, 2주: 8~14일, ...)
   const weekData = [1,2,3,4,5].map(w => {
