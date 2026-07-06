@@ -305,7 +305,7 @@ function render(month) {
     const wk = weekMap[w];
     const ratio = prevWeek1 > 0 ? wk.prev / prevWeek1 : null;
     if (wk.daysWithData === wk.totalDays) weeklyProjected += wk.actual;
-    else if (wk.daysWithData > 0) weeklyProjected += wk.actual; // 진행 중: 실적 그대로
+    else if (wk.daysWithData > 0) weeklyProjected += Math.round(wk.actual / wk.daysWithData * wk.totalDays); // 진행 중: 일평균으로 주차 전체 추정
     else if (anchor1 !== null && ratio !== null) weeklyProjected += Math.round(anchor1 * ratio);
   });
   const projected = weeklyProjected > 0 ? weeklyProjected : (dataCount > 0 ? cumActual / dataCount * totalDays : 0);
