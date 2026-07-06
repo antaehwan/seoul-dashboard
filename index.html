@@ -269,17 +269,54 @@ function render(month) {
   const cumTarget = withData.reduce((s,d) => s+d.target, 0);
   const monthTarget = days.reduce((s,d) => s+d.target, 0);
 
-  // 예상 달성률: 현재 일평균으로 월말 예측
-  const dailyAvg = dataCount > 0 ? cumActual / dataCount : 0;
-  const projected = dailyAvg * totalDays;
-  const projectedAch = monthTarget > 0 ? Math.round(projected / monthTarget * 100) : 0;
   const curAch = cumTarget > 0 ? (cumActual / cumTarget * 100).toFixed(1) : '0.0';
 
   const cumPrevActual = withData.reduce((s,d) => s+d.prev_actual, 0);
   const monthPrevActual = days.reduce((s,d) => s+d.prev_actual, 0);
   const yoyVal = yoy(cumActual, cumPrevActual);
 
-  // 예상 월말 매출: 현재 페이스를 각 기준에 적용
+  // 전년 주차별 비율 기반 예상 월매출 계산
+  const WEEK_START = 1; // 월요일 기준
+  function getWeekNum(dateStr) {
+    const d = new Date(dateStr);
+    const firstDay = new Date(d.getFullYear(), d.getMonth(), 1);
+    const firstMon = new Date(firstDay);
+    const dayOfWeek = firstDay.getDay() || 7;
+    if (dayOfWeek !== 1) firstMon.setDate(firstDay.getDate() - (dayOfWeek - 1));
+    const diff = Math.floor((d - firstMon) / 86400000);
+    return Math.floor(diff / 7) + 1;
+  }
+  // 주차별 그룹핑
+  const weekMap = {};
+  days.forEach(d => {
+    const w = getWeekNum(d.date);
+    if (!weekMap[w]) weekMap[w] = { actual: 0, prev: 0, daysWithData: 0, totalDays: 0, lastDate: '' };
+    weekMap[w].totalDays++;
+    weekMap[w].prev += (d.prev_actual || 0);
+    if (d.actual > 0 && d.date <= today) { weekMap[w].actual += d.actual; weekMap[w].daysWithData++; weekMap[w].lastDate = d.date; }
+  });
+  const weeks = Object.keys(weekMap).map(Number).sort((a,b)=>a-b);
+  const prevWeek1 = weekMap[weeks[0]]?.prev || 0;
+  // 완료 주차 기준 anchor (당월 1주차 환산)
+  let anchor1 = null;
+  for (const w of weeks) {
+    const wk = weekMap[w];
+    const ratio = prevWeek1 > 0 ? wk.prev / prevWeek1 : null;
+    if (wk.daysWithData === wk.totalDays && ratio > 0) { anchor1 = wk.actual / ratio; break; }
+  }
+  // 전년 주차 비율로 예상 월매출 합산
+  let weeklyProjected = 0;
+  weeks.forEach(w => {
+    const wk = weekMap[w];
+    const ratio = prevWeek1 > 0 ? wk.prev / prevWeek1 : null;
+    if (wk.daysWithData === wk.totalDays) weeklyProjected += wk.actual;
+    else if (wk.daysWithData > 0) weeklyProjected += wk.actual; // 진행 중: 실적 그대로
+    else if (anchor1 !== null && ratio !== null) weeklyProjected += Math.round(anchor1 * ratio);
+  });
+  const projected = weeklyProjected > 0 ? weeklyProjected : (dataCount > 0 ? cumActual / dataCount * totalDays : 0);
+  const projectedAch = monthTarget > 0 ? Math.round(projected / monthTarget * 100) : 0;
+
+  // 예상 월말 매출: 목표 페이스 vs 전년 페이스
   const planRate = cumTarget > 0 ? cumActual / cumTarget : 0;
   const planProj = Math.round(monthTarget * planRate);
   const planDiff = (Math.abs(1 - planRate) * 100).toFixed(1);
@@ -327,11 +364,10 @@ function render(month) {
       <div class="sub-value" style="margin-top:6px">${monthTarget.toLocaleString('ko-KR')}원</div>
     </div>
     <div class="card">
-      <div class="label">예상</div>
-      <div class="sub-value" style="margin-bottom:2px">계획 <span class="value-num">${planProj.toLocaleString('ko-KR')}원</span></div>
-      <div class="sub-pct ${projVsPlanArr==='▲'?'up':'dn'}" style="margin-bottom:8px">${projVsPlanArr} ${planDiff}%</div>
-      <div class="sub-value" style="margin-bottom:2px">전년 <span class="value-num">${yoyProj.toLocaleString('ko-KR')}원</span></div>
-      <div class="sub-pct ${projVsPrevArr==='▲'?'up':'dn'}">${projVsPrevArr} ${yoyDiff}%</div>
+      <div class="label">예상 달성률</div>
+      <div class="value ${colorPct(projectedAch)}" style="font-size:28px">${projectedAch}%</div>
+      <div class="sub-value" style="margin-top:8px;margin-bottom:2px">예상 월매출 <span class="value-num">${fmtM(projected)}</span></div>
+      <div class="sub-value" style="font-size:10px;color:var(--muted)">전년 주차 비율 기반</div>
     </div>
     <div class="card">
       <div class="label">객수 / 객단가</div>
