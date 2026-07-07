@@ -948,30 +948,26 @@ function renderPmix(month) {
 function renderMenuMatrix(month) {
   const el = document.getElementById('menu-matrix');
   if (!el) return;
-  const pmix = DATA.pmix && DATA.pmix[String(month)];
-  if (!pmix) { el.innerHTML = ''; return; }
+  if (!DATA.pmix) { el.innerHTML = ''; return; }
 
-  const { sales_top10, revenue_top10 } = pmix;
-
-  // 전체 메뉴 데이터 사용 (menus_all 우선, 없으면 TOP10 merge 폴백)
-  let menus;
-  if (pmix.menus_all && pmix.menus_all.length) {
-    menus = pmix.menus_all;
-  } else {
-    const map = {};
-    sales_top10.forEach(m => { map[m.name] = { name: m.name, qty: m.qty }; });
-    revenue_top10.forEach(m => {
-      if (map[m.name]) map[m.name].revenue = m.revenue;
-      else map[m.name] = { name: m.name, revenue: m.revenue };
+  // 전체 월 합산 (특정 월이 아닌 누적 기준으로 메뉴 구조 파악)
+  const aggMap = {};
+  const tcMerged = {};
+  Object.values(DATA.pmix).forEach(pmix => {
+    Object.assign(tcMerged, pmix.theory_cost || {});
+    (pmix.menus_all || []).forEach(m => {
+      if (!aggMap[m.name]) aggMap[m.name] = { name: m.name, qty: 0, revenue: 0, category: m.category };
+      aggMap[m.name].qty += m.qty;
+      aggMap[m.name].revenue += m.revenue;
     });
-    menus = Object.values(map).filter(m => m.qty && m.revenue);
-  }
+  });
+  let menus = Object.values(aggMap).filter(m => m.qty > 0 && m.revenue > 0);
   if (!menus.length) { el.innerHTML = ''; return; }
 
   const median = arr => { const s = [...arr].sort((a,b)=>a-b); const m = Math.floor(s.length/2); return s.length%2 ? s[m] : (s[m-1]+s[m])/2; };
 
   // 공헌이익 = 매출 × (1 - 이론원가율)
-  const tc = pmix.theory_cost || {};
+  const tc = tcMerged;
   menus.forEach(m => {
     const rate = (tc[m.category] || 0) / 100;
     m.contribution = Math.round(m.revenue * (1 - rate));
