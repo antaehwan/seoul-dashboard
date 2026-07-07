@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-06 21:29",
+  "updated_at": "2026-07-07 09:51",
   "store": "서울역",
   "store_code": "4018",
   "months": {
@@ -5106,7 +5106,104 @@
   },
   "pmix": {
     "1": {
-      "menus_all": [],
+      "menus_all": [
+        {
+          "name": "쇼마이_3pcs",
+          "qty": 951,
+          "revenue": 9034500,
+          "category": "딤섬"
+        },
+        {
+          "name": "블랙하가우_3pcs",
+          "qty": 719,
+          "revenue": 6830500,
+          "category": "딤섬"
+        },
+        {
+          "name": "소롱포_4pcs",
+          "qty": 1314,
+          "revenue": 9855000,
+          "category": "딤섬"
+        },
+        {
+          "name": "호우섬 완탕",
+          "qty": 190,
+          "revenue": 1881000,
+          "category": "딤섬"
+        },
+        {
+          "name": "맑은우육탕면",
+          "qty": 1786,
+          "revenue": 27504400,
+          "category": "면"
+        },
+        {
+          "name": "호우섬마라탕면",
+          "qty": 789,
+          "revenue": 12545100,
+          "category": "면"
+        },
+        {
+          "name": "완탕면",
+          "qty": 1981,
+          "revenue": 30507400,
+          "category": "면"
+        },
+        {
+          "name": "라구짜장도삭면",
+          "qty": 673,
+          "revenue": 8008700,
+          "category": "면"
+        },
+        {
+          "name": "새우/돼지고기완자",
+          "qty": 837,
+          "revenue": 15819300,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "라구짜장&계란튀김 뽀짜이판",
+          "qty": 182,
+          "revenue": 2821000,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "새우가지조림뽀짜이판",
+          "qty": 463,
+          "revenue": 8565500,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "마늘칩꿔바육",
+          "qty": 459,
+          "revenue": 13724100,
+          "category": "요리"
+        },
+        {
+          "name": "쯔란갑오징어튀김",
+          "qty": 64,
+          "revenue": 1408000,
+          "category": "요리"
+        },
+        {
+          "name": "공심채 볶음",
+          "qty": 286,
+          "revenue": 2717000,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "파이황과",
+          "qty": 156,
+          "revenue": 1092000,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "홍콩식 배추찜",
+          "qty": 86,
+          "revenue": 817000,
+          "category": "사이드메뉴"
+        }
+      ],
       "sales_top10": [
         {
           "name": "맑은우육탕면",
@@ -5201,11 +5298,108 @@
         "음료": 23.1,
         "추가메뉴": 55.4
       },
-      "total_revenue": 0,
-      "total_qty": 0
+      "total_revenue": 153130500,
+      "total_qty": 10936
     },
     "2": {
-      "menus_all": [],
+      "menus_all": [
+        {
+          "name": "쇼마이_3pcs",
+          "qty": 856,
+          "revenue": 8132000,
+          "category": "딤섬"
+        },
+        {
+          "name": "블랙하가우_3pcs",
+          "qty": 624,
+          "revenue": 5928000,
+          "category": "딤섬"
+        },
+        {
+          "name": "소롱포_4pcs",
+          "qty": 1166,
+          "revenue": 8745000,
+          "category": "딤섬"
+        },
+        {
+          "name": "호우섬 완탕",
+          "qty": 197,
+          "revenue": 1950300,
+          "category": "딤섬"
+        },
+        {
+          "name": "맑은우육탕면",
+          "qty": 1638,
+          "revenue": 25225200,
+          "category": "면"
+        },
+        {
+          "name": "호우섬마라탕면",
+          "qty": 845,
+          "revenue": 13435500,
+          "category": "면"
+        },
+        {
+          "name": "완탕면",
+          "qty": 1608,
+          "revenue": 24763200,
+          "category": "면"
+        },
+        {
+          "name": "라구짜장도삭면",
+          "qty": 681,
+          "revenue": 8103900,
+          "category": "면"
+        },
+        {
+          "name": "새우/돼지고기완자",
+          "qty": 712,
+          "revenue": 13456800,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "라구짜장&계란튀김 뽀짜이판",
+          "qty": 162,
+          "revenue": 2511000,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "새우가지조림뽀짜이판",
+          "qty": 429,
+          "revenue": 7936500,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "마늘칩꿔바육",
+          "qty": 413,
+          "revenue": 12348700,
+          "category": "요리"
+        },
+        {
+          "name": "쯔란갑오징어튀김",
+          "qty": 75,
+          "revenue": 1650000,
+          "category": "요리"
+        },
+        {
+          "name": "공심채 볶음",
+          "qty": 245,
+          "revenue": 2327500,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "파이황과",
+          "qty": 161,
+          "revenue": 1127000,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "홍콩식 배추찜",
+          "qty": 81,
+          "revenue": 769500,
+          "category": "사이드메뉴"
+        }
+      ],
       "sales_top10": [
         {
           "name": "맑은우육탕면",
@@ -5300,11 +5494,108 @@
         "음료": 23.6,
         "추가메뉴": 53.4
       },
-      "total_revenue": 0,
-      "total_qty": 0
+      "total_revenue": 138410100,
+      "total_qty": 9893
     },
     "3": {
-      "menus_all": [],
+      "menus_all": [
+        {
+          "name": "쇼마이_3pcs",
+          "qty": 837,
+          "revenue": 7951500,
+          "category": "딤섬"
+        },
+        {
+          "name": "블랙하가우_3pcs",
+          "qty": 588,
+          "revenue": 5586000,
+          "category": "딤섬"
+        },
+        {
+          "name": "소롱포_4pcs",
+          "qty": 1170,
+          "revenue": 8775000,
+          "category": "딤섬"
+        },
+        {
+          "name": "호우섬 완탕",
+          "qty": 208,
+          "revenue": 2059200,
+          "category": "딤섬"
+        },
+        {
+          "name": "맑은우육탕면",
+          "qty": 1600,
+          "revenue": 24640000,
+          "category": "면"
+        },
+        {
+          "name": "호우섬마라탕면",
+          "qty": 706,
+          "revenue": 11225400,
+          "category": "면"
+        },
+        {
+          "name": "완탕면",
+          "qty": 1466,
+          "revenue": 22576400,
+          "category": "면"
+        },
+        {
+          "name": "라구짜장도삭면",
+          "qty": 608,
+          "revenue": 7235200,
+          "category": "면"
+        },
+        {
+          "name": "새우/돼지고기완자",
+          "qty": 696,
+          "revenue": 13154400,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "라구짜장&계란튀김 뽀짜이판",
+          "qty": 143,
+          "revenue": 2216500,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "새우가지조림뽀짜이판",
+          "qty": 395,
+          "revenue": 7307500,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "마늘칩꿔바육",
+          "qty": 385,
+          "revenue": 11511500,
+          "category": "요리"
+        },
+        {
+          "name": "쯔란갑오징어튀김",
+          "qty": 94,
+          "revenue": 2068000,
+          "category": "요리"
+        },
+        {
+          "name": "공심채 볶음",
+          "qty": 267,
+          "revenue": 2536500,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "파이황과",
+          "qty": 153,
+          "revenue": 1071000,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "홍콩식 배추찜",
+          "qty": 99,
+          "revenue": 940500,
+          "category": "사이드메뉴"
+        }
+      ],
       "sales_top10": [
         {
           "name": "맑은우육탕면",
@@ -5399,11 +5690,132 @@
         "음료": 24.2,
         "추가메뉴": 53.6
       },
-      "total_revenue": 0,
-      "total_qty": 0
+      "total_revenue": 130854600,
+      "total_qty": 9415
     },
     "4": {
-      "menus_all": [],
+      "menus_all": [
+        {
+          "name": "쇼마이_3pcs",
+          "qty": 922,
+          "revenue": 8759000,
+          "category": "딤섬"
+        },
+        {
+          "name": "블랙하가우_3pcs",
+          "qty": 654,
+          "revenue": 6213000,
+          "category": "딤섬"
+        },
+        {
+          "name": "소롱포_4pcs",
+          "qty": 1160,
+          "revenue": 8700000,
+          "category": "딤섬"
+        },
+        {
+          "name": "고수소롱포",
+          "qty": 170,
+          "revenue": 1275000,
+          "category": "딤섬"
+        },
+        {
+          "name": "크런치쉬림프딤섬_3pcs",
+          "qty": 171,
+          "revenue": 1863900,
+          "category": "딤섬"
+        },
+        {
+          "name": "호우섬 완탕",
+          "qty": 280,
+          "revenue": 2772000,
+          "category": "딤섬"
+        },
+        {
+          "name": "맑은우육탕면",
+          "qty": 1632,
+          "revenue": 25132800,
+          "category": "면"
+        },
+        {
+          "name": "호우섬마라탕면",
+          "qty": 642,
+          "revenue": 10207800,
+          "category": "면"
+        },
+        {
+          "name": "완탕면",
+          "qty": 1366,
+          "revenue": 21036400,
+          "category": "면"
+        },
+        {
+          "name": "라구짜장도삭면",
+          "qty": 526,
+          "revenue": 6259400,
+          "category": "면"
+        },
+        {
+          "name": "마라완탕비빔면",
+          "qty": 277,
+          "revenue": 4265800,
+          "category": "면"
+        },
+        {
+          "name": "새우/돼지고기완자",
+          "qty": 729,
+          "revenue": 13778100,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "라구짜장&계란튀김 뽀짜이판",
+          "qty": 100,
+          "revenue": 1550000,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "새우가지조림뽀짜이판",
+          "qty": 402,
+          "revenue": 7437000,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "마늘칩꿔바육",
+          "qty": 408,
+          "revenue": 12199200,
+          "category": "요리"
+        },
+        {
+          "name": "쯔란갑오징어튀김",
+          "qty": 106,
+          "revenue": 2332000,
+          "category": "요리"
+        },
+        {
+          "name": "크리스피라페치킨",
+          "qty": 217,
+          "revenue": 6054300,
+          "category": "요리"
+        },
+        {
+          "name": "공심채 볶음",
+          "qty": 321,
+          "revenue": 3049500,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "파이황과",
+          "qty": 190,
+          "revenue": 1330000,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "홍콩식 배추찜",
+          "qty": 74,
+          "revenue": 703000,
+          "category": "사이드메뉴"
+        }
+      ],
       "sales_top10": [
         {
           "name": "맑은우육탕면",
@@ -5498,11 +5910,150 @@
         "음료": 24.1,
         "추가메뉴": 53.8
       },
-      "total_revenue": 0,
-      "total_qty": 0
+      "total_revenue": 144918200,
+      "total_qty": 10347
     },
     "5": {
-      "menus_all": [],
+      "menus_all": [
+        {
+          "name": "쇼마이_3pcs",
+          "qty": 795,
+          "revenue": 7552500,
+          "category": "딤섬"
+        },
+        {
+          "name": "블랙하가우_3pcs",
+          "qty": 554,
+          "revenue": 5263000,
+          "category": "딤섬"
+        },
+        {
+          "name": "소롱포_4pcs",
+          "qty": 1201,
+          "revenue": 9007500,
+          "category": "딤섬"
+        },
+        {
+          "name": "고수소롱포",
+          "qty": 138,
+          "revenue": 1035000,
+          "category": "딤섬"
+        },
+        {
+          "name": "크런치쉬림프딤섬_3pcs",
+          "qty": 197,
+          "revenue": 2147300,
+          "category": "딤섬"
+        },
+        {
+          "name": "호우섬 완탕",
+          "qty": 259,
+          "revenue": 2564100,
+          "category": "딤섬"
+        },
+        {
+          "name": "맑은우육탕면",
+          "qty": 1578,
+          "revenue": 24301200,
+          "category": "면"
+        },
+        {
+          "name": "호우섬마라탕면",
+          "qty": 675,
+          "revenue": 10732500,
+          "category": "면"
+        },
+        {
+          "name": "도삭_호우섬마라탕면",
+          "qty": 1,
+          "revenue": 17900,
+          "category": "면"
+        },
+        {
+          "name": "완탕면",
+          "qty": 1396,
+          "revenue": 21498400,
+          "category": "면"
+        },
+        {
+          "name": "라구짜장도삭면",
+          "qty": 578,
+          "revenue": 6878200,
+          "category": "면"
+        },
+        {
+          "name": "마라완탕비빔면",
+          "qty": 189,
+          "revenue": 2910600,
+          "category": "면"
+        },
+        {
+          "name": "새우/돼지고기완자",
+          "qty": 649,
+          "revenue": 12266100,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "라구짜장&계란튀김 뽀짜이판",
+          "qty": 115,
+          "revenue": 1782500,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "새우가지조림뽀짜이판",
+          "qty": 342,
+          "revenue": 6327000,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "마늘칩꿔바육",
+          "qty": 330,
+          "revenue": 9867000,
+          "category": "요리"
+        },
+        {
+          "name": "쯔란갑오징어튀김",
+          "qty": 76,
+          "revenue": 1672000,
+          "category": "요리"
+        },
+        {
+          "name": "크리스피라페치킨",
+          "qty": 166,
+          "revenue": 4631400,
+          "category": "요리"
+        },
+        {
+          "name": "시그니처2인세트",
+          "qty": 916,
+          "revenue": 45708400,
+          "category": "세트"
+        },
+        {
+          "name": "패밀리3인세트",
+          "qty": 211,
+          "revenue": 16014900,
+          "category": "세트"
+        },
+        {
+          "name": "공심채 볶음",
+          "qty": 270,
+          "revenue": 2565000,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "파이황과",
+          "qty": 177,
+          "revenue": 1239000,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "홍콩식 배추찜",
+          "qty": 83,
+          "revenue": 788500,
+          "category": "사이드메뉴"
+        }
+      ],
       "sales_top10": [
         {
           "name": "맑은우육탕면",
@@ -5598,11 +6149,144 @@
         "음료": 23.7,
         "추가메뉴": 52.9
       },
-      "total_revenue": 0,
-      "total_qty": 0
+      "total_revenue": 196770000,
+      "total_qty": 10896
     },
     "6": {
-      "menus_all": [],
+      "menus_all": [
+        {
+          "name": "쇼마이_3pcs",
+          "qty": 751,
+          "revenue": 7134500,
+          "category": "딤섬"
+        },
+        {
+          "name": "블랙하가우_3pcs",
+          "qty": 562,
+          "revenue": 5339000,
+          "category": "딤섬"
+        },
+        {
+          "name": "소롱포_4pcs",
+          "qty": 1069,
+          "revenue": 8017500,
+          "category": "딤섬"
+        },
+        {
+          "name": "고수소롱포",
+          "qty": 131,
+          "revenue": 982500,
+          "category": "딤섬"
+        },
+        {
+          "name": "크런치쉬림프딤섬_3pcs",
+          "qty": 189,
+          "revenue": 2060100,
+          "category": "딤섬"
+        },
+        {
+          "name": "호우섬 완탕",
+          "qty": 243,
+          "revenue": 2405700,
+          "category": "딤섬"
+        },
+        {
+          "name": "맑은우육탕면",
+          "qty": 1471,
+          "revenue": 22653400,
+          "category": "면"
+        },
+        {
+          "name": "호우섬마라탕면",
+          "qty": 575,
+          "revenue": 9142500,
+          "category": "면"
+        },
+        {
+          "name": "완탕면",
+          "qty": 1261,
+          "revenue": 19419400,
+          "category": "면"
+        },
+        {
+          "name": "라구짜장도삭면",
+          "qty": 474,
+          "revenue": 5640600,
+          "category": "면"
+        },
+        {
+          "name": "마라완탕비빔면",
+          "qty": 226,
+          "revenue": 3480400,
+          "category": "면"
+        },
+        {
+          "name": "새우/돼지고기완자",
+          "qty": 620,
+          "revenue": 11718000,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "라구짜장&계란튀김 뽀짜이판",
+          "qty": 108,
+          "revenue": 1674000,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "새우가지조림뽀짜이판",
+          "qty": 329,
+          "revenue": 6086500,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "마늘칩꿔바육",
+          "qty": 278,
+          "revenue": 8312200,
+          "category": "요리"
+        },
+        {
+          "name": "쯔란갑오징어튀김",
+          "qty": 79,
+          "revenue": 1738000,
+          "category": "요리"
+        },
+        {
+          "name": "크리스피라페치킨",
+          "qty": 144,
+          "revenue": 4017600,
+          "category": "요리"
+        },
+        {
+          "name": "시그니처2인세트",
+          "qty": 895,
+          "revenue": 44660500,
+          "category": "세트"
+        },
+        {
+          "name": "패밀리3인세트",
+          "qty": 186,
+          "revenue": 14117400,
+          "category": "세트"
+        },
+        {
+          "name": "공심채 볶음",
+          "qty": 255,
+          "revenue": 2422500,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "파이황과",
+          "qty": 164,
+          "revenue": 1148000,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "홍콩식 배추찜",
+          "qty": 80,
+          "revenue": 760000,
+          "category": "사이드메뉴"
+        }
+      ],
       "sales_top10": [
         {
           "name": "맑은우육탕면",
@@ -5698,11 +6382,144 @@
         "음료": 24.0,
         "추가메뉴": 53.6
       },
-      "total_revenue": 0,
-      "total_qty": 0
+      "total_revenue": 182930300,
+      "total_qty": 10090
     },
     "7": {
-      "menus_all": [],
+      "menus_all": [
+        {
+          "name": "쇼마이_3pcs",
+          "qty": 132,
+          "revenue": 1254000,
+          "category": "딤섬"
+        },
+        {
+          "name": "블랙하가우_3pcs",
+          "qty": 101,
+          "revenue": 959500,
+          "category": "딤섬"
+        },
+        {
+          "name": "소롱포_4pcs",
+          "qty": 203,
+          "revenue": 1522500,
+          "category": "딤섬"
+        },
+        {
+          "name": "고수소롱포",
+          "qty": 21,
+          "revenue": 157500,
+          "category": "딤섬"
+        },
+        {
+          "name": "크런치쉬림프딤섬_3pcs",
+          "qty": 30,
+          "revenue": 327000,
+          "category": "딤섬"
+        },
+        {
+          "name": "호우섬 완탕",
+          "qty": 41,
+          "revenue": 405900,
+          "category": "딤섬"
+        },
+        {
+          "name": "맑은우육탕면",
+          "qty": 243,
+          "revenue": 3742200,
+          "category": "면"
+        },
+        {
+          "name": "호우섬마라탕면",
+          "qty": 111,
+          "revenue": 1764900,
+          "category": "면"
+        },
+        {
+          "name": "완탕면",
+          "qty": 221,
+          "revenue": 3403400,
+          "category": "면"
+        },
+        {
+          "name": "라구짜장도삭면",
+          "qty": 71,
+          "revenue": 844900,
+          "category": "면"
+        },
+        {
+          "name": "마라완탕비빔면",
+          "qty": 38,
+          "revenue": 585200,
+          "category": "면"
+        },
+        {
+          "name": "새우/돼지고기완자",
+          "qty": 89,
+          "revenue": 1682100,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "라구짜장&계란튀김 뽀짜이판",
+          "qty": 23,
+          "revenue": 356500,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "새우가지조림뽀짜이판",
+          "qty": 48,
+          "revenue": 888000,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "마늘칩꿔바육",
+          "qty": 48,
+          "revenue": 1435200,
+          "category": "요리"
+        },
+        {
+          "name": "쯔란갑오징어튀김",
+          "qty": 17,
+          "revenue": 374000,
+          "category": "요리"
+        },
+        {
+          "name": "크리스피라페치킨",
+          "qty": 29,
+          "revenue": 809100,
+          "category": "요리"
+        },
+        {
+          "name": "시그니처2인세트",
+          "qty": 168,
+          "revenue": 8383200,
+          "category": "세트"
+        },
+        {
+          "name": "패밀리3인세트",
+          "qty": 43,
+          "revenue": 3263700,
+          "category": "세트"
+        },
+        {
+          "name": "공심채 볶음",
+          "qty": 41,
+          "revenue": 389500,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "파이황과",
+          "qty": 25,
+          "revenue": 175000,
+          "category": "사이드메뉴"
+        },
+        {
+          "name": "홍콩식 배추찜",
+          "qty": 14,
+          "revenue": 133000,
+          "category": "사이드메뉴"
+        }
+      ],
       "sales_top10": [
         {
           "name": "맑은우육탕면",
@@ -5798,8 +6615,8 @@
         "음료": 34.2,
         "추가메뉴": 50.0
       },
-      "total_revenue": 0,
-      "total_qty": 0
+      "total_revenue": 32856300,
+      "total_qty": 1757
     }
   }
 }

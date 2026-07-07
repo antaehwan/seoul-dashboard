@@ -146,7 +146,8 @@ def parse_pmix():
             cat_cell = row[1]  # col B = 분류
             if cat_cell: current_cat = str(cat_cell).strip()
             if current_cat in EXCLUDE_CATEGORIES: continue
-            name = row[2]; qty = row[6]; rev = row[7]
+            name = row[2]; qty = row[6]; price = row[3]
+            rev = row[7] if isinstance(row[7], (int, float)) and row[7] > 0 else (price * qty if isinstance(price, (int, float)) and isinstance(qty, (int, float)) else None)
             n = clean_name(name)
             if not n: continue
             if any(k in n for k in EXCLUDE_KEYWORDS): continue
