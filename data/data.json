@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-07 09:51",
+  "updated_at": "2026-07-07 10:06",
   "store": "서울역",
   "store_code": "4018",
   "months": {
@@ -5041,10 +5041,64 @@
       "revenue": 184700997,
       "food_cost": 38422559,
       "food_cost_pct": 20.8,
+      "food_cost_detail": [
+        {
+          "label": "식료재료비",
+          "amount": 26779740
+        },
+        {
+          "label": "음료재료비",
+          "amount": 1637547
+        },
+        {
+          "label": "기타재료비",
+          "amount": 10005272
+        }
+      ],
       "labor_cost": 51110037,
       "labor_cost_pct": 27.7,
+      "labor_cost_detail": [
+        {
+          "label": "고정비",
+          "amount": 32670828
+        },
+        {
+          "label": "변동비",
+          "amount": 13306750
+        },
+        {
+          "label": "연차수당",
+          "amount": 2620224
+        },
+        {
+          "label": "상여금",
+          "amount": 0
+        },
+        {
+          "label": "퇴직급여",
+          "amount": 2512235
+        }
+      ],
       "ga_cost": 47963285,
       "ga_cost_pct": 26.0,
+      "ga_cost_detail": [
+        {
+          "label": "복리후생비",
+          "amount": 2130442
+        },
+        {
+          "label": "교육훈련비",
+          "amount": 124679
+        },
+        {
+          "label": "여비교통비",
+          "amount": 0
+        },
+        {
+          "label": "통신비",
+          "amount": 45073
+        }
+      ],
       "op_profit": 47205114,
       "op_profit_pct": 25.6
     },
@@ -5052,10 +5106,64 @@
       "revenue": 167994933,
       "food_cost": 35145036,
       "food_cost_pct": 20.9,
+      "food_cost_detail": [
+        {
+          "label": "식료재료비",
+          "amount": 26059071
+        },
+        {
+          "label": "음료재료비",
+          "amount": 1724941
+        },
+        {
+          "label": "기타재료비",
+          "amount": 7361024
+        }
+      ],
       "labor_cost": 45936459,
       "labor_cost_pct": 27.3,
+      "labor_cost_detail": [
+        {
+          "label": "고정비",
+          "amount": 30274002
+        },
+        {
+          "label": "변동비",
+          "amount": 11625558
+        },
+        {
+          "label": "연차수당",
+          "amount": 1524664
+        },
+        {
+          "label": "상여금",
+          "amount": 0
+        },
+        {
+          "label": "퇴직급여",
+          "amount": 2512235
+        }
+      ],
       "ga_cost": 46051780,
       "ga_cost_pct": 27.4,
+      "ga_cost_detail": [
+        {
+          "label": "복리후생비",
+          "amount": 2529051
+        },
+        {
+          "label": "교육훈련비",
+          "amount": 555753
+        },
+        {
+          "label": "여비교통비",
+          "amount": 0
+        },
+        {
+          "label": "통신비",
+          "amount": 45000
+        }
+      ],
       "op_profit": 40861657,
       "op_profit_pct": 24.3
     },
@@ -5063,10 +5171,64 @@
       "revenue": 161327945,
       "food_cost": 34959056,
       "food_cost_pct": 21.7,
+      "food_cost_detail": [
+        {
+          "label": "식료재료비",
+          "amount": 25138362
+        },
+        {
+          "label": "음료재료비",
+          "amount": 1759201
+        },
+        {
+          "label": "기타재료비",
+          "amount": 8061493
+        }
+      ],
       "labor_cost": 45833717,
       "labor_cost_pct": 28.4,
+      "labor_cost_detail": [
+        {
+          "label": "고정비",
+          "amount": 29757558
+        },
+        {
+          "label": "변동비",
+          "amount": 12519945
+        },
+        {
+          "label": "연차수당",
+          "amount": 1395388
+        },
+        {
+          "label": "상여금",
+          "amount": 0
+        },
+        {
+          "label": "퇴직급여",
+          "amount": 2160826
+        }
+      ],
       "ga_cost": 43601064,
       "ga_cost_pct": 27.0,
+      "ga_cost_detail": [
+        {
+          "label": "복리후생비",
+          "amount": 2334586
+        },
+        {
+          "label": "교육훈련비",
+          "amount": 322656
+        },
+        {
+          "label": "여비교통비",
+          "amount": 0
+        },
+        {
+          "label": "통신비",
+          "amount": 45000
+        }
+      ],
       "op_profit": 36934108,
       "op_profit_pct": 22.9
     },
@@ -5074,10 +5236,64 @@
       "revenue": 160798437,
       "food_cost": 32299568,
       "food_cost_pct": 20.1,
+      "food_cost_detail": [
+        {
+          "label": "식료재료비",
+          "amount": 23689606
+        },
+        {
+          "label": "음료재료비",
+          "amount": 2256786
+        },
+        {
+          "label": "기타재료비",
+          "amount": 6353176
+        }
+      ],
       "labor_cost": 46813267,
       "labor_cost_pct": 29.1,
+      "labor_cost_detail": [
+        {
+          "label": "고정비",
+          "amount": 31088128
+        },
+        {
+          "label": "변동비",
+          "amount": 11537636
+        },
+        {
+          "label": "연차수당",
+          "amount": 1675268
+        },
+        {
+          "label": "상여금",
+          "amount": 0
+        },
+        {
+          "label": "퇴직급여",
+          "amount": 2512235
+        }
+      ],
       "ga_cost": 44737459,
       "ga_cost_pct": 27.8,
+      "ga_cost_detail": [
+        {
+          "label": "복리후생비",
+          "amount": 4579943
+        },
+        {
+          "label": "교육훈련비",
+          "amount": 174240
+        },
+        {
+          "label": "여비교통비",
+          "amount": 0
+        },
+        {
+          "label": "통신비",
+          "amount": 45000
+        }
+      ],
       "op_profit": 36948143,
       "op_profit_pct": 23.0
     },
@@ -5085,10 +5301,64 @@
       "revenue": 193487013,
       "food_cost": 41023773,
       "food_cost_pct": 21.2,
+      "food_cost_detail": [
+        {
+          "label": "식료재료비",
+          "amount": 28824736
+        },
+        {
+          "label": "음료재료비",
+          "amount": 2219355
+        },
+        {
+          "label": "기타재료비",
+          "amount": 9979682
+        }
+      ],
       "labor_cost": 52362842,
       "labor_cost_pct": 27.1,
+      "labor_cost_detail": [
+        {
+          "label": "고정비",
+          "amount": 34862619
+        },
+        {
+          "label": "변동비",
+          "amount": 13432870
+        },
+        {
+          "label": "연차수당",
+          "amount": 1555118
+        },
+        {
+          "label": "상여금",
+          "amount": 0
+        },
+        {
+          "label": "퇴직급여",
+          "amount": 2512235
+        }
+      ],
       "ga_cost": 49258635,
       "ga_cost_pct": 25.5,
+      "ga_cost_detail": [
+        {
+          "label": "복리후생비",
+          "amount": 2729619
+        },
+        {
+          "label": "교육훈련비",
+          "amount": 2943
+        },
+        {
+          "label": "여비교통비",
+          "amount": 0
+        },
+        {
+          "label": "통신비",
+          "amount": 45000
+        }
+      ],
       "op_profit": 50841762,
       "op_profit_pct": 26.3
     },
@@ -5096,10 +5366,64 @@
       "revenue": 178255815,
       "food_cost": 37651150,
       "food_cost_pct": 21.1,
+      "food_cost_detail": [
+        {
+          "label": "식료재료비",
+          "amount": 26470138
+        },
+        {
+          "label": "음료재료비",
+          "amount": 2117955
+        },
+        {
+          "label": "기타재료비",
+          "amount": 9063057
+        }
+      ],
       "labor_cost": 48449909,
       "labor_cost_pct": 27.2,
+      "labor_cost_detail": [
+        {
+          "label": "고정비",
+          "amount": 31311311
+        },
+        {
+          "label": "변동비",
+          "amount": 13071245
+        },
+        {
+          "label": "연차수당",
+          "amount": 1555118
+        },
+        {
+          "label": "상여금",
+          "amount": 0
+        },
+        {
+          "label": "퇴직급여",
+          "amount": 2512235
+        }
+      ],
       "ga_cost": 47943133,
       "ga_cost_pct": 26.9,
+      "ga_cost_detail": [
+        {
+          "label": "복리후생비",
+          "amount": 2665387
+        },
+        {
+          "label": "교육훈련비",
+          "amount": 356511
+        },
+        {
+          "label": "여비교통비",
+          "amount": 0
+        },
+        {
+          "label": "통신비",
+          "amount": 45000
+        }
+      ],
       "op_profit": 44211622,
       "op_profit_pct": 24.8
     }

@@ -687,10 +687,13 @@ function renderPnl() {
   const months = Object.entries(DATA.pnl).sort((a,b) => parseInt(a[0])-parseInt(b[0]));
   if (months.length === 0) { el.innerHTML = '<p style="color:var(--muted);font-size:13px">P&L 데이터 없음</p>'; return; }
 
+  // 패널용 데이터 저장
+  window._pnlMonths = { months, mNames };
+
   const tableRows = months.map(([m, d]) => {
     const profitCls = d.op_profit >= 0 ? 'up' : 'dn';
     const won = v => v.toLocaleString('ko-KR') + '원';
-    return `<tr>
+    return `<tr onclick="openPnlPanel('${m}')" style="cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background=''">
       <td style="text-align:left;color:var(--muted)">${mNames[parseInt(m)-1]}</td>
       <td>${fmtM(d.revenue)}</td>
       <td><span class="dn">${d.food_cost_pct}%</span><br><span style="font-size:11px;color:var(--muted)">${won(d.food_cost)}</span></td>
@@ -1241,6 +1244,85 @@ function renderWeeklyTrend(days, today) {
 }
 
 loadData();
+
+// P&L 월별 상세 슬라이드 패널
+function openPnlPanel(m) {
+  const { months, mNames } = window._pnlMonths || {};
+  if (!months) return;
+  const entry = months.find(([k]) => k === m);
+  if (!entry) return;
+  const [, d] = entry;
+  const mName = mNames[parseInt(m)-1];
+  const won = v => v.toLocaleString('ko-KR') + '원';
+  const profitCls = d.op_profit >= 0 ? 'up' : 'dn';
+
+  // 원가율 바 생성
+  const mkBar = (pct, color) => `
+    <div style="height:6px;background:var(--border);border-radius:3px;margin-top:6px">
+      <div style="height:6px;width:${Math.min(pct*3,100)}%;background:${color};border-radius:3px"></div>
+    </div>`;
+
+  const mkSubRows = (detail, color) => (detail || []).map(sub => `
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0 6px 12px;border-bottom:1px solid var(--border)">
+      <span style="font-size:12px;color:var(--muted)">└ ${sub.label}</span>
+      <span style="font-size:12px;color:var(--text)">${won(sub.amount)}</span>
+    </div>`).join('');
+
+  const items = [
+    { label:'매출',    val: won(d.revenue),     pct: null,              color: '#6c8fff', detail: null },
+    { label:'재료비',  val: won(d.food_cost),   pct: d.food_cost_pct,  color: '#e34948', detail: d.food_cost_detail },
+    { label:'인건비',  val: won(d.labor_cost),  pct: d.labor_cost_pct, color: '#378add', detail: d.labor_cost_detail },
+    { label:'일반관리비', val: won(d.ga_cost),  pct: d.ga_cost_pct,    color: '#eda100', detail: d.ga_cost_detail },
+    { label:'영업이익', val: won(d.op_profit),  pct: d.op_profit_pct,  color: '#1baf7a', detail: null },
+  ];
+
+  const rows = items.map(it => `
+    <div style="padding:14px 0;border-bottom:${it.detail && it.detail.length ? 'none' : '1px solid var(--border)'}">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font-size:13px;color:var(--muted)">${it.label}</span>
+        <div style="text-align:right">
+          <span style="font-size:15px;font-weight:700;color:var(--text)">${it.val}</span>
+          ${it.pct !== null ? `<span style="font-size:12px;color:var(--muted);margin-left:8px">${it.pct}%</span>` : ''}
+        </div>
+      </div>
+      ${it.pct !== null ? mkBar(it.pct, it.color) : ''}
+    </div>
+    ${it.detail && it.detail.length ? mkSubRows(it.detail, it.color) + '<div style="border-bottom:1px solid var(--border)"></div>' : ''}`).join('');
+
+  let existing = document.getElementById('pnl-panel');
+  if (existing) existing.remove();
+  let overlay = document.getElementById('pnl-overlay');
+  if (overlay) overlay.remove();
+
+  overlay = document.createElement('div');
+  overlay.id = 'pnl-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:999;transition:opacity .25s';
+  overlay.onclick = closePnlPanel;
+  document.body.appendChild(overlay);
+
+  const panel = document.createElement('div');
+  panel.id = 'pnl-panel';
+  panel.style.cssText = 'position:fixed;top:0;right:-420px;width:400px;height:100%;background:var(--card);z-index:1000;box-shadow:-4px 0 24px rgba(0,0,0,0.4);display:flex;flex-direction:column;transition:right .25s ease';
+  panel.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <div>
+        <div style="font-size:14px;font-weight:700">${mName} 손익 상세</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">영업이익률 <span class="${profitCls}" style="font-weight:700">${d.op_profit_pct}%</span></div>
+      </div>
+      <button onclick="closePnlPanel()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:4px">✕</button>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:4px 20px 20px">${rows}</div>`;
+  document.body.appendChild(panel);
+
+  requestAnimationFrame(() => { panel.style.right = '0'; });
+}
+
+function closePnlPanel() {
+  const panel = document.getElementById('pnl-panel');
+  const overlay = document.getElementById('pnl-overlay');
+  if (panel) { panel.style.right = '-420px'; setTimeout(() => panel.remove(), 250); }
+  if (overlay) { overlay.style.opacity = '0'; setTimeout(() => overlay.remove(), 250); }
+}
 
 // P-MIX 전체 메뉴 슬라이드 패널
 function openPmixPanel(type) {

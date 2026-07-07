@@ -74,45 +74,62 @@ def parse_pnl():
     ws = wb['26Y 실적']
     rows = list(ws.iter_rows(min_row=1, max_row=200, max_col=20, values_only=True))
 
-    # 행 찾기
+    # B열 주요 항목 + C열 세부 항목 인덱스 찾기
     idx = {}
+    sub_labels = {
+        '재료비': ['1) 식료재료비', '2) 음료재료비', '3) 기타재료비'],
+        '노무비': ['1) 고정비', '2) 변동비', '3) 연차수당', '4) 상여금', '5) 퇴직급여'],
+        '일반관리비': ['1) 복리후생비', '2) 교육훈련비', '3) 여비교통비', '4) 통신비'],
+    }
+    sub_idx = {k: {} for k in sub_labels}
     for i, row in enumerate(rows):
-        label = row[1]
-        if label == '매출': idx['매출'] = i
-        elif label == '재료비': idx['재료비'] = i
-        elif label == '노무비': idx['노무비'] = i
-        elif label == '일반관리비': idx['일반관리비'] = i
-        elif label == '영업이익(매장)': idx['영업이익'] = i
+        b, c = row[1], row[2]
+        if b == '매출': idx['매출'] = i
+        elif b == '재료비': idx['재료비'] = i
+        elif b == '노무비': idx['노무비'] = i
+        elif b == '일반관리비': idx['일반관리비'] = i
+        elif b == '영업이익(매장)': idx['영업이익'] = i
+        if c:
+            for parent, labels in sub_labels.items():
+                if c in labels:
+                    sub_idx[parent][c] = i
 
     pnl = {}
     for m in range(1, 13):
-        vc = 4 + (m - 1) * 2  # value col index
-        rc = vc + 1             # ratio col index
+        vc = 4 + (m - 1) * 2
+        rc = vc + 1
 
-        def v(key):
-            if key not in idx: return None
-            row = rows[idx[key]]
-            return row[vc] if vc < len(row) else None
+        def v(i):
+            row = rows[i]
+            val = row[vc] if vc < len(row) else None
+            return int(val) if isinstance(val, (int, float)) else 0
 
-        def r(key):
-            if key not in idx: return None
-            row = rows[idx[key]]
-            return row[rc] if rc < len(row) else None
+        def r(i):
+            row = rows[i]
+            val = row[rc] if rc < len(row) else None
+            return round(float(val) * 100, 1) if isinstance(val, (int, float)) else 0.0
 
-        revenue = v('매출')
-        if not revenue:
-            continue
+        if '매출' not in idx: continue
+        revenue = rows[idx['매출']][vc] if vc < len(rows[idx['매출']]) else None
+        if not revenue: continue
+
+        def sub_detail(parent):
+            return [{"label": lbl.split(') ',1)[1], "amount": v(sub_idx[parent][lbl])}
+                    for lbl in sub_labels[parent] if lbl in sub_idx[parent]]
 
         pnl[str(m)] = {
-            "revenue": int(revenue) if revenue else 0,
-            "food_cost": int(v('재료비') or 0),
-            "food_cost_pct": round((r('재료비') or 0) * 100, 1),
-            "labor_cost": int(v('노무비') or 0),
-            "labor_cost_pct": round((r('노무비') or 0) * 100, 1),
-            "ga_cost": int(v('일반관리비') or 0),
-            "ga_cost_pct": round((r('일반관리비') or 0) * 100, 1),
-            "op_profit": int(v('영업이익') or 0),
-            "op_profit_pct": round((r('영업이익') or 0) * 100, 1),
+            "revenue": int(revenue),
+            "food_cost": v(idx['재료비']) if '재료비' in idx else 0,
+            "food_cost_pct": r(idx['재료비']) if '재료비' in idx else 0.0,
+            "food_cost_detail": sub_detail('재료비'),
+            "labor_cost": v(idx['노무비']) if '노무비' in idx else 0,
+            "labor_cost_pct": r(idx['노무비']) if '노무비' in idx else 0.0,
+            "labor_cost_detail": sub_detail('노무비'),
+            "ga_cost": v(idx['일반관리비']) if '일반관리비' in idx else 0,
+            "ga_cost_pct": r(idx['일반관리비']) if '일반관리비' in idx else 0.0,
+            "ga_cost_detail": sub_detail('일반관리비'),
+            "op_profit": v(idx['영업이익']) if '영업이익' in idx else 0,
+            "op_profit_pct": r(idx['영업이익']) if '영업이익' in idx else 0.0,
         }
         print(f"  P&L {m}월: 매출 {revenue:,.0f}원, 영업이익 {pnl[str(m)]['op_profit_pct']}%")
 
