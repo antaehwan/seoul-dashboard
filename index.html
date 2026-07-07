@@ -309,6 +309,7 @@ function render(month) {
     else if (anchor1 !== null && ratio !== null) weeklyProjected += Math.round(anchor1 * ratio);
   });
   const projected = weeklyProjected > 0 ? weeklyProjected : (dataCount > 0 ? cumActual / dataCount * totalDays : 0);
+  window._projected = projected; // 전략분석·총평에서 동일 값 사용
   const projectedAch = monthTarget > 0 ? (projected / monthTarget * 100).toFixed(1) : '0.0';
 
   // 예상 월말 매출: 목표 페이스 vs 전년 페이스
@@ -395,7 +396,7 @@ function renderReview(days, today, month) {
   const monthTarget = days.reduce((s,d)=>s+d.target,0);
   const cumPrev = done.reduce((s,d)=>s+d.prev_actual,0);
   const pace = cumTarget > 0 ? cumActual/cumTarget : 0;
-  const planProj = Math.round(monthTarget * pace);
+  const planProj = Math.round(window._projected || monthTarget * pace);
   const achPct = (pace*100).toFixed(1);
   const yoyVal = cumPrev > 0 ? ((cumActual-cumPrev)/cumPrev*100).toFixed(1) : null;
   const remaining = days.filter(d=>d.date>today).length;
@@ -554,7 +555,7 @@ function renderStrategy(days, today) {
   const remaining = days.filter(d => d.date > today);
   const remainTarget = remaining.reduce((s,d) => s+d.target, 0);
   const pace = cumTarget > 0 ? cumActual / cumTarget : 0;
-  const projected = Math.round(monthTarget * pace);
+  const projected = Math.round(window._projected || monthTarget * pace);
   const avgDaily = Math.round(cumActual / done.length);
 
   // 요일별 평균 달성률
