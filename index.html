@@ -958,11 +958,9 @@ function renderMenuMatrix(month) {
 
   // 전체 월 합산 (특정 월이 아닌 누적 기준으로 메뉴 구조 파악)
   const aggMap = {};
-  const tcMerged = {};
   Object.values(DATA.pmix).forEach(pmix => {
-    Object.assign(tcMerged, pmix.theory_cost || {});
     (pmix.menus_all || []).forEach(m => {
-      if (!aggMap[m.name]) aggMap[m.name] = { name: m.name, qty: 0, revenue: 0, category: m.category };
+      if (!aggMap[m.name]) aggMap[m.name] = { name: m.name, qty: 0, revenue: 0, category: m.category, cost_rate: m.cost_rate };
       aggMap[m.name].qty += m.qty;
       aggMap[m.name].revenue += m.revenue;
     });
@@ -973,10 +971,9 @@ function renderMenuMatrix(month) {
 
   const median = arr => { const s = [...arr].sort((a,b)=>a-b); const m = Math.floor(s.length/2); return s.length%2 ? s[m] : (s[m-1]+s[m])/2; };
 
-  // 공헌이익 = 매출 × (1 - 이론원가율)
-  const tc = tcMerged;
+  // 공헌이익 = 매출 × (1 - 메뉴별 원가율)
   menus.forEach(m => {
-    const rate = (tc[m.category] || 0) / 100;
+    const rate = (m.cost_rate || 0) / 100;
     m.contribution = Math.round(m.revenue * (1 - rate));
   });
 
