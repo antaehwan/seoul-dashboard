@@ -944,11 +944,10 @@ function renderPmix(month) {
     </div>`;
 
   // 패널 데이터 저장
-  const theoryCostMenuRows = [...allMenus].sort((a,b) => b.revenue - a.revenue).map((item, i) => {
-    const rate = (theory_cost[item.category] || 0);
-    const costAmt = Math.round(item.revenue * rate / 100);
-    return { rank: i+1, name: item.name, category: item.category, revenue: item.revenue, costRate: rate, costAmt };
-  });
+  const theoryCostMenuRows = [...allMenus].map(item => ({
+    name: item.name, category: item.category, revenue: item.revenue,
+    costRate: item.cost_rate !== undefined && item.cost_rate !== null ? item.cost_rate : (theory_cost[item.category] || 0),
+  }));
   window._pmixPanelData = { allRevRows, allQtyRows, total: allMenus.length, theoryCostMenuRows, theory_cost };
 }
 
