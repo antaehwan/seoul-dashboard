@@ -154,8 +154,7 @@ def parse_pmix():
         # col J 이론원가 섹션과 무관하게 col C/G/H 데이터 모두 수집
         all_menus = []
         total_qty = 0; total_revenue = 0
-        EXCLUDE_CATEGORIES = {'조식', '음료', '추가메뉴'}
-        EXCLUDE_KEYWORDS   = ['[아침]', '사이다', '펩시', '맥주', '밀크티', '레몬티', '홍차', '포장용기', '고수추가']
+        EXCLUDE_CATEGORIES = {'추가메뉴'}
         seen = set()
         current_cat = ''
         for i in range(3, len(rows)):
@@ -167,14 +166,15 @@ def parse_pmix():
             rev = row[7] if isinstance(row[7], (int, float)) and row[7] > 0 else (price * qty if isinstance(price, (int, float)) and isinstance(qty, (int, float)) else None)
             n = clean_name(name)
             if not n: continue
-            if any(k in n for k in EXCLUDE_KEYWORDS): continue
-            if not (isinstance(qty, (int, float)) and qty > 0): continue
-            if not (isinstance(rev, (int, float)) and rev > 0): continue
+            if not isinstance(qty, (int, float)): continue
+            if not isinstance(price, (int, float)): continue
             if n in seen: continue
             seen.add(n)
-            all_menus.append({"name": n, "qty": int(qty), "revenue": int(rev), "category": current_cat})
-            total_qty += int(qty)
-            total_revenue += int(rev)
+            qty_int = int(qty) if qty else 0
+            rev_int = int(rev) if isinstance(rev, (int, float)) else 0
+            all_menus.append({"name": n, "qty": qty_int, "revenue": rev_int, "category": current_cat})
+            total_qty += qty_int
+            total_revenue += rev_int
 
         # TOP 10: col J(9)/K(10) 판매수량, col M(12)/N(13) 매출
         sales_top10, revenue_top10 = [], []

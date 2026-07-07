@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-07 10:06",
+  "updated_at": "2026-07-07 10:11",
   "store": "서울역",
   "store_code": "4018",
   "months": {
@@ -5450,6 +5450,18 @@
           "category": "딤섬"
         },
         {
+          "name": "고수소롱포",
+          "qty": 0,
+          "revenue": 0,
+          "category": "딤섬"
+        },
+        {
+          "name": "크런치쉬림프딤섬_3pcs",
+          "qty": 0,
+          "revenue": 0,
+          "category": "딤섬"
+        },
+        {
           "name": "호우섬 완탕",
           "qty": 190,
           "revenue": 1881000,
@@ -5462,9 +5474,21 @@
           "category": "면"
         },
         {
+          "name": "도삭_맑은우육탕면",
+          "qty": 0,
+          "revenue": 0,
+          "category": "면"
+        },
+        {
           "name": "호우섬마라탕면",
           "qty": 789,
           "revenue": 12545100,
+          "category": "면"
+        },
+        {
+          "name": "도삭_호우섬마라탕면",
+          "qty": 0,
+          "revenue": 0,
           "category": "면"
         },
         {
@@ -5477,6 +5501,12 @@
           "name": "라구짜장도삭면",
           "qty": 673,
           "revenue": 8008700,
+          "category": "면"
+        },
+        {
+          "name": "마라완탕비빔면",
+          "qty": 0,
+          "revenue": 0,
           "category": "면"
         },
         {
@@ -5498,6 +5528,12 @@
           "category": "뽀짜이판"
         },
         {
+          "name": "돼지고기&마파두부뽀짜이판",
+          "qty": 0,
+          "revenue": 0,
+          "category": "뽀짜이판"
+        },
+        {
           "name": "마늘칩꿔바육",
           "qty": 459,
           "revenue": 13724100,
@@ -5508,6 +5544,24 @@
           "qty": 64,
           "revenue": 1408000,
           "category": "요리"
+        },
+        {
+          "name": "크리스피라페치킨",
+          "qty": 0,
+          "revenue": 0,
+          "category": "요리"
+        },
+        {
+          "name": "시그니처2인세트",
+          "qty": 0,
+          "revenue": 0,
+          "category": "세트"
+        },
+        {
+          "name": "패밀리3인세트",
+          "qty": 0,
+          "revenue": 0,
+          "category": "세트"
         },
         {
           "name": "공심채 볶음",
@@ -5526,6 +5580,84 @@
           "qty": 86,
           "revenue": 817000,
           "category": "사이드메뉴"
+        },
+        {
+          "name": "[아침]소롱포_4pcs",
+          "qty": 0,
+          "revenue": 0,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]쇼마이_3pcs",
+          "qty": 56,
+          "revenue": 532000,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]호우섬우육국밥",
+          "qty": 0,
+          "revenue": 0,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]맑은우육탕면",
+          "qty": 83,
+          "revenue": 1278200,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]도삭_맑은우육탕면",
+          "qty": 43,
+          "revenue": 748200,
+          "category": "조식"
+        },
+        {
+          "name": "홍차맥주",
+          "qty": 87,
+          "revenue": 652500,
+          "category": "음료"
+        },
+        {
+          "name": "사이다(공통)",
+          "qty": 77,
+          "revenue": 308000,
+          "category": "음료"
+        },
+        {
+          "name": "사이다제로(공통)",
+          "qty": 52,
+          "revenue": 208000,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬밀크티",
+          "qty": 137,
+          "revenue": 890500,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬레몬티",
+          "qty": 115,
+          "revenue": 747500,
+          "category": "음료"
+        },
+        {
+          "name": "펩시콜라(공통)",
+          "qty": 98,
+          "revenue": 392000,
+          "category": "음료"
+        },
+        {
+          "name": "펩시제로(공통)",
+          "qty": 195,
+          "revenue": 780000,
+          "category": "음료"
+        },
+        {
+          "name": "타이거맥주_330ml",
+          "qty": 225,
+          "revenue": 1687500,
+          "category": "음료"
         }
       ],
       "sales_top10": [
@@ -5622,8 +5754,8 @@
         "음료": 23.1,
         "추가메뉴": 55.4
       },
-      "total_revenue": 153130500,
-      "total_qty": 10936
+      "total_revenue": 161354900,
+      "total_qty": 12104
     },
     "2": {
       "menus_all": [
@@ -5646,6 +5778,18 @@
           "category": "딤섬"
         },
         {
+          "name": "고수소롱포",
+          "qty": 0,
+          "revenue": 0,
+          "category": "딤섬"
+        },
+        {
+          "name": "크런치쉬림프딤섬_3pcs",
+          "qty": 0,
+          "revenue": 0,
+          "category": "딤섬"
+        },
+        {
           "name": "호우섬 완탕",
           "qty": 197,
           "revenue": 1950300,
@@ -5658,9 +5802,21 @@
           "category": "면"
         },
         {
+          "name": "도삭_맑은우육탕면",
+          "qty": 0,
+          "revenue": 0,
+          "category": "면"
+        },
+        {
           "name": "호우섬마라탕면",
           "qty": 845,
           "revenue": 13435500,
+          "category": "면"
+        },
+        {
+          "name": "도삭_호우섬마라탕면",
+          "qty": 0,
+          "revenue": 0,
           "category": "면"
         },
         {
@@ -5673,6 +5829,12 @@
           "name": "라구짜장도삭면",
           "qty": 681,
           "revenue": 8103900,
+          "category": "면"
+        },
+        {
+          "name": "마라완탕비빔면",
+          "qty": 0,
+          "revenue": 0,
           "category": "면"
         },
         {
@@ -5694,6 +5856,12 @@
           "category": "뽀짜이판"
         },
         {
+          "name": "돼지고기&마파두부뽀짜이판",
+          "qty": 0,
+          "revenue": 0,
+          "category": "뽀짜이판"
+        },
+        {
           "name": "마늘칩꿔바육",
           "qty": 413,
           "revenue": 12348700,
@@ -5704,6 +5872,24 @@
           "qty": 75,
           "revenue": 1650000,
           "category": "요리"
+        },
+        {
+          "name": "크리스피라페치킨",
+          "qty": 0,
+          "revenue": 0,
+          "category": "요리"
+        },
+        {
+          "name": "시그니처2인세트",
+          "qty": 0,
+          "revenue": 0,
+          "category": "세트"
+        },
+        {
+          "name": "패밀리3인세트",
+          "qty": 0,
+          "revenue": 0,
+          "category": "세트"
         },
         {
           "name": "공심채 볶음",
@@ -5722,6 +5908,84 @@
           "qty": 81,
           "revenue": 769500,
           "category": "사이드메뉴"
+        },
+        {
+          "name": "[아침]소롱포_4pcs",
+          "qty": 13,
+          "revenue": 97500,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]쇼마이_3pcs",
+          "qty": 56,
+          "revenue": 532000,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]호우섬우육국밥",
+          "qty": 12,
+          "revenue": 184800,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]맑은우육탕면",
+          "qty": 78,
+          "revenue": 1201200,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]도삭_맑은우육탕면",
+          "qty": 33,
+          "revenue": 574200,
+          "category": "조식"
+        },
+        {
+          "name": "홍차맥주",
+          "qty": 111,
+          "revenue": 832500,
+          "category": "음료"
+        },
+        {
+          "name": "사이다(공통)",
+          "qty": 71,
+          "revenue": 284000,
+          "category": "음료"
+        },
+        {
+          "name": "사이다제로(공통)",
+          "qty": 65,
+          "revenue": 260000,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬밀크티",
+          "qty": 111,
+          "revenue": 721500,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬레몬티",
+          "qty": 110,
+          "revenue": 715000,
+          "category": "음료"
+        },
+        {
+          "name": "펩시콜라(공통)",
+          "qty": 100,
+          "revenue": 400000,
+          "category": "음료"
+        },
+        {
+          "name": "펩시제로(공통)",
+          "qty": 216,
+          "revenue": 864000,
+          "category": "음료"
+        },
+        {
+          "name": "타이거맥주_330ml",
+          "qty": 235,
+          "revenue": 1762500,
+          "category": "음료"
         }
       ],
       "sales_top10": [
@@ -5818,8 +6082,8 @@
         "음료": 23.6,
         "추가메뉴": 53.4
       },
-      "total_revenue": 138410100,
-      "total_qty": 9893
+      "total_revenue": 146839300,
+      "total_qty": 11104
     },
     "3": {
       "menus_all": [
@@ -5842,6 +6106,18 @@
           "category": "딤섬"
         },
         {
+          "name": "고수소롱포",
+          "qty": 0,
+          "revenue": 0,
+          "category": "딤섬"
+        },
+        {
+          "name": "크런치쉬림프딤섬_3pcs",
+          "qty": 0,
+          "revenue": 0,
+          "category": "딤섬"
+        },
+        {
           "name": "호우섬 완탕",
           "qty": 208,
           "revenue": 2059200,
@@ -5854,9 +6130,21 @@
           "category": "면"
         },
         {
+          "name": "도삭_맑은우육탕면",
+          "qty": 0,
+          "revenue": 0,
+          "category": "면"
+        },
+        {
           "name": "호우섬마라탕면",
           "qty": 706,
           "revenue": 11225400,
+          "category": "면"
+        },
+        {
+          "name": "도삭_호우섬마라탕면",
+          "qty": 0,
+          "revenue": 0,
           "category": "면"
         },
         {
@@ -5869,6 +6157,12 @@
           "name": "라구짜장도삭면",
           "qty": 608,
           "revenue": 7235200,
+          "category": "면"
+        },
+        {
+          "name": "마라완탕비빔면",
+          "qty": 0,
+          "revenue": 0,
           "category": "면"
         },
         {
@@ -5890,6 +6184,12 @@
           "category": "뽀짜이판"
         },
         {
+          "name": "돼지고기&마파두부뽀짜이판",
+          "qty": 0,
+          "revenue": 0,
+          "category": "뽀짜이판"
+        },
+        {
           "name": "마늘칩꿔바육",
           "qty": 385,
           "revenue": 11511500,
@@ -5900,6 +6200,24 @@
           "qty": 94,
           "revenue": 2068000,
           "category": "요리"
+        },
+        {
+          "name": "크리스피라페치킨",
+          "qty": 0,
+          "revenue": 0,
+          "category": "요리"
+        },
+        {
+          "name": "시그니처2인세트",
+          "qty": 0,
+          "revenue": 0,
+          "category": "세트"
+        },
+        {
+          "name": "패밀리3인세트",
+          "qty": 0,
+          "revenue": 0,
+          "category": "세트"
         },
         {
           "name": "공심채 볶음",
@@ -5918,6 +6236,84 @@
           "qty": 99,
           "revenue": 940500,
           "category": "사이드메뉴"
+        },
+        {
+          "name": "[아침]소롱포_4pcs",
+          "qty": 57,
+          "revenue": 427500,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]쇼마이_3pcs",
+          "qty": 29,
+          "revenue": 275500,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]호우섬우육국밥",
+          "qty": 64,
+          "revenue": 985600,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]맑은우육탕면",
+          "qty": 52,
+          "revenue": 800800,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]도삭_맑은우육탕면",
+          "qty": 17,
+          "revenue": 295800,
+          "category": "조식"
+        },
+        {
+          "name": "홍차맥주",
+          "qty": 108,
+          "revenue": 810000,
+          "category": "음료"
+        },
+        {
+          "name": "사이다(공통)",
+          "qty": 84,
+          "revenue": 336000,
+          "category": "음료"
+        },
+        {
+          "name": "사이다제로(공통)",
+          "qty": 64,
+          "revenue": 256000,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬밀크티",
+          "qty": 131,
+          "revenue": 851500,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬레몬티",
+          "qty": 133,
+          "revenue": 864500,
+          "category": "음료"
+        },
+        {
+          "name": "펩시콜라(공통)",
+          "qty": 100,
+          "revenue": 400000,
+          "category": "음료"
+        },
+        {
+          "name": "펩시제로(공통)",
+          "qty": 204,
+          "revenue": 816000,
+          "category": "음료"
+        },
+        {
+          "name": "타이거맥주_330ml",
+          "qty": 341,
+          "revenue": 2557500,
+          "category": "음료"
         }
       ],
       "sales_top10": [
@@ -6014,8 +6410,8 @@
         "음료": 24.2,
         "추가메뉴": 53.6
       },
-      "total_revenue": 130854600,
-      "total_qty": 9415
+      "total_revenue": 140531300,
+      "total_qty": 10799
     },
     "4": {
       "menus_all": [
@@ -6062,9 +6458,21 @@
           "category": "면"
         },
         {
+          "name": "도삭_맑은우육탕면",
+          "qty": 0,
+          "revenue": 0,
+          "category": "면"
+        },
+        {
           "name": "호우섬마라탕면",
           "qty": 642,
           "revenue": 10207800,
+          "category": "면"
+        },
+        {
+          "name": "도삭_호우섬마라탕면",
+          "qty": 0,
+          "revenue": 0,
           "category": "면"
         },
         {
@@ -6104,6 +6512,12 @@
           "category": "뽀짜이판"
         },
         {
+          "name": "돼지고기&마파두부뽀짜이판",
+          "qty": 0,
+          "revenue": 0,
+          "category": "뽀짜이판"
+        },
+        {
           "name": "마늘칩꿔바육",
           "qty": 408,
           "revenue": 12199200,
@@ -6122,6 +6536,18 @@
           "category": "요리"
         },
         {
+          "name": "시그니처2인세트",
+          "qty": 0,
+          "revenue": 0,
+          "category": "세트"
+        },
+        {
+          "name": "패밀리3인세트",
+          "qty": 0,
+          "revenue": 0,
+          "category": "세트"
+        },
+        {
           "name": "공심채 볶음",
           "qty": 321,
           "revenue": 3049500,
@@ -6138,6 +6564,84 @@
           "qty": 74,
           "revenue": 703000,
           "category": "사이드메뉴"
+        },
+        {
+          "name": "[아침]소롱포_4pcs",
+          "qty": 48,
+          "revenue": 360000,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]쇼마이_3pcs",
+          "qty": 35,
+          "revenue": 332500,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]호우섬우육국밥",
+          "qty": 74,
+          "revenue": 1139600,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]맑은우육탕면",
+          "qty": 66,
+          "revenue": 1016400,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]도삭_맑은우육탕면",
+          "qty": 22,
+          "revenue": 382800,
+          "category": "조식"
+        },
+        {
+          "name": "홍차맥주",
+          "qty": 150,
+          "revenue": 1125000,
+          "category": "음료"
+        },
+        {
+          "name": "사이다(공통)",
+          "qty": 88,
+          "revenue": 352000,
+          "category": "음료"
+        },
+        {
+          "name": "사이다제로(공통)",
+          "qty": 72,
+          "revenue": 288000,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬밀크티",
+          "qty": 133,
+          "revenue": 864500,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬레몬티",
+          "qty": 169,
+          "revenue": 1098500,
+          "category": "음료"
+        },
+        {
+          "name": "펩시콜라(공통)",
+          "qty": 123,
+          "revenue": 492000,
+          "category": "음료"
+        },
+        {
+          "name": "펩시제로(공통)",
+          "qty": 221,
+          "revenue": 884000,
+          "category": "음료"
+        },
+        {
+          "name": "타이거맥주_330ml",
+          "qty": 364,
+          "revenue": 2730000,
+          "category": "음료"
         }
       ],
       "sales_top10": [
@@ -6234,8 +6738,8 @@
         "음료": 24.1,
         "추가메뉴": 53.8
       },
-      "total_revenue": 144918200,
-      "total_qty": 10347
+      "total_revenue": 155983500,
+      "total_qty": 11912
     },
     "5": {
       "menus_all": [
@@ -6279,6 +6783,12 @@
           "name": "맑은우육탕면",
           "qty": 1578,
           "revenue": 24301200,
+          "category": "면"
+        },
+        {
+          "name": "도삭_맑은우육탕면",
+          "qty": 0,
+          "revenue": 0,
           "category": "면"
         },
         {
@@ -6330,6 +6840,12 @@
           "category": "뽀짜이판"
         },
         {
+          "name": "돼지고기&마파두부뽀짜이판",
+          "qty": 0,
+          "revenue": 0,
+          "category": "뽀짜이판"
+        },
+        {
           "name": "마늘칩꿔바육",
           "qty": 330,
           "revenue": 9867000,
@@ -6376,6 +6892,84 @@
           "qty": 83,
           "revenue": 788500,
           "category": "사이드메뉴"
+        },
+        {
+          "name": "[아침]소롱포_4pcs",
+          "qty": 63,
+          "revenue": 472500,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]쇼마이_3pcs",
+          "qty": 54,
+          "revenue": 513000,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]호우섬우육국밥",
+          "qty": 129,
+          "revenue": 1986600,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]맑은우육탕면",
+          "qty": 76,
+          "revenue": 1170400,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]도삭_맑은우육탕면",
+          "qty": 26,
+          "revenue": 452400,
+          "category": "조식"
+        },
+        {
+          "name": "홍차맥주",
+          "qty": 160,
+          "revenue": 1200000,
+          "category": "음료"
+        },
+        {
+          "name": "사이다(공통)",
+          "qty": 112,
+          "revenue": 448000,
+          "category": "음료"
+        },
+        {
+          "name": "사이다제로(공통)",
+          "qty": 100,
+          "revenue": 400000,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬밀크티",
+          "qty": 175,
+          "revenue": 1137500,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬레몬티",
+          "qty": 185,
+          "revenue": 1202500,
+          "category": "음료"
+        },
+        {
+          "name": "펩시콜라(공통)",
+          "qty": 149,
+          "revenue": 596000,
+          "category": "음료"
+        },
+        {
+          "name": "펩시제로(공통)",
+          "qty": 280,
+          "revenue": 1120000,
+          "category": "음료"
+        },
+        {
+          "name": "타이거맥주_330ml",
+          "qty": 394,
+          "revenue": 2955000,
+          "category": "음료"
         }
       ],
       "sales_top10": [
@@ -6473,8 +7067,8 @@
         "음료": 23.7,
         "추가메뉴": 52.9
       },
-      "total_revenue": 196770000,
-      "total_qty": 10896
+      "total_revenue": 210423900,
+      "total_qty": 12799
     },
     "6": {
       "menus_all": [
@@ -6521,9 +7115,21 @@
           "category": "면"
         },
         {
+          "name": "도삭_맑은우육탕면",
+          "qty": 0,
+          "revenue": 0,
+          "category": "면"
+        },
+        {
           "name": "호우섬마라탕면",
           "qty": 575,
           "revenue": 9142500,
+          "category": "면"
+        },
+        {
+          "name": "도삭_호우섬마라탕면",
+          "qty": 0,
+          "revenue": 0,
           "category": "면"
         },
         {
@@ -6560,6 +7166,12 @@
           "name": "새우가지조림뽀짜이판",
           "qty": 329,
           "revenue": 6086500,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "돼지고기&마파두부뽀짜이판",
+          "qty": 0,
+          "revenue": 0,
           "category": "뽀짜이판"
         },
         {
@@ -6609,6 +7221,84 @@
           "qty": 80,
           "revenue": 760000,
           "category": "사이드메뉴"
+        },
+        {
+          "name": "[아침]소롱포_4pcs",
+          "qty": 65,
+          "revenue": 487500,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]쇼마이_3pcs",
+          "qty": 52,
+          "revenue": 494000,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]호우섬우육국밥",
+          "qty": 66,
+          "revenue": 1016400,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]맑은우육탕면",
+          "qty": 68,
+          "revenue": 1047200,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]도삭_맑은우육탕면",
+          "qty": 24,
+          "revenue": 417600,
+          "category": "조식"
+        },
+        {
+          "name": "홍차맥주",
+          "qty": 128,
+          "revenue": 960000,
+          "category": "음료"
+        },
+        {
+          "name": "사이다(공통)",
+          "qty": 96,
+          "revenue": 384000,
+          "category": "음료"
+        },
+        {
+          "name": "사이다제로(공통)",
+          "qty": 89,
+          "revenue": 356000,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬밀크티",
+          "qty": 159,
+          "revenue": 1033500,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬레몬티",
+          "qty": 178,
+          "revenue": 1157000,
+          "category": "음료"
+        },
+        {
+          "name": "펩시콜라(공통)",
+          "qty": 104,
+          "revenue": 416000,
+          "category": "음료"
+        },
+        {
+          "name": "펩시제로(공통)",
+          "qty": 238,
+          "revenue": 952000,
+          "category": "음료"
+        },
+        {
+          "name": "타이거맥주_330ml",
+          "qty": 409,
+          "revenue": 3067500,
+          "category": "음료"
         }
       ],
       "sales_top10": [
@@ -6706,8 +7396,8 @@
         "음료": 24.0,
         "추가메뉴": 53.6
       },
-      "total_revenue": 182930300,
-      "total_qty": 10090
+      "total_revenue": 194719000,
+      "total_qty": 11766
     },
     "7": {
       "menus_all": [
@@ -6754,9 +7444,21 @@
           "category": "면"
         },
         {
+          "name": "도삭_맑은우육탕면",
+          "qty": 0,
+          "revenue": 0,
+          "category": "면"
+        },
+        {
           "name": "호우섬마라탕면",
           "qty": 111,
           "revenue": 1764900,
+          "category": "면"
+        },
+        {
+          "name": "도삭_호우섬마라탕면",
+          "qty": 0,
+          "revenue": 0,
           "category": "면"
         },
         {
@@ -6793,6 +7495,12 @@
           "name": "새우가지조림뽀짜이판",
           "qty": 48,
           "revenue": 888000,
+          "category": "뽀짜이판"
+        },
+        {
+          "name": "돼지고기&마파두부뽀짜이판",
+          "qty": 0,
+          "revenue": 0,
           "category": "뽀짜이판"
         },
         {
@@ -6842,6 +7550,84 @@
           "qty": 14,
           "revenue": 133000,
           "category": "사이드메뉴"
+        },
+        {
+          "name": "[아침]소롱포_4pcs",
+          "qty": 6,
+          "revenue": 45000,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]쇼마이_3pcs",
+          "qty": 2,
+          "revenue": 19000,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]호우섬우육국밥",
+          "qty": 7,
+          "revenue": 107800,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]맑은우육탕면",
+          "qty": 7,
+          "revenue": 107800,
+          "category": "조식"
+        },
+        {
+          "name": "[아침]도삭_맑은우육탕면",
+          "qty": 1,
+          "revenue": 17400,
+          "category": "조식"
+        },
+        {
+          "name": "홍차맥주",
+          "qty": 21,
+          "revenue": 157500,
+          "category": "음료"
+        },
+        {
+          "name": "사이다(공통)",
+          "qty": 21,
+          "revenue": 84000,
+          "category": "음료"
+        },
+        {
+          "name": "사이다제로(공통)",
+          "qty": 13,
+          "revenue": 52000,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬밀크티",
+          "qty": 19,
+          "revenue": 123500,
+          "category": "음료"
+        },
+        {
+          "name": "호우섬레몬티",
+          "qty": 27,
+          "revenue": 175500,
+          "category": "음료"
+        },
+        {
+          "name": "펩시콜라(공통)",
+          "qty": 16,
+          "revenue": 64000,
+          "category": "음료"
+        },
+        {
+          "name": "펩시제로(공통)",
+          "qty": 43,
+          "revenue": 172000,
+          "category": "음료"
+        },
+        {
+          "name": "타이거맥주_330ml",
+          "qty": 82,
+          "revenue": 615000,
+          "category": "음료"
         }
       ],
       "sales_top10": [
@@ -6939,8 +7725,8 @@
         "음료": 34.2,
         "추가메뉴": 50.0
       },
-      "total_revenue": 32856300,
-      "total_qty": 1757
+      "total_revenue": 34596800,
+      "total_qty": 2022
     }
   }
 }
