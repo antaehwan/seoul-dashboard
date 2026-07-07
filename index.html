@@ -961,7 +961,8 @@ function renderMenuMatrix(month) {
       aggMap[m.name].revenue += m.revenue;
     });
   });
-  let menus = Object.values(aggMap).filter(m => m.qty > 0 && m.revenue > 0);
+  const MATRIX_EXCLUDE = new Set(['조식', '음료']);
+  let menus = Object.values(aggMap).filter(m => m.qty > 0 && m.revenue > 0 && !MATRIX_EXCLUDE.has(m.category));
   if (!menus.length) { el.innerHTML = ''; return; }
 
   const median = arr => { const s = [...arr].sort((a,b)=>a-b); const m = Math.floor(s.length/2); return s.length%2 ? s[m] : (s[m-1]+s[m])/2; };
