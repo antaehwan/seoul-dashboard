@@ -1409,20 +1409,9 @@ function openTheoryCostPanel() {
 
   const won = v => Number(v).toLocaleString('ko-KR');
   const rows = data.theoryCostMenuRows.map(item => `
-    <div style="padding:8px 0;border-bottom:1px solid var(--border)">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px">
-        <div style="min-width:0">
-          <span style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block">${item.name}</span>
-          <span style="font-size:11px;color:var(--muted)">${item.category}</span>
-        </div>
-        <div style="text-align:right;flex-shrink:0;margin-left:8px">
-          <span style="font-size:13px;font-weight:700">${won(item.costAmt)}원</span>
-          <span style="font-size:12px;color:var(--muted);margin-left:6px">${item.costRate.toFixed(1)}%</span>
-        </div>
-      </div>
-      <div style="height:3px;background:var(--border);border-radius:2px">
-        <div style="height:3px;width:${Math.min(item.costRate*3,100)}%;background:#eda100;border-radius:2px"></div>
-      </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:13px">${item.name}</span>
+      <span style="font-size:13px;font-weight:700;flex-shrink:0;margin-left:8px">${item.costRate.toFixed(1)}%</span>
     </div>`).join('');
 
   const panel = document.createElement('div');
