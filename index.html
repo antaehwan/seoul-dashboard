@@ -938,11 +938,17 @@ function renderPmix(month) {
           ${avgPct ? `<span style="font-size:12px;font-weight:700;color:var(--accent)">평균 ${avgPct}%</span>` : ''}
         </div>
         ${theoryCostRows}
+        ${allMenus.length ? `<button onclick="openTheoryCostPanel()" style="width:100%;margin-top:8px;font-size:11px;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:4px;padding:4px 8px;cursor:pointer">전체 ${allMenus.length}개 메뉴 원가 보기</button>` : ''}
       </div>
     </div>`;
 
   // 패널 데이터 저장
-  window._pmixPanelData = { allRevRows, allQtyRows, total: allMenus.length };
+  const theoryCostMenuRows = [...allMenus].sort((a,b) => b.revenue - a.revenue).map((item, i) => {
+    const rate = (theory_cost[item.category] || 0);
+    const costAmt = Math.round(item.revenue * rate / 100);
+    return { rank: i+1, name: item.name, category: item.category, revenue: item.revenue, costRate: rate, costAmt };
+  });
+  window._pmixPanelData = { allRevRows, allQtyRows, total: allMenus.length, theoryCostMenuRows, theory_cost };
 }
 
 function renderMenuMatrix(month) {
@@ -1383,6 +1389,61 @@ function openPmixPanel(type) {
 function closePmixPanel() {
   const panel = document.getElementById('pmix-panel');
   const overlay = document.getElementById('pmix-overlay');
+  if (panel) { panel.style.right = '-420px'; setTimeout(() => panel.remove(), 250); }
+  if (overlay) { overlay.style.opacity = '0'; setTimeout(() => overlay.remove(), 250); }
+}
+
+function openTheoryCostPanel() {
+  const data = window._pmixPanelData;
+  if (!data || !data.theoryCostMenuRows) return;
+  let existing = document.getElementById('theory-panel');
+  if (existing) existing.remove();
+  let overlay = document.getElementById('theory-overlay');
+  if (overlay) overlay.remove();
+
+  overlay = document.createElement('div');
+  overlay.id = 'theory-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:999;transition:opacity .25s';
+  overlay.onclick = closeTheoryCostPanel;
+  document.body.appendChild(overlay);
+
+  const won = v => Number(v).toLocaleString('ko-KR');
+  const rows = data.theoryCostMenuRows.map(item => `
+    <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px">
+        <div style="min-width:0">
+          <span style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block">${item.name}</span>
+          <span style="font-size:11px;color:var(--muted)">${item.category}</span>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:8px">
+          <span style="font-size:13px;font-weight:700">${won(item.costAmt)}원</span>
+          <span style="font-size:12px;color:var(--muted);margin-left:6px">${item.costRate.toFixed(1)}%</span>
+        </div>
+      </div>
+      <div style="height:3px;background:var(--border);border-radius:2px">
+        <div style="height:3px;width:${Math.min(item.costRate*3,100)}%;background:#eda100;border-radius:2px"></div>
+      </div>
+    </div>`).join('');
+
+  const panel = document.createElement('div');
+  panel.id = 'theory-panel';
+  panel.style.cssText = 'position:fixed;top:0;right:-420px;width:400px;height:100%;background:var(--card);z-index:1000;box-shadow:-4px 0 24px rgba(0,0,0,0.4);display:flex;flex-direction:column;transition:right .25s ease';
+  panel.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <div>
+        <div style="font-size:14px;font-weight:700">전체 메뉴 예상 이론원가</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">매출 기준 정렬 · ${data.theoryCostMenuRows.length}개 메뉴</div>
+      </div>
+      <button onclick="closeTheoryCostPanel()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:4px">✕</button>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:4px 20px 20px">${rows}</div>`;
+  document.body.appendChild(panel);
+  requestAnimationFrame(() => { panel.style.right = '0'; });
+}
+
+function closeTheoryCostPanel() {
+  const panel = document.getElementById('theory-panel');
+  const overlay = document.getElementById('theory-overlay');
   if (panel) { panel.style.right = '-420px'; setTimeout(() => panel.remove(), 250); }
   if (overlay) { overlay.style.opacity = '0'; setTimeout(() => overlay.remove(), 250); }
 }
