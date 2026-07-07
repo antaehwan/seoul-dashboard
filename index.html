@@ -1408,12 +1408,21 @@ function openTheoryCostPanel() {
   overlay.onclick = closeTheoryCostPanel;
   document.body.appendChild(overlay);
 
-  const won = v => Number(v).toLocaleString('ko-KR');
-  const rows = data.theoryCostMenuRows.map(item => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
-      <span style="font-size:13px">${item.name}</span>
-      <span style="font-size:13px;font-weight:700;flex-shrink:0;margin-left:8px">${item.costRate.toFixed(1)}%</span>
-    </div>`).join('');
+  const CAT_ORDER = ['세트', '요리', '면', '뽀차이판', '딤섬', '사이드메뉴', '음료', '조식'];
+  const grouped = {};
+  CAT_ORDER.forEach(c => grouped[c] = []);
+  data.theoryCostMenuRows.forEach(item => {
+    const key = CAT_ORDER.find(c => item.category.includes(c.replace('메뉴','').replace('판',''))) || item.category;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(item);
+  });
+  const rows = CAT_ORDER.filter(c => grouped[c] && grouped[c].length).map(cat => `
+    <div style="padding:10px 0 4px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;border-bottom:1px solid var(--border)">${cat}</div>
+    ${grouped[cat].map(item => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:13px">${item.name}</span>
+        <span style="font-size:13px;font-weight:700;flex-shrink:0;margin-left:8px">${item.costRate.toFixed(1)}%</span>
+      </div>`).join('')}`).join('');
 
   const panel = document.createElement('div');
   panel.id = 'theory-panel';
