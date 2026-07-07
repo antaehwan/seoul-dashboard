@@ -72,14 +72,18 @@ def parse_sheet(ws, month):
 def parse_pnl():
     wb = load_workbook(PNL_PATH, data_only=True)
     ws = wb['26Y 실적']
-    rows = list(ws.iter_rows(min_row=1, max_row=200, max_col=20, values_only=True))
+    rows = list(ws.iter_rows(min_row=1, max_row=220, max_col=20, values_only=True))
 
-    # B열 주요 항목 + C열 세부 항목 인덱스 찾기
     idx = {}
     sub_labels = {
         '재료비': ['1) 식료재료비', '2) 음료재료비', '3) 기타재료비'],
         '노무비': ['1) 고정비', '2) 변동비', '3) 연차수당', '4) 상여금', '5) 퇴직급여'],
-        '일반관리비': ['1) 복리후생비', '2) 교육훈련비', '3) 여비교통비', '4) 통신비'],
+        '일반관리비': [
+            '1) 복리후생비', '2) 교육훈련비', '3) 여비교통비', '4) 통신비',
+            '5) 수도광열비', '6) 세금과공과', '7) 지급수수료', '8) 임차료',
+            '9) 감가상각비', '10) 수선비', '11) 소모품비', '12) 도서인쇄비',
+            '13) 보험료', '14) 광고선전비', '15) 기타', '16) 라이선스 수수료',
+        ],
     }
     sub_idx = {k: {} for k in sub_labels}
     for i, row in enumerate(rows):
@@ -114,8 +118,14 @@ def parse_pnl():
         if not revenue: continue
 
         def sub_detail(parent):
-            return [{"label": lbl.split(') ',1)[1], "amount": v(sub_idx[parent][lbl])}
-                    for lbl in sub_labels[parent] if lbl in sub_idx[parent]]
+            parent_amt = v(idx[parent]) if parent in idx else 0
+            result = []
+            for lbl in sub_labels[parent]:
+                if lbl not in sub_idx[parent]: continue
+                amt = v(sub_idx[parent][lbl])
+                pct = round(amt / parent_amt * 100, 1) if parent_amt else 0.0
+                result.append({"label": lbl.split(') ', 1)[1], "amount": amt, "pct": pct})
+            return result
 
         pnl[str(m)] = {
             "revenue": int(revenue),
@@ -227,6 +237,15 @@ def main():
 
     print(f"\nP&L 파일 읽는 중...")
     pnl_data = parse_pnl()
+
+    # 월별 고객수·객단가를 P&L에 추가
+    for m_str, days in all_data.items():
+        if m_str not in pnl_data: continue
+        total_count = sum(d['count'] for d in days if d['actual'] > 0)
+        total_actual = sum(d['actual'] for d in days)
+        avg_spend = round(total_actual / total_count) if total_count else 0
+        pnl_data[m_str]['customer_count'] = total_count
+        pnl_data[m_str]['avg_spend'] = avg_spend
 
     print(f"\nP-MIX 파일 읽는 중...")
     pmix_data = parse_pmix()

@@ -1262,11 +1262,14 @@ function openPnlPanel(m) {
       <div style="height:6px;width:${Math.min(pct*3,100)}%;background:${color};border-radius:3px"></div>
     </div>`;
 
-  const mkSubRows = (detail, color) => (detail || []).map(sub => `
-    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0 6px 12px;border-bottom:1px solid var(--border)">
+  const mkSubRows = (detail) => (detail || []).map(sub => `
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 0 5px 12px;border-bottom:1px solid var(--border)">
       <span style="font-size:12px;color:var(--muted)">└ ${sub.label}</span>
-      <span style="font-size:12px;color:var(--text)">${won(sub.amount)}</span>
+      <span style="font-size:12px;color:var(--text)">${won(sub.amount)}<span style="color:var(--muted);margin-left:6px">${sub.pct !== undefined ? sub.pct+'%' : ''}</span></span>
     </div>`).join('');
+
+  const customerCount = d.customer_count || 0;
+  const avgSpend = d.avg_spend || 0;
 
   const items = [
     { label:'매출',    val: won(d.revenue),     pct: null,              color: '#6c8fff', detail: null },
@@ -1276,7 +1279,25 @@ function openPnlPanel(m) {
     { label:'영업이익', val: won(d.op_profit),  pct: d.op_profit_pct,  color: '#1baf7a', detail: null },
   ];
 
-  const rows = items.map(it => `
+  const revenueRow = `
+    <div style="padding:14px 0;border-bottom:none">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font-size:13px;color:var(--muted)">매출</span>
+        <span style="font-size:15px;font-weight:700;color:var(--text)">${won(d.revenue)}</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);padding-bottom:12px">
+      <div style="flex:1;padding:4px 0 0 12px">
+        <div style="font-size:11px;color:var(--muted)">└ 고객수</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:2px">${customerCount.toLocaleString('ko-KR')}명</div>
+      </div>
+      <div style="flex:1;padding:4px 0 0 12px">
+        <div style="font-size:11px;color:var(--muted)">└ 객단가</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:2px">${avgSpend.toLocaleString('ko-KR')}원</div>
+      </div>
+    </div>`;
+
+  const costRows = items.slice(1).map(it => `
     <div style="padding:14px 0;border-bottom:${it.detail && it.detail.length ? 'none' : '1px solid var(--border)'}">
       <div style="display:flex;justify-content:space-between;align-items:baseline">
         <span style="font-size:13px;color:var(--muted)">${it.label}</span>
@@ -1287,7 +1308,9 @@ function openPnlPanel(m) {
       </div>
       ${it.pct !== null ? mkBar(it.pct, it.color) : ''}
     </div>
-    ${it.detail && it.detail.length ? mkSubRows(it.detail, it.color) + '<div style="border-bottom:1px solid var(--border)"></div>' : ''}`).join('');
+    ${it.detail && it.detail.length ? mkSubRows(it.detail) + '<div style="border-bottom:1px solid var(--border)"></div>' : ''}`).join('');
+
+  const rows = revenueRow + costRows;
 
   let existing = document.getElementById('pnl-panel');
   if (existing) existing.remove();
