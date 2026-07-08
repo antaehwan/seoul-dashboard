@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-07 12:55",
+  "updated_at": "2026-07-09 08:17",
   "store": "서울역",
   "store_code": "4018",
   "months": {
@@ -2825,13 +2825,13 @@
         "date": "2026-07-07",
         "weekday": "화",
         "target": 5270185,
-        "actual": 0,
-        "sales_l": 0,
-        "sales_d": 0,
-        "count": 0,
-        "count_l": 0,
-        "count_d": 0,
-        "avg_spend": 0,
+        "actual": 5645535,
+        "sales_l": 3574904,
+        "sales_d": 2070631,
+        "count": 262,
+        "count_l": 165,
+        "count_d": 97,
+        "avg_spend": 21547.8,
         "prev_target": 4900000,
         "prev_actual": 4360433,
         "prev_count": 214
