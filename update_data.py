@@ -172,7 +172,7 @@ def parse_pmix():
             cat_cell = row[1]  # col B = 분류
             if cat_cell: current_cat = str(cat_cell).strip()
             if current_cat in EXCLUDE_CATEGORIES: continue
-            name = row[2]; qty = row[6]; price = row[3]; cost_rate_raw = row[5]
+            name = row[2]; qty = row[6]; price = row[3]; cost_amt = row[4]
             rev = row[7] if isinstance(row[7], (int, float)) and row[7] > 0 else (price * qty if isinstance(price, (int, float)) and isinstance(qty, (int, float)) else None)
             n = clean_name(name)
             if not n: continue
@@ -182,8 +182,11 @@ def parse_pmix():
             seen.add(n)
             qty_int = int(qty) if qty else 0
             rev_int = int(rev) if isinstance(rev, (int, float)) else 0
-            # F열: 부가세 제외 기준 원가율 (소수점) → ×100으로 %
-            cost_rate = round(cost_rate_raw * 100, 1) if isinstance(cost_rate_raw, (int, float)) else None
+            # D열=단가(VAT포함), E열=원가금액(VAT제외) → 원가율 = E / (D/1.1) * 100
+            if isinstance(cost_amt, (int, float)) and price > 0:
+                cost_rate = round(cost_amt / (price / 1.1) * 100, 1)
+            else:
+                cost_rate = None
             all_menus.append({"name": n, "qty": qty_int, "revenue": rev_int, "category": current_cat, "cost_rate": cost_rate})
             total_qty += qty_int
             total_revenue += rev_int
