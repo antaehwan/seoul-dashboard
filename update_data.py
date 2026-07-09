@@ -205,13 +205,27 @@ def parse_pmix():
                 revenue_top10.append({"name": clean(name_r), "revenue": int(rev)})
 
         # 예상 이론원가: col J(9), K(10), 행16(idx15)부터
+        CAT_NAME_MAP = {'뽀차이판': '뽀짜이판'}
         theory_cost = {}
         for i in range(15, 35):
             if i >= len(rows): break
             row = rows[i]
             label = row[9]; val = row[10]
             if label and isinstance(val, (int, float)):
-                theory_cost[str(label)] = round(float(val) * 100, 1)
+                key = CAT_NAME_MAP.get(str(label), str(label))
+                theory_cost[key] = round(float(val) * 100, 1)
+
+        # theory_cost가 0이거나 없는 카테고리는 menus_all 가중평균으로 보정
+        cat_rev = {}; cat_cm = {}
+        for menu in all_menus:
+            if menu['cost_rate'] is None or menu['revenue'] <= 0:
+                continue
+            cat = menu['category']
+            cat_rev[cat] = cat_rev.get(cat, 0) + menu['revenue']
+            cat_cm[cat] = cat_cm.get(cat, 0) + menu['revenue'] * menu['cost_rate'] / 100
+        for cat, rev in cat_rev.items():
+            if rev > 0 and theory_cost.get(cat, 0) == 0:
+                theory_cost[cat] = round(cat_cm[cat] / rev * 100, 1)
 
         if sales_top10 or revenue_top10 or all_menus:
             pmix[str(m)] = {
