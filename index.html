@@ -443,7 +443,7 @@ function renderReview(days, today, month) {
   lines.push(`<strong>${mName}</strong> 현재까지 목표 대비 <strong>${achPct}%</strong> 달성 중입니다. (누적 ${fmtM(cumActual)} / 목표 ${fmtM(cumTarget)})`);
 
   // 2. 월말 예상
-  lines.push(`현재 페이스 유지 시 월말 예상 매출은 <strong>${fmtM(planProj)}</strong>으로, 월 목표(${fmtM(monthTarget)}) 대비 <strong>${pace>=1?'초과 달성':'미달'}</strong>이 예상됩니다.`);
+  lines.push(`현재 페이스 유지 시 월말 예상 매출은 <strong>${fmtM(planProj)}</strong>으로, 월 목표(${fmtM(monthTarget)}) 대비 <strong>${planProj>=monthTarget?'초과 달성':'미달'}</strong>이 예상됩니다.`);
 
   // 3. 전년비
   if (yoyVal !== null) {
