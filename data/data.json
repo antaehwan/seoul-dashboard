@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-23 09:06",
+  "updated_at": "2026-07-24 10:44",
   "store": "서울역",
   "store_code": "4018",
   "months": {
@@ -3065,13 +3065,13 @@
         "date": "2026-07-23",
         "weekday": "목",
         "target": 6148549,
-        "actual": 0,
-        "sales_l": 0,
-        "sales_d": 0,
-        "count": 0,
-        "count_l": 0,
-        "count_d": 0,
-        "avg_spend": 0,
+        "actual": 5860559,
+        "sales_l": 3931377,
+        "sales_d": 1929182,
+        "count": 313,
+        "count_l": 215,
+        "count_d": 98,
+        "avg_spend": 18723.8,
         "prev_target": 5400000,
         "prev_actual": 5111630,
         "prev_count": 239
@@ -5317,42 +5317,42 @@
     },
     "3": {
       "revenue": 161327945,
-      "food_cost": 34959056,
+      "food_cost": 34410396,
       "food_cost_pct": 21.7,
       "food_cost_detail": [
         {
           "label": "식료재료비",
-          "amount": 25138362,
-          "pct": 71.9
+          "amount": 24987833,
+          "pct": 72.6
         },
         {
           "label": "음료재료비",
-          "amount": 1759201,
-          "pct": 5.0
+          "amount": 1856110,
+          "pct": 5.4
         },
         {
           "label": "기타재료비",
-          "amount": 8061493,
-          "pct": 23.1
+          "amount": 7566453,
+          "pct": 22.0
         }
       ],
-      "labor_cost": 45833717,
+      "labor_cost": 48584480,
       "labor_cost_pct": 28.4,
       "labor_cost_detail": [
         {
           "label": "고정비",
-          "amount": 29757558,
-          "pct": 64.9
+          "amount": 32245645,
+          "pct": 66.4
         },
         {
           "label": "변동비",
-          "amount": 12519945,
-          "pct": 27.3
+          "amount": 12271482,
+          "pct": 25.3
         },
         {
           "label": "연차수당",
-          "amount": 1395388,
-          "pct": 3.0
+          "amount": 1555118,
+          "pct": 3.2
         },
         {
           "label": "상여금",
@@ -5361,22 +5361,22 @@
         },
         {
           "label": "퇴직급여",
-          "amount": 2160826,
-          "pct": 4.7
+          "amount": 2512235,
+          "pct": 5.2
         }
       ],
-      "ga_cost": 43601064,
+      "ga_cost": 43191164,
       "ga_cost_pct": 27.0,
       "ga_cost_detail": [
         {
           "label": "복리후생비",
-          "amount": 2334586,
+          "amount": 2347250,
           "pct": 5.4
         },
         {
           "label": "교육훈련비",
-          "amount": 322656,
-          "pct": 0.7
+          "amount": 78235,
+          "pct": 0.2
         },
         {
           "label": "여비교통비",
@@ -5391,27 +5391,27 @@
         {
           "label": "수도광열비",
           "amount": 6848616,
-          "pct": 15.7
+          "pct": 15.9
         },
         {
           "label": "세금과공과",
-          "amount": 1613279,
-          "pct": 3.7
+          "amount": 1662910,
+          "pct": 3.9
         },
         {
           "label": "지급수수료",
-          "amount": 3860803,
-          "pct": 8.9
+          "amount": 1587596,
+          "pct": 3.7
         },
         {
           "label": "임차료",
-          "amount": 19359404,
-          "pct": 44.4
+          "amount": 21843652,
+          "pct": 50.6
         },
         {
           "label": "감가상각비",
-          "amount": 5848016,
-          "pct": 13.4
+          "amount": 5929477,
+          "pct": 13.7
         },
         {
           "label": "수선비",
@@ -5420,8 +5420,8 @@
         },
         {
           "label": "소모품비",
-          "amount": 1427435,
-          "pct": 3.3
+          "amount": 1366073,
+          "pct": 3.2
         },
         {
           "label": "도서인쇄비",
@@ -5430,12 +5430,12 @@
         },
         {
           "label": "보험료",
-          "amount": 1667696,
-          "pct": 3.8
+          "amount": 1211680,
+          "pct": 2.8
         },
         {
           "label": "광고선전비",
-          "amount": 273573,
+          "amount": 270675,
           "pct": 0.6
         },
         {
@@ -5449,7 +5449,7 @@
           "pct": 0.0
         }
       ],
-      "op_profit": 36934108,
+      "op_profit": 35141904,
       "op_profit_pct": 22.9,
       "customer_count": 8058,
       "avg_spend": 20021
@@ -5733,43 +5733,43 @@
       "avg_spend": 20203
     },
     "6": {
-      "revenue": 178255815,
-      "food_cost": 37651150,
-      "food_cost_pct": 21.1,
+      "revenue": 187461133,
+      "food_cost": 37265058,
+      "food_cost_pct": 19.9,
       "food_cost_detail": [
         {
           "label": "식료재료비",
-          "amount": 26470138,
-          "pct": 70.3
+          "amount": 26480811,
+          "pct": 71.1
         },
         {
           "label": "음료재료비",
-          "amount": 2117955,
-          "pct": 5.6
+          "amount": 2142213,
+          "pct": 5.7
         },
         {
           "label": "기타재료비",
-          "amount": 9063057,
-          "pct": 24.1
+          "amount": 8642034,
+          "pct": 23.2
         }
       ],
-      "labor_cost": 48449909,
-      "labor_cost_pct": 27.2,
+      "labor_cost": 47583173,
+      "labor_cost_pct": 25.4,
       "labor_cost_detail": [
         {
           "label": "고정비",
-          "amount": 31311311,
-          "pct": 64.6
+          "amount": 30962868,
+          "pct": 65.1
         },
         {
           "label": "변동비",
-          "amount": 13071245,
-          "pct": 27.0
+          "amount": 12552952,
+          "pct": 26.4
         },
         {
           "label": "연차수당",
           "amount": 1555118,
-          "pct": 3.2
+          "pct": 3.3
         },
         {
           "label": "상여금",
@@ -5779,21 +5779,21 @@
         {
           "label": "퇴직급여",
           "amount": 2512235,
-          "pct": 5.2
+          "pct": 5.3
         }
       ],
-      "ga_cost": 47943133,
-      "ga_cost_pct": 26.9,
+      "ga_cost": 46749623,
+      "ga_cost_pct": 24.9,
       "ga_cost_detail": [
         {
           "label": "복리후생비",
-          "amount": 2665387,
-          "pct": 5.6
+          "amount": 2679755,
+          "pct": 5.7
         },
         {
           "label": "교육훈련비",
-          "amount": 356511,
-          "pct": 0.7
+          "amount": 0,
+          "pct": 0.0
         },
         {
           "label": "여비교통비",
@@ -5802,33 +5802,33 @@
         },
         {
           "label": "통신비",
-          "amount": 45000,
-          "pct": 0.1
+          "amount": 90474,
+          "pct": 0.2
         },
         {
           "label": "수도광열비",
-          "amount": 5793147,
-          "pct": 12.1
+          "amount": 5721885,
+          "pct": 12.2
         },
         {
           "label": "세금과공과",
-          "amount": 1782558,
-          "pct": 3.7
+          "amount": 1630710,
+          "pct": 3.5
         },
         {
           "label": "지급수수료",
-          "amount": 4430942,
+          "amount": 4306109,
           "pct": 9.2
         },
         {
           "label": "임차료",
-          "amount": 23173255,
-          "pct": 48.3
+          "amount": 23173292,
+          "pct": 49.6
         },
         {
           "label": "감가상각비",
-          "amount": 5951354,
-          "pct": 12.4
+          "amount": 5951356,
+          "pct": 12.7
         },
         {
           "label": "수선비",
@@ -5837,7 +5837,7 @@
         },
         {
           "label": "소모품비",
-          "amount": 1192322,
+          "amount": 1179178,
           "pct": 2.5
         },
         {
@@ -5847,8 +5847,8 @@
         },
         {
           "label": "보험료",
-          "amount": 1842684,
-          "pct": 3.8
+          "amount": 1306893,
+          "pct": 2.8
         },
         {
           "label": "광고선전비",
@@ -5866,8 +5866,8 @@
           "pct": 0.0
         }
       ],
-      "op_profit": 44211622,
-      "op_profit_pct": 24.8,
+      "op_profit": 55863278,
+      "op_profit_pct": 29.8,
       "customer_count": 8972,
       "avg_spend": 19868
     }
@@ -8103,22 +8103,22 @@
         },
         {
           "name": "크런치쉬림프딤섬_3pcs",
-          "qty": 144,
-          "revenue": 1569600,
+          "qty": 159,
+          "revenue": 1733100,
           "category": "딤섬",
           "cost_rate": 27.2
         },
         {
           "name": "호우섬 완탕",
-          "qty": 187,
-          "revenue": 1851300,
+          "qty": 204,
+          "revenue": 2019600,
           "category": "딤섬",
           "cost_rate": 18.5
         },
         {
           "name": "맑은우육탕면",
-          "qty": 1135,
-          "revenue": 17479000,
+          "qty": 1220,
+          "revenue": 18788000,
           "category": "면",
           "cost_rate": 21.0
         },
@@ -8131,8 +8131,8 @@
         },
         {
           "name": "호우섬마라탕면",
-          "qty": 529,
-          "revenue": 8411100,
+          "qty": 559,
+          "revenue": 8888100,
           "category": "면",
           "cost_rate": 19.4
         },
@@ -8145,43 +8145,43 @@
         },
         {
           "name": "완탕면",
-          "qty": 975,
-          "revenue": 15015000,
+          "qty": 1025,
+          "revenue": 15785000,
           "category": "면",
           "cost_rate": 19.8
         },
         {
           "name": "라구짜장도삭면",
-          "qty": 404,
-          "revenue": 4807600,
+          "qty": 433,
+          "revenue": 5152700,
           "category": "면",
           "cost_rate": 15.8
         },
         {
           "name": "마라완탕비빔면",
-          "qty": 170,
-          "revenue": 2618000,
+          "qty": 177,
+          "revenue": 2725800,
           "category": "면",
           "cost_rate": 18.9
         },
         {
           "name": "새우/돼지고기완자",
-          "qty": 406,
-          "revenue": 7673400,
+          "qty": 442,
+          "revenue": 8353800,
           "category": "뽀짜이판",
           "cost_rate": 27.5
         },
         {
           "name": "라구짜장&계란튀김 뽀짜이판",
-          "qty": 96,
-          "revenue": 1488000,
+          "qty": 103,
+          "revenue": 1596500,
           "category": "뽀짜이판",
           "cost_rate": 15.8
         },
         {
           "name": "새우가지조림뽀짜이판",
-          "qty": 265,
-          "revenue": 4902500,
+          "qty": 287,
+          "revenue": 5309500,
           "category": "뽀짜이판",
           "cost_rate": 21.2
         },
@@ -8194,22 +8194,22 @@
         },
         {
           "name": "마늘칩꿔바육",
-          "qty": 207,
-          "revenue": 6189300,
+          "qty": 232,
+          "revenue": 6936800,
           "category": "요리",
           "cost_rate": 19.2
         },
         {
           "name": "쯔란갑오징어튀김",
-          "qty": 80,
-          "revenue": 1760000,
+          "qty": 92,
+          "revenue": 2024000,
           "category": "요리",
           "cost_rate": 21.1
         },
         {
           "name": "크리스피라페치킨",
-          "qty": 137,
-          "revenue": 3822300,
+          "qty": 147,
+          "revenue": 4101300,
           "category": "요리",
           "cost_rate": 15.9
         },
@@ -8229,15 +8229,15 @@
         },
         {
           "name": "공심채 볶음",
-          "qty": 218,
-          "revenue": 2071000,
+          "qty": 229,
+          "revenue": 2175500,
           "category": "사이드메뉴",
           "cost_rate": 20.3
         },
         {
           "name": "파이황과",
-          "qty": 112,
-          "revenue": 784000,
+          "qty": 114,
+          "revenue": 798000,
           "category": "사이드메뉴",
           "cost_rate": 22.6
         },
@@ -8285,57 +8285,57 @@
         },
         {
           "name": "홍차맥주",
-          "qty": 108,
-          "revenue": 810000,
+          "qty": 112,
+          "revenue": 840000,
           "category": "음료",
           "cost_rate": 37.6
         },
         {
           "name": "사이다(공통)",
-          "qty": 89,
-          "revenue": 356000,
+          "qty": 94,
+          "revenue": 376000,
           "category": "음료",
           "cost_rate": 18.7
         },
         {
           "name": "사이다제로(공통)",
-          "qty": 73,
-          "revenue": 292000,
+          "qty": 75,
+          "revenue": 300000,
           "category": "음료",
           "cost_rate": 20.1
         },
         {
           "name": "호우섬밀크티",
-          "qty": 107,
-          "revenue": 695500,
+          "qty": 111,
+          "revenue": 721500,
           "category": "음료",
           "cost_rate": 23.7
         },
         {
           "name": "호우섬레몬티",
-          "qty": 149,
-          "revenue": 968500,
+          "qty": 154,
+          "revenue": 1001000,
           "category": "음료",
           "cost_rate": 5.5
         },
         {
           "name": "펩시콜라(공통)",
-          "qty": 106,
-          "revenue": 424000,
+          "qty": 108,
+          "revenue": 432000,
           "category": "음료",
           "cost_rate": 17.3
         },
         {
           "name": "펩시제로(공통)",
-          "qty": 203,
-          "revenue": 812000,
+          "qty": 216,
+          "revenue": 864000,
           "category": "음료",
           "cost_rate": 19.8
         },
         {
           "name": "타이거맥주_330ml",
-          "qty": 250,
-          "revenue": 1875000,
+          "qty": 260,
+          "revenue": 1950000,
           "category": "음료",
           "cost_rate": 36.7
         }
@@ -8343,11 +8343,11 @@
       "sales_top10": [
         {
           "name": "맑은우육탕면",
-          "qty": 1135
+          "qty": 1220
         },
         {
           "name": "완탕면",
-          "qty": 975
+          "qty": 1025
         },
         {
           "name": "소롱포_4pcs",
@@ -8358,28 +8358,28 @@
           "qty": 761
         },
         {
+          "name": "호우섬마라탕면",
+          "qty": 559
+        },
+        {
           "name": "쇼마이_3pcs",
           "qty": 550
         },
         {
-          "name": "호우섬마라탕면",
-          "qty": 529
+          "name": "새우/돼지고기완자",
+          "qty": 442
         },
         {
           "name": "블랙하가우_3pcs",
           "qty": 433
         },
         {
-          "name": "새우/돼지고기완자",
-          "qty": 406
-        },
-        {
           "name": "라구짜장도삭면",
-          "qty": 404
+          "qty": 433
         },
         {
           "name": "새우가지조림뽀짜이판",
-          "qty": 265
+          "qty": 287
         }
       ],
       "revenue_top10": [
@@ -8389,11 +8389,11 @@
         },
         {
           "name": "맑은우육탕면",
-          "revenue": 17479000
+          "revenue": 18788000
         },
         {
           "name": "완탕면",
-          "revenue": 15015000
+          "revenue": 15785000
         },
         {
           "name": "패밀리3인세트",
@@ -8401,27 +8401,27 @@
         },
         {
           "name": "호우섬마라탕면",
-          "revenue": 8411100
+          "revenue": 8888100
         },
         {
           "name": "새우/돼지고기완자",
-          "revenue": 7673400
+          "revenue": 8353800
+        },
+        {
+          "name": "마늘칩꿔바육",
+          "revenue": 6936800
         },
         {
           "name": "소롱포_4pcs",
           "revenue": 6412500
         },
         {
-          "name": "마늘칩꿔바육",
-          "revenue": 6189300
+          "name": "새우가지조림뽀짜이판",
+          "revenue": 5309500
         },
         {
           "name": "쇼마이_3pcs",
           "revenue": 5225000
-        },
-        {
-          "name": "새우가지조림뽀짜이판",
-          "revenue": 4902500
         }
       ],
       "theory_cost": {
@@ -8435,8 +8435,8 @@
         "음료": 34.2,
         "추가메뉴": 50.0
       },
-      "total_revenue": 157642000,
-      "total_qty": 9243
+      "total_revenue": 163839100,
+      "total_qty": 9646
     }
   }
 }
