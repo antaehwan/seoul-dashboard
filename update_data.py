@@ -253,6 +253,18 @@ def parse_pmix():
                         "name": n, "qty": qty_int, "revenue": int(rev),
                         "category": "프로모션", "cost_rate": cost_rate
                     })
+        # 키인 오류 보정: [화]완탕면 → [3주년]완탕면으로 합산
+        MERGE_MAP = {"[화]완탕면": "[3주년]완탕면"}
+        merged = {}
+        for pm in promo_menus:
+            key = MERGE_MAP.get(pm["name"], pm["name"])
+            if key in merged:
+                merged[key]["qty"]     += pm["qty"]
+                merged[key]["revenue"] += pm["revenue"]
+            else:
+                merged[key] = dict(pm, name=key)
+        promo_menus = list(merged.values())
+
         all_menus += promo_menus
         total_qty  += sum(m["qty"]     for m in promo_menus)
         total_revenue += sum(m["revenue"] for m in promo_menus)

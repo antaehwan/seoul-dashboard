@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-01 14:40",
+  "updated_at": "2026-08-01 14:56",
   "store": "영등포",
   "store_code": "영등포",
   "months": {
@@ -6518,9 +6518,9 @@
           "cost_rate": 15.5
         },
         {
-          "name": "[화]완탕면",
-          "qty": 2,
-          "revenue": 21000,
+          "name": "[3주년]완탕면",
+          "qty": 719,
+          "revenue": 7836300,
           "category": "프로모션",
           "cost_rate": 27.7
         },
@@ -6537,13 +6537,6 @@
           "revenue": 2720000,
           "category": "프로모션",
           "cost_rate": 61.2
-        },
-        {
-          "name": "[3주년]완탕면",
-          "qty": 717,
-          "revenue": 7815300,
-          "category": "프로모션",
-          "cost_rate": 26.7
         },
         {
           "name": "[3주년]마파두부뽀짜이판",
