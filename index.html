@@ -635,8 +635,10 @@ function renderStrategy(days, today) {
       ${wdRates.map(w => {
         const diff = ((w.rate - 1) * 100).toFixed(1);
         const sign = w.rate >= 1 ? '+' : '';
+        const weight = WD_WEIGHT[w.w];
+        const weightLabel = weight === 1.0 ? '기준(1.0배)' : `월요일 대비 ${weight}배`;
         return `<div class="strat-row">
-          <span class="strat-label">${wdNames[w.w]}요일</span>
+          <span class="strat-label">${wdNames[w.w]}요일 <span style="color:var(--muted);font-weight:400">(기대치: ${weightLabel})</span></span>
           <span class="strat-val ${w.rate >= 1.05 ? 'up' : w.rate >= 0.95 ? '' : 'dn'}">${sign}${diff}%</span>
         </div>`;
       }).join('')}
