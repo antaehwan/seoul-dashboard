@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-01 12:35",
+  "updated_at": "2026-08-01 12:55",
   "store": "영등포",
   "store_code": "영등포",
   "months": {
@@ -3185,13 +3185,13 @@
         "date": "2026-07-31",
         "weekday": "금",
         "target": 2500000,
-        "actual": 0,
-        "sales_l": 0,
-        "sales_d": 0,
-        "count": 0,
-        "count_l": 0,
-        "count_d": 0,
-        "avg_spend": 0,
+        "actual": 3813339,
+        "sales_l": 1792945,
+        "sales_d": 2020394,
+        "count": 198,
+        "count_l": 106,
+        "count_d": 92,
+        "avg_spend": 19259.3,
         "prev_target": 2833322,
         "prev_actual": 2437396,
         "prev_count": 110
