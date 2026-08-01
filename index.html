@@ -576,16 +576,21 @@ function renderStrategy(days, today) {
   const projected = Math.round(window._projected || monthTarget * pace);
   const avgDaily = Math.round(cumActual / done.length);
 
-  // 요일별 평균 달성률
+  // 요일별 패턴 — 사용자 정의 비중 대비 실제 강약 (월화=1.0, 수목=1.1, 금=1.4, 토일=2.0)
+  const WD_WEIGHT = {0:2.0, 1:1.0, 2:1.0, 3:1.1, 4:1.1, 5:1.4, 6:2.0};
+  const totalWeight = done.reduce((s,d) => s + WD_WEIGHT[new Date(d.date).getDay()], 0);
+  const baseDaily = totalWeight > 0 ? cumActual / totalWeight : 0;
   const wdNames = ['일','월','화','수','목','금','토'];
   const wdMap = {};
   done.forEach(d => {
     const w = new Date(d.date).getDay();
-    if (!wdMap[w]) wdMap[w] = { sum: 0, cnt: 0 };
-    wdMap[w].sum += d.target > 0 ? d.actual / d.target : 0;
+    const expected = baseDaily * WD_WEIGHT[w];
+    if (!wdMap[w]) wdMap[w] = { sumActual: 0, sumExpected: 0, cnt: 0 };
+    wdMap[w].sumActual += d.actual;
+    wdMap[w].sumExpected += expected;
     wdMap[w].cnt++;
   });
-  const wdRates = Object.entries(wdMap).map(([w, v]) => ({ w: parseInt(w), rate: v.sum / v.cnt }));
+  const wdRates = Object.entries(wdMap).map(([w, v]) => ({ w: parseInt(w), rate: v.sumExpected > 0 ? v.sumActual / v.sumExpected : 1 }));
   wdRates.sort((a,b) => b.rate - a.rate);
   const bestDay = wdRates[0];
   const worstDay = wdRates[wdRates.length - 1];
@@ -614,7 +619,7 @@ function renderStrategy(days, today) {
     <div class="strat-card">
       <h3>페이스 분석</h3>
       <div class="strat-row"><span class="strat-label">현재 페이스</span><span class="strat-val ${pace>=1?'up':'dn'}">${(pace*100).toFixed(1)}%</span></div>
-      <div class="strat-row"><span class="strat-label">월말 예상 매출</span><span class="strat-val">${fmt(projected)}</span></div>
+      <div class="strat-row"><span class="strat-label">${remaining.length === 0 ? '최종 실적' : '월말 예상 매출'}</span><span class="strat-val">${remaining.length === 0 ? fmt(cumActual) : fmt(projected)}</span></div>
       <div class="strat-row"><span class="strat-label">월 사업계획</span><span class="strat-val">${fmt(monthTarget)}</span></div>
       <div class="strat-row"><span class="strat-label">최근 3일 추세</span><span class="strat-badge ${trendClass}">${trendStr}</span></div>
     </div>
@@ -627,12 +632,15 @@ function renderStrategy(days, today) {
     </div>
     <div class="strat-card">
       <h3>요일별 패턴</h3>
-      ${wdRates.map(w => `
-        <div class="strat-row">
+      ${wdRates.map(w => {
+        const diff = ((w.rate - 1) * 100).toFixed(1);
+        const sign = w.rate >= 1 ? '+' : '';
+        return `<div class="strat-row">
           <span class="strat-label">${wdNames[w.w]}요일</span>
-          <span class="strat-val ${w.rate >= 1 ? 'up' : w.rate >= 0.9 ? '' : 'dn'}">${(w.rate*100).toFixed(1)}%</span>
-        </div>`).join('')}
-      ${bestDay ? `<p class="strat-tip"><strong>${wdNames[bestDay.w]}요일</strong>이 가장 강한 요일, <strong>${wdNames[worstDay.w]}요일</strong>이 가장 약한 요일입니다.</p>` : ''}
+          <span class="strat-val ${w.rate >= 1.05 ? 'up' : w.rate >= 0.95 ? '' : 'dn'}">${sign}${diff}%</span>
+        </div>`;
+      }).join('')}
+      ${bestDay ? `<p class="strat-tip">기대치 대비: <strong>${wdNames[bestDay.w]}요일</strong> 가장 강, <strong>${wdNames[worstDay.w]}요일</strong> 가장 약</p>` : ''}
     </div>
     <div class="strat-card">
       <h3>이상 탐지</h3>
