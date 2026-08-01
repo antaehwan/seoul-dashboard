@@ -372,6 +372,7 @@ function render(month) {
       <div class="sub-value" style="margin-top:6px">런치 ${cumCountL.toLocaleString('ko-KR')}명 · 디너 ${cumCountD.toLocaleString('ko-KR')}명</div>
       <div class="sub-value">객단가 ${fmt(avgSpend)}원</div>
     </div>
+    <div style="grid-column:1/-1;border-top:1px solid var(--border);margin:4px 0"></div>
     ${(() => {
       const pmix = DATA.pmix && DATA.pmix[String(month)];
       if (!pmix) return '';
