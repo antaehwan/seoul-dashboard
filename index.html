@@ -205,7 +205,7 @@ let DATA = null;
 let currentMonth = null;
 
 async function loadData() {
-  const res = await fetch('data/data.json');
+  const res = await fetch('data/data.json?t=' + Date.now());
   DATA = await res.json();
   document.getElementById('badge-date').textContent = 'DATA · ' + DATA.updated_at;
   initMonthSelect();
@@ -390,6 +390,25 @@ function render(month) {
       <div class="label">프로모션 매출</div>
       <div class="value-num" style="font-size:22px;font-weight:700;color:#fff">${fmt(proRev)}원</div>
       <div class="sub-value" style="margin-top:6px;color:var(--muted)">전체 매출 대비 ${proPct}%</div>
+    </div>`;
+    })()}
+    ${(() => {
+      const reviews = DATA.reviews || {};
+      const dates = Object.keys(reviews).sort();
+      if (dates.length === 0) return '';
+      const lastDate = dates[dates.length - 1];
+      const lastCount = reviews[lastDate];
+      const prevDate = dates.length >= 2 ? dates[dates.length - 2] : null;
+      const prevCount = prevDate ? reviews[prevDate] : null;
+      const diff = prevCount !== null ? lastCount - prevCount : null;
+      const diffStr = diff !== null
+        ? `<div class="delta ${diff >= 0 ? 'up' : 'dn'}" style="margin-top:6px">${diff >= 0 ? '▲' : '▼'} ${Math.abs(diff)}개 (전일 대비)</div>`
+        : `<div class="sub-value" style="margin-top:6px;color:var(--muted)">${lastDate} 기준</div>`;
+      return `
+    <div class="card">
+      <div class="label">네이버 리뷰</div>
+      <div class="value-num" style="font-size:26px;font-weight:700;color:#fff">${lastCount.toLocaleString('ko-KR')}개</div>
+      ${diffStr}
     </div>`;
     })()}
   `;

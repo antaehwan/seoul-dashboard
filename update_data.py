@@ -4,8 +4,16 @@
 """
 import json
 import os
+import re
 from datetime import datetime
 from openpyxl import load_workbook
+try:
+    from playwright.sync_api import sync_playwright
+    _HAS_PLAYWRIGHT = True
+except ImportError:
+    _HAS_PLAYWRIGHT = False
+
+NAVER_PLACE_ID = "1708007751"
 
 if os.name == "nt":  # Windows
     _ONEDRIVE = r"C:\Users\안태환\Desktop\OneDrive"
@@ -236,6 +244,33 @@ def parse_pmix():
             print(f"  P-MIX {m}월: 판매TOP{len(sales_top10)} 매출TOP{len(revenue_top10)} 배달 {int(delivery_revenue):,}원 프로모션 {int(promo_revenue):,}원")
     return pmix
 
+def get_naver_review_count():
+    if not _HAS_PLAYWRIGHT:
+        print("  playwright 미설치 → 리뷰 수 스킵")
+        return None
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            ctx = browser.new_context(
+                user_agent='Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1',
+                locale='ko-KR'
+            )
+            page = ctx.new_page()
+            page.goto(
+                f'https://m.place.naver.com/restaurant/{NAVER_PLACE_ID}/review/visitor',
+                wait_until='networkidle', timeout=20000
+            )
+            html = page.content()
+            browser.close()
+        m = re.search(r'"hideProductSelectBox"\s*:\s*true\s*,\s*"total"\s*:\s*(\d+)', html)
+        if not m:
+            m = re.search(r'"total"\s*:\s*(\d+)\s*,\s*"showRecommendationSort"', html)
+        return int(m.group(1)) if m else None
+    except Exception as e:
+        print(f"  리뷰 수 조회 실패: {e}")
+        return None
+
+
 def main():
     print(f"엑셀 파일 읽는 중...")
     wb = load_workbook(EXCEL_PATH, data_only=True)
@@ -266,6 +301,25 @@ def main():
     print(f"\nP-MIX 파일 읽는 중...")
     pmix_data = parse_pmix()
 
+    print(f"\n네이버 리뷰 수 가져오는 중...")
+    review_count = get_naver_review_count()
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    # 기존 data.json의 reviews 이력 유지
+    reviews_history = {}
+    if os.path.exists(OUTPUT_PATH):
+        try:
+            with open(OUTPUT_PATH, encoding="utf-8") as f:
+                old = json.load(f)
+            reviews_history = old.get("reviews", {})
+        except Exception:
+            pass
+    if review_count is not None:
+        reviews_history[today] = review_count
+        print(f"  {today}: {review_count:,}개")
+    else:
+        print(f"  리뷰 수 가져오기 실패 (이전 이력 유지)")
+
     output = {
         "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "store": "영등포",
@@ -273,6 +327,7 @@ def main():
         "months": all_data,
         "pnl": pnl_data,
         "pmix": pmix_data,
+        "reviews": reviews_history,
     }
 
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
