@@ -162,7 +162,7 @@ def parse_pmix():
         except ValueError:
             continue
         ws = wb[sheet_name]
-        rows = list(ws.iter_rows(min_row=1, max_row=ws.max_row, max_col=16, values_only=True))
+        rows = list(ws.iter_rows(min_row=1, max_row=ws.max_row, max_col=22, values_only=True))
 
         def clean_name(s):
             if not s: return ""
@@ -195,22 +195,35 @@ def parse_pmix():
             total_qty += qty_int
             total_revenue += rev_int
 
-        # TOP 10: 왼쪽 메뉴 데이터에서 직접 계산
-        valid = [m for m in all_menus if m['qty'] > 0 and m['revenue'] > 0]
-        sales_top10  = [{"name": m["name"], "qty": m["qty"]}
-                        for m in sorted(valid, key=lambda x: -x['qty'])[:10]]
-        revenue_top10 = [{"name": m["name"], "revenue": m["revenue"]}
-                         for m in sorted(valid, key=lambda x: -x['revenue'])[:10]]
+        # TOP 10: R열(17)·S열(18)=건수 / U열(20)·V열(21)=매출 (시트 행5-14 → 0-indexed 4-13)
+        sales_top10 = []
+        revenue_top10 = []
+        for i in range(4, 14):
+            if i >= len(rows): break
+            row = rows[i]
+            r_name = row[17] if len(row) > 17 else None
+            r_qty  = row[18] if len(row) > 18 else None
+            u_name = row[20] if len(row) > 20 else None
+            v_rev  = row[21] if len(row) > 21 else None
+            if isinstance(r_name, str) and isinstance(r_qty, (int, float)):
+                sales_top10.append({"name": clean_name(r_name), "qty": int(r_qty)})
+            if isinstance(u_name, str) and isinstance(v_rev, (int, float)):
+                revenue_top10.append({"name": clean_name(u_name), "revenue": int(v_rev)})
 
-        # 이론원가: 카테고리별 가중평균 원가율
-        cat_rev = {}; cat_cm = {}
-        for menu in all_menus:
-            if menu['cost_rate'] is None or menu['revenue'] <= 0: continue
-            cat = menu['category']
-            cat_rev[cat] = cat_rev.get(cat, 0) + menu['revenue']
-            cat_cm[cat]  = cat_cm.get(cat, 0)  + menu['revenue'] * menu['cost_rate'] / 100
-        theory_cost = {cat: round(cat_cm[cat] / rev * 100, 1)
-                       for cat, rev in cat_rev.items() if rev > 0}
+        # 이론원가: R열(17)=소분류 / S열(18)=순매출 / U열(20)=원가율 (시트 행18-28 → 0-indexed 17-27)
+        theory_cost = {}
+        theory_net_rev = {}
+        for i in range(17, 28):
+            if i >= len(rows): break
+            row = rows[i]
+            cat     = row[17] if len(row) > 17 else None
+            net_rev = row[18] if len(row) > 18 else None
+            rate    = row[20] if len(row) > 20 else None
+            if isinstance(cat, str) and cat.strip() and isinstance(rate, (int, float)):
+                k = cat.strip()
+                theory_cost[k] = round(rate * 100, 1)
+                if isinstance(net_rev, (int, float)):
+                    theory_net_rev[k] = round(net_rev)
 
         # ── 오른쪽: 배달 & 프로모션 (col J~P, index 9~15) ──
         delivery_revenue = 0
@@ -236,6 +249,7 @@ def parse_pmix():
                 "sales_top10": sales_top10,
                 "revenue_top10": revenue_top10,
                 "theory_cost": theory_cost,
+                "theory_net_rev": theory_net_rev,
                 "total_revenue": total_revenue,
                 "total_qty": total_qty,
                 "delivery_revenue": int(delivery_revenue),

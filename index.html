@@ -953,15 +953,13 @@ function renderPmix(month) {
     mkRow(i+1, item.name, item.qty+'건', p1(item.qty, total_qty), Math.round(item.qty/maxQty*100), '#1baf7a')
   ).join('');
 
-  // 예상 이론원가: pct × total_revenue = 예상 원가 금액
-  const catEntries = Object.entries(theory_cost).filter(([l]) => l !== '이론원가');
-  const avgPct = catEntries.length ? (catEntries.reduce((s,[,v])=>s+v,0)/catEntries.length).toFixed(1) : null;
-
+  // 예상 이론원가: 시트 R~V 사전계산값 그대로 표시
+  const totalPct = theory_cost['합계'];
   const theoryCostRows = Object.entries(theory_cost).map(([label, pct]) => {
-    const isTotal = label === '이론원가';
+    const isTotal = label === '합계';
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;${isTotal?'border-top:1px solid var(--border);margin-top:4px;':''}border-bottom:1px solid var(--border)">
-      <span style="font-size:12px;color:${isTotal?'var(--text)':'var(--muted)'};font-weight:${isTotal?'600':'400'}">${isTotal?'전체 이론원가':label}</span>
-      <span style="font-size:12px;font-weight:${isTotal?'700':'500'}" class="${isTotal?'up':''}">${isTotal && avgPct ? `${pct}% <span style="font-size:11px;font-weight:400;color:var(--muted)">(평균 ${avgPct}%)</span>` : pct+'%'}</span>
+      <span style="font-size:12px;color:${isTotal?'var(--text)':'var(--muted)'};font-weight:${isTotal?'700':'400'}">${label}</span>
+      <span style="font-size:12px;font-weight:${isTotal?'700':'500'}">${pct}%</span>
     </div>`;
   }).join('');
 
@@ -1015,7 +1013,7 @@ function renderPmix(month) {
       <div class="strat-card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <span style="font-size:12px;font-weight:600;color:var(--muted)">예상 이론원가</span>
-          ${avgPct ? `<span style="font-size:12px;font-weight:700;color:var(--accent)">평균 ${avgPct}%</span>` : ''}
+          ${totalPct ? `<span style="font-size:12px;font-weight:700;color:var(--accent)">전체 ${totalPct}%</span>` : ''}
         </div>
         ${theoryCostRows}
         ${allMenus.length ? `<button onclick="openTheoryCostPanel()" style="width:100%;margin-top:8px;font-size:11px;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:4px;padding:4px 8px;cursor:pointer">전체 ${allMenus.length}개 메뉴 원가 보기</button>` : ''}
