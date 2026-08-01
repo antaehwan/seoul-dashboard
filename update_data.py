@@ -154,14 +154,13 @@ def parse_pmix():
         except ValueError:
             continue
         ws = wb[sheet_name]
-        rows = list(ws.iter_rows(min_row=1, max_row=60, max_col=15, values_only=True))
+        rows = list(ws.iter_rows(min_row=1, max_row=ws.max_row, max_col=16, values_only=True))
 
         def clean_name(s):
             if not s: return ""
             return str(s).replace("(H.CD)", "").replace("(H.CD", "").strip()
 
-        # 전체 메뉴: col C(2)=상품명, G(6)=판매수량, H(7)=판매금액 (row 4~끝)
-        # col J 이론원가 섹션과 무관하게 col C/G/H 데이터 모두 수집
+        # ── 왼쪽: 홀 메뉴 (col B~H, index 1~7) ──
         all_menus = []
         total_qty = 0; total_revenue = 0
         EXCLUDE_CATEGORIES = {'추가메뉴'}
@@ -169,65 +168,61 @@ def parse_pmix():
         current_cat = ''
         for i in range(3, len(rows)):
             row = rows[i]
-            cat_cell = row[1]  # col B = 분류
-            if cat_cell: current_cat = str(cat_cell).strip()
+            cat_cell = row[1]
+            if cat_cell and isinstance(cat_cell, str): current_cat = cat_cell.strip()
             if current_cat in EXCLUDE_CATEGORIES: continue
             name = row[2]; qty = row[6]; price = row[3]; cost_amt = row[4]
-            rev = row[7] if isinstance(row[7], (int, float)) and row[7] > 0 else (price * qty if isinstance(price, (int, float)) and isinstance(qty, (int, float)) else None)
+            rev = row[7] if isinstance(row[7], (int, float)) and row[7] > 0 \
+                else (price * qty if isinstance(price, (int, float)) and isinstance(qty, (int, float)) else None)
             n = clean_name(name)
-            if not n: continue
-            if not isinstance(qty, (int, float)): continue
-            if not isinstance(price, (int, float)): continue
+            if not n or not isinstance(qty, (int, float)) or not isinstance(price, (int, float)): continue
             if n in seen: continue
             seen.add(n)
-            qty_int = int(qty) if qty else 0
+            qty_int = int(qty)
             rev_int = int(rev) if isinstance(rev, (int, float)) else 0
-            # D열=단가(VAT포함), E열=원가금액(VAT제외) → 원가율 = E / (D/1.1) * 100
-            if isinstance(cost_amt, (int, float)) and price > 0:
-                cost_rate = round(cost_amt / (price / 1.1) * 100, 1)
-            else:
-                cost_rate = None
-            all_menus.append({"name": n, "qty": qty_int, "revenue": rev_int, "category": current_cat, "cost_rate": cost_rate})
+            cost_rate = round(cost_amt / (price / 1.1) * 100, 1) \
+                if isinstance(cost_amt, (int, float)) and price > 0 else None
+            all_menus.append({"name": n, "qty": qty_int, "revenue": rev_int,
+                              "category": current_cat, "cost_rate": cost_rate})
             total_qty += qty_int
             total_revenue += rev_int
 
-        # TOP 10: col J(9)/K(10) 판매수량, col M(12)/N(13) 매출
-        sales_top10, revenue_top10 = [], []
-        for i in range(4, 14):
-            if i >= len(rows): break
-            row = rows[i]
-            name_s = row[9]; qty = row[10]
-            name_r = row[12]; rev = row[13]
-            clean = lambda s: str(s).replace("(H.CD)", "").replace("(H.C", "").strip() if s else ""
-            if name_s and isinstance(qty, (int, float)) and qty > 0:
-                sales_top10.append({"name": clean(name_s), "qty": int(qty)})
-            if name_r and isinstance(rev, (int, float)) and rev > 0:
-                revenue_top10.append({"name": clean(name_r), "revenue": int(rev)})
+        # TOP 10: 왼쪽 메뉴 데이터에서 직접 계산
+        valid = [m for m in all_menus if m['qty'] > 0 and m['revenue'] > 0]
+        sales_top10  = [{"name": m["name"], "qty": m["qty"]}
+                        for m in sorted(valid, key=lambda x: -x['qty'])[:10]]
+        revenue_top10 = [{"name": m["name"], "revenue": m["revenue"]}
+                         for m in sorted(valid, key=lambda x: -x['revenue'])[:10]]
 
-        # 예상 이론원가: col J(9), K(10), 행16(idx15)부터
-        CAT_NAME_MAP = {'뽀차이판': '뽀짜이판'}
-        theory_cost = {}
-        for i in range(15, 35):
-            if i >= len(rows): break
-            row = rows[i]
-            label = row[9]; val = row[10]
-            if label and isinstance(val, (int, float)):
-                key = CAT_NAME_MAP.get(str(label), str(label))
-                theory_cost[key] = round(float(val) * 100, 1)
-
-        # theory_cost가 0이거나 없는 카테고리는 menus_all 가중평균으로 보정
+        # 이론원가: 카테고리별 가중평균 원가율
         cat_rev = {}; cat_cm = {}
         for menu in all_menus:
-            if menu['cost_rate'] is None or menu['revenue'] <= 0:
-                continue
+            if menu['cost_rate'] is None or menu['revenue'] <= 0: continue
             cat = menu['category']
             cat_rev[cat] = cat_rev.get(cat, 0) + menu['revenue']
-            cat_cm[cat] = cat_cm.get(cat, 0) + menu['revenue'] * menu['cost_rate'] / 100
-        for cat, rev in cat_rev.items():
-            if rev > 0 and theory_cost.get(cat, 0) == 0:
-                theory_cost[cat] = round(cat_cm[cat] / rev * 100, 1)
+            cat_cm[cat]  = cat_cm.get(cat, 0)  + menu['revenue'] * menu['cost_rate'] / 100
+        theory_cost = {cat: round(cat_cm[cat] / rev * 100, 1)
+                       for cat, rev in cat_rev.items() if rev > 0}
 
-        if sales_top10 or revenue_top10 or all_menus:
+        # ── 오른쪽: 배달 & 프로모션 (col J~P, index 9~15) ──
+        delivery_revenue = 0
+        promo_revenue = 0
+        current_right_cat = ''
+        for row in rows[3:]:
+            cat = row[9]
+            name = row[10]
+            rev = row[15]
+            if cat and isinstance(cat, str) and cat not in ('소분류',):
+                current_right_cat = cat.strip()
+            # 이름 없는 행(소계행) 제외
+            if not (isinstance(name, str) and name): continue
+            if not isinstance(rev, (int, float)) or rev <= 0: continue
+            if current_right_cat == '배달':
+                delivery_revenue += rev
+            elif current_right_cat == '프로모션':
+                promo_revenue += rev
+
+        if all_menus:
             pmix[str(m)] = {
                 "menus_all": all_menus,
                 "sales_top10": sales_top10,
@@ -235,8 +230,10 @@ def parse_pmix():
                 "theory_cost": theory_cost,
                 "total_revenue": total_revenue,
                 "total_qty": total_qty,
+                "delivery_revenue": int(delivery_revenue),
+                "promo_revenue": int(promo_revenue),
             }
-            print(f"  P-MIX {m}월: 판매TOP{len(sales_top10)} 매출TOP{len(revenue_top10)}")
+            print(f"  P-MIX {m}월: 판매TOP{len(sales_top10)} 매출TOP{len(revenue_top10)} 배달 {int(delivery_revenue):,}원 프로모션 {int(promo_revenue):,}원")
     return pmix
 
 def main():
