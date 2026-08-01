@@ -1,5 +1,5 @@
 """
-서울역 매출 데이터 업데이트 스크립트
+영등포 매출 데이터 업데이트 스크립트
 실행: python update_data.py
 """
 import json
@@ -12,9 +12,9 @@ if os.name == "nt":  # Windows
 else:  # macOS
     _ONEDRIVE = os.path.expanduser("~/Library/CloudStorage/OneDrive-개인")
 
-EXCEL_PATH = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 25.06 ~ )", "00. 매출 & 손익", "00. 매출", "H.서울역 월간 매출 _ 26Y.xlsx")
-PNL_PATH   = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 25.06 ~ )", "00. 매출 & 손익", "01. 실적", "H.서울역 누적 실적 _ 23.11 ~.xlsx")
-PMIX_PATH  = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 25.06 ~ )", "00. 매출 & 손익", "01. 실적", "H.서울역 P-MIX.xlsx")
+EXCEL_PATH = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 26.08~ )", "00. 매출 & 손익", "00. 매출", "H.영등포 월간 매출 _ 26Y.xlsx")
+PNL_PATH   = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 26.08~ )", "00. 매출 & 손익", "01. 실적", "H.영등포 누적 실적 _ 25Y~.xlsx")
+PMIX_PATH  = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 26.08~ )", "00. 매출 & 손익", "01. 실적", "H.영등포 P-MIX _ 26Y.xlsx")
 OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "data", "data.json")
 
 WEEKDAY_KO = ["월", "화", "수", "목", "금", "토", "일"]
@@ -271,8 +271,8 @@ def main():
 
     output = {
         "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "store": "서울역",
-        "store_code": "4018",
+        "store": "영등포",
+        "store_code": "영등포",
         "months": all_data,
         "pnl": pnl_data,
         "pmix": pmix_data,
