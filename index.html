@@ -404,16 +404,22 @@ function renderReview(days, today, month) {
   const avgDaily = Math.round(cumActual/done.length);
   const needAvg = remaining > 0 ? Math.round((monthTarget-cumActual)/remaining) : 0;
 
-  // 요일 패턴
+  // 요일 패턴 — 사용자 정의 비중 대비 실제 강약
+  // 월화=1.0, 수목=1.1, 금=1.4, 토일=2.0
+  const WD_WEIGHT = {0:2.0, 1:1.0, 2:1.0, 3:1.1, 4:1.1, 5:1.4, 6:2.0};
+  const totalWeight = done.reduce((s,d) => s + WD_WEIGHT[new Date(d.date).getDay()], 0);
+  const baseDaily = totalWeight > 0 ? cumActual / totalWeight : 0;
   const wdMap = {};
   done.forEach(d => {
     const w = new Date(d.date).getDay();
-    if (!wdMap[w]) wdMap[w] = {sum:0,cnt:0};
-    wdMap[w].sum += d.target>0?d.actual/d.target:0;
+    const expected = baseDaily * WD_WEIGHT[w];
+    if (!wdMap[w]) wdMap[w] = {sumActual:0, sumExpected:0, cnt:0};
+    wdMap[w].sumActual += d.actual;
+    wdMap[w].sumExpected += expected;
     wdMap[w].cnt++;
   });
   const wdNames = ['일','월','화','수','목','금','토'];
-  const wdRates = Object.entries(wdMap).map(([w,v])=>({w:parseInt(w),rate:v.sum/v.cnt})).sort((a,b)=>b.rate-a.rate);
+  const wdRates = Object.entries(wdMap).map(([w,v])=>({w:parseInt(w),rate:v.sumExpected>0?v.sumActual/v.sumExpected:1})).sort((a,b)=>b.rate-a.rate);
   const bestDay = wdRates[0];
   const worstDay = wdRates[wdRates.length-1];
 
@@ -443,17 +449,25 @@ function renderReview(days, today, month) {
   // 1. 전체 달성 현황
   lines.push(`<strong>${mName}</strong> 현재까지 목표 대비 <strong>${achPct}%</strong> 달성 중입니다. (누적 ${fmtM(cumActual)} / 목표 ${fmtM(cumTarget)})`);
 
-  // 2. 월말 예상
-  lines.push(`현재 페이스 유지 시 월말 예상 매출은 <strong>${fmtM(planProj)}</strong>으로, 월 목표(${fmtM(monthTarget)}) 대비 <strong>${planProj>=monthTarget?'초과 달성':'미달'}</strong>이 예상됩니다.`);
+  // 2. 월말 예상 (월이 완료된 경우 실제 결과 표시)
+  if (remaining === 0) {
+    lines.push(`${mName} 최종 실적은 <strong>${fmtM(cumActual)}</strong>으로, 월 목표(${fmtM(monthTarget)}) 대비 <strong>${cumActual>=monthTarget?'초과 달성':'미달'}</strong>했습니다. (달성률 ${(cumActual/monthTarget*100).toFixed(1)}%)`);
+  } else {
+    lines.push(`현재 페이스 유지 시 월말 예상 매출은 <strong>${fmtM(planProj)}</strong>으로, 월 목표(${fmtM(monthTarget)}) 대비 <strong>${planProj>=monthTarget?'초과 달성':'미달'}</strong>이 예상됩니다.`);
+  }
 
   // 3. 전년비
   if (yoyVal !== null) {
     lines.push(`전년 동기 대비 <strong>${parseFloat(yoyVal)>=0?'▲':'▼'} ${Math.abs(parseFloat(yoyVal))}%</strong>로, 전년 대비 ${parseFloat(yoyVal)>=0?'개선':'부진'} 중입니다.`);
   }
 
-  // 4. 요일 패턴
+  // 4. 요일 패턴 (요일별 기대치 대비 실적 강약)
   if (bestDay && worstDay && bestDay.w !== worstDay.w) {
-    lines.push(`<strong>${wdNames[bestDay.w]}요일</strong>이 가장 강하고(${(bestDay.rate*100).toFixed(1)}%), <strong>${wdNames[worstDay.w]}요일</strong>이 가장 약합니다(${(worstDay.rate*100).toFixed(1)}%). ${wdNames[worstDay.w]}요일 집중 운영 전략이 필요합니다.`);
+    const bestPct = ((bestDay.rate-1)*100).toFixed(1);
+    const worstPct = ((worstDay.rate-1)*100).toFixed(1);
+    const bestStr = bestDay.rate >= 1 ? `기대 대비 +${bestPct}%` : `기대 대비 ${bestPct}%`;
+    const worstStr = worstDay.rate >= 1 ? `기대 대비 +${worstPct}%` : `기대 대비 ${worstPct}%`;
+    lines.push(`요일별 기대치 대비: <strong>${wdNames[bestDay.w]}요일</strong>이 가장 강하고(${bestStr}), <strong>${wdNames[worstDay.w]}요일</strong>이 가장 약합니다(${worstStr}). ${wdNames[worstDay.w]}요일 집중 운영 전략이 필요합니다.`);
   }
 
   // 5. 런치/디너
@@ -510,11 +524,14 @@ function renderReview(days, today, month) {
     const vsYtdAvg = ytdMonthlyAvg ? ((monthTarget - ytdMonthlyAvg) / ytdMonthlyAvg * 100).toFixed(1) : null;
     const vsMax = maxMonthlyActual ? ((monthTarget - maxMonthlyActual) / maxMonthlyActual * 100).toFixed(1) : null;
 
-    // 과대 판단: YTD 월평균보다 10% 이상 높거나, YoY 요구가 실제 트렌드보다 5%p 이상 높은 경우
-    const isOverAmbitious = (vsYtdAvg !== null && parseFloat(vsYtdAvg) > 10) ||
-                            (avgY !== null && implied > avgY + 5);
-    const isSlightlyAmbitious = (vsYtdAvg !== null && parseFloat(vsYtdAvg) > 5) ||
-                                (avgY !== null && implied > avgY + 2);
+    // 현재 달성 페이스를 우선 반영: 이미 목표 초과 달성 중이면 과대 아님
+    const currentPace = parseFloat(achPct);
+    // 과대 판단: YoY 요구가 실제 트렌드보다 5%p 이상 높고, 현재 달성률도 95% 미만인 경우
+    const isOverAmbitious = (avgY !== null && implied > avgY + 5 && currentPace < 95) ||
+                            (vsYtdAvg !== null && parseFloat(vsYtdAvg) > 10 && currentPace < 95);
+    const isSlightlyAmbitious = !isOverAmbitious && (
+                                (vsYtdAvg !== null && parseFloat(vsYtdAvg) > 5 && currentPace < 100) ||
+                                (avgY !== null && implied > avgY + 2 && currentPace < 100));
     const isConservative = implied < 0 || (vsYtdAvg !== null && parseFloat(vsYtdAvg) < -5);
 
     let feasibilityEmoji, feasibilityText;
