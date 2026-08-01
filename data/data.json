@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-01 14:33",
+  "updated_at": "2026-08-01 14:40",
   "store": "영등포",
   "store_code": "영등포",
   "months": {
@@ -6518,60 +6518,46 @@
           "cost_rate": 15.5
         },
         {
-          "name": "홍차맥주",
-          "qty": 103,
-          "revenue": 772500,
-          "category": "음료",
-          "cost_rate": 37.6
+          "name": "[화]완탕면",
+          "qty": 2,
+          "revenue": 21000,
+          "category": "프로모션",
+          "cost_rate": 27.7
         },
         {
-          "name": "사이다(공통)",
-          "qty": 53,
-          "revenue": 212000,
-          "category": "음료",
-          "cost_rate": 18.7
+          "name": "[주말]크리스피라페치킨",
+          "qty": 60,
+          "revenue": 1194000,
+          "category": "프로모션",
+          "cost_rate": 81.6
         },
         {
-          "name": "사이다제로(공통)",
-          "qty": 68,
-          "revenue": 272000,
-          "category": "음료",
-          "cost_rate": 20.1
+          "name": "[3주년]라구짜장도삭면",
+          "qty": 320,
+          "revenue": 2720000,
+          "category": "프로모션",
+          "cost_rate": 61.2
         },
         {
-          "name": "호우섬밀크티",
-          "qty": 116,
-          "revenue": 754000,
-          "category": "음료",
-          "cost_rate": 23.7
+          "name": "[3주년]완탕면",
+          "qty": 717,
+          "revenue": 7815300,
+          "category": "프로모션",
+          "cost_rate": 26.7
         },
         {
-          "name": "호우섬레몬티",
-          "qty": 84,
-          "revenue": 546000,
-          "category": "음료",
-          "cost_rate": 5.5
+          "name": "[3주년]마파두부뽀짜이판",
+          "qty": 516,
+          "revenue": 6140400,
+          "category": "프로모션",
+          "cost_rate": 39.1
         },
         {
-          "name": "펩시콜라(공통)",
-          "qty": 63,
-          "revenue": 252000,
-          "category": "음료",
-          "cost_rate": 17.3
-        },
-        {
-          "name": "펩시제로(공통)",
-          "qty": 194,
-          "revenue": 776000,
-          "category": "음료",
-          "cost_rate": 19.8
-        },
-        {
-          "name": "타이거맥주_330ml",
-          "qty": 84,
-          "revenue": 630000,
-          "category": "음료",
-          "cost_rate": 36.7
+          "name": "[3주년]라구짜장뽀짜이판",
+          "qty": 293,
+          "revenue": 3193700,
+          "category": "프로모션",
+          "cost_rate": 23.4
         }
       ],
       "sales_top10": [
@@ -6684,8 +6670,8 @@
         "프로모션": 19167636,
         "합계": 102414364
       },
-      "total_revenue": 86452300,
-      "total_qty": 5506,
+      "total_revenue": 103322200,
+      "total_qty": 6649,
       "delivery_revenue": 4911100,
       "promo_revenue": 21084400
     }

@@ -171,7 +171,7 @@ def parse_pmix():
         # ── 왼쪽: 홀 메뉴 (col B~H, index 1~7) ──
         all_menus = []
         total_qty = 0; total_revenue = 0
-        EXCLUDE_CATEGORIES = {'추가메뉴'}
+        EXCLUDE_CATEGORIES = {'추가메뉴', '음료'}
         seen = set()
         current_cat = ''
         for i in range(3, len(rows)):
@@ -228,20 +228,34 @@ def parse_pmix():
         # ── 오른쪽: 배달 & 프로모션 (col J~P, index 9~15) ──
         delivery_revenue = 0
         promo_revenue = 0
+        promo_menus = []
         current_right_cat = ''
         for row in rows[3:]:
             cat = row[9]
-            name = row[10]
+            name_cell = row[10]
             rev = row[15]
             if cat and isinstance(cat, str) and cat not in ('소분류',):
                 current_right_cat = cat.strip()
             # 이름 없는 행(소계행) 제외
-            if not (isinstance(name, str) and name): continue
+            if not (isinstance(name_cell, str) and name_cell): continue
             if not isinstance(rev, (int, float)) or rev <= 0: continue
             if current_right_cat == '배달':
                 delivery_revenue += rev
             elif current_right_cat == '프로모션':
                 promo_revenue += rev
+                n = clean_name(name_cell)
+                qty_p = row[14]  # O열: 총건수
+                cost_rate_raw = row[13]  # N열: 원가율
+                qty_int = int(qty_p) if isinstance(qty_p, (int, float)) and qty_p > 0 else 0
+                cost_rate = round(cost_rate_raw * 100, 1) if isinstance(cost_rate_raw, (int, float)) else None
+                if n and qty_int > 0:
+                    promo_menus.append({
+                        "name": n, "qty": qty_int, "revenue": int(rev),
+                        "category": "프로모션", "cost_rate": cost_rate
+                    })
+        all_menus += promo_menus
+        total_qty  += sum(m["qty"]     for m in promo_menus)
+        total_revenue += sum(m["revenue"] for m in promo_menus)
 
         if all_menus:
             pmix[str(m)] = {

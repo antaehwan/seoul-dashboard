@@ -1492,7 +1492,7 @@ function openPmixPanel(type) {
   let overlay = document.getElementById('pmix-overlay');
   if (overlay) overlay.remove();
 
-  const SHEET_ORDER = ['딤섬', '면', '뽀짜이판', '요리', '세트', '사이드메뉴', '음료'];
+  const SHEET_ORDER = ['딤섬', '면', '뽀짜이판', '요리', '세트', '사이드메뉴', '프로모션'];
   const isCat = type === 'cat';
   const isRev = type === 'rev';
   const title = isCat ? '카테고리별 메뉴 현황' : isRev ? '전체 메뉴 매출 순위' : '전체 메뉴 판매수량 순위';
@@ -1572,7 +1572,7 @@ function openTheoryCostPanel() {
   overlay.onclick = closeTheoryCostPanel;
   document.body.appendChild(overlay);
 
-  const CAT_ORDER = ['딤섬', '면', '뽀짜이판', '요리', '세트', '사이드메뉴', '음료'];
+  const CAT_ORDER = ['딤섬', '면', '뽀짜이판', '요리', '세트', '사이드메뉴', '프로모션'];
   const grouped = {};
   CAT_ORDER.forEach(c => grouped[c] = []);
   data.theoryCostMenuRows.forEach(item => {
