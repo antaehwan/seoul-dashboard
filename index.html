@@ -998,7 +998,10 @@ function renderPmix(month) {
       <div class="strat-card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <span style="font-size:12px;font-weight:600;color:var(--muted)">매출 TOP 10</span>
-          ${allMenus.length ? `<button onclick="openPmixPanel('rev')" style="font-size:11px;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:4px;padding:2px 8px;cursor:pointer">전체 ${allMenus.length}개 보기</button>` : ''}
+          <div style="display:flex;gap:6px">
+            ${allMenus.length ? `<button onclick="openPmixPanel('cat')" style="font-size:11px;color:var(--muted);background:none;border:1px solid var(--border);border-radius:4px;padding:2px 8px;cursor:pointer">카테고리별</button>` : ''}
+            ${allMenus.length ? `<button onclick="openPmixPanel('rev')" style="font-size:11px;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:4px;padding:2px 8px;cursor:pointer">전체 ${allMenus.length}개</button>` : ''}
+          </div>
         </div>
         ${revRows}
       </div>
@@ -1024,7 +1027,7 @@ function renderPmix(month) {
     name: item.name, category: item.category, revenue: item.revenue,
     costRate: item.cost_rate !== undefined && item.cost_rate !== null ? item.cost_rate : (theory_cost[item.category] || 0),
   }));
-  window._pmixPanelData = { allRevRows, allQtyRows, total: allMenus.length, theoryCostMenuRows, theory_cost };
+  window._pmixPanelData = { allRevRows, allQtyRows, allMenusSrc: allMenus, total: allMenus.length, theoryCostMenuRows, theory_cost };
 }
 
 function renderMenuMatrix(month) {
@@ -1491,9 +1494,41 @@ function openPmixPanel(type) {
   let overlay = document.getElementById('pmix-overlay');
   if (overlay) overlay.remove();
 
+  const SHEET_ORDER = ['딤섬', '면', '뽀짜이판', '요리', '세트', '사이드메뉴', '음료'];
+  const isCat = type === 'cat';
   const isRev = type === 'rev';
-  const title = isRev ? '전체 메뉴 매출 순위' : '전체 메뉴 판매수량 순위';
-  const rows = isRev ? data.allRevRows : data.allQtyRows;
+  const title = isCat ? '카테고리별 메뉴 현황' : isRev ? '전체 메뉴 매출 순위' : '전체 메뉴 판매수량 순위';
+
+  let rows;
+  if (isCat) {
+    const allMenus = data.allMenusSrc || [];
+    const catMap = {};
+    SHEET_ORDER.forEach(c => catMap[c] = []);
+    allMenus.forEach(m => { if (catMap[m.category]) catMap[m.category].push(m); });
+    const totalRev = allMenus.reduce((s, m) => s + m.revenue, 0);
+    const totalQty = allMenus.reduce((s, m) => s + m.qty, 0);
+    rows = SHEET_ORDER.filter(c => catMap[c].length).map(cat => {
+      const items = catMap[cat].slice().sort((a, b) => b.revenue - a.revenue);
+      const catRev = items.reduce((s, m) => s + m.revenue, 0);
+      const catQty = items.reduce((s, m) => s + m.qty, 0);
+      const menuRows = items.map(m => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0 7px 8px;border-bottom:1px solid var(--border)">
+          <span style="font-size:12px">${m.name}</span>
+          <div style="text-align:right;flex-shrink:0;margin-left:8px">
+            <div style="font-size:12px;font-weight:600">${m.revenue.toLocaleString('ko-KR')}원</div>
+            <div style="font-size:11px;color:var(--muted)">${m.qty}건</div>
+          </div>
+        </div>`).join('');
+      return `
+        <div style="padding:10px 0 4px;display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--border)">
+          <span style="font-size:12px;font-weight:700;color:var(--accent)">${cat}</span>
+          <span style="font-size:11px;color:var(--muted)">${catRev.toLocaleString('ko-KR')}원 · ${catQty}건</span>
+        </div>
+        ${menuRows}`;
+    }).join('');
+  } else {
+    rows = isRev ? data.allRevRows : data.allQtyRows;
+  }
 
   overlay = document.createElement('div');
   overlay.id = 'pmix-overlay';
@@ -1539,12 +1574,12 @@ function openTheoryCostPanel() {
   overlay.onclick = closeTheoryCostPanel;
   document.body.appendChild(overlay);
 
-  const CAT_ORDER = ['세트', '요리', '면', '뽀짜이판', '딤섬', '사이드메뉴', '음료', '조식'];
+  const CAT_ORDER = ['딤섬', '면', '뽀짜이판', '요리', '세트', '사이드메뉴', '음료'];
   const grouped = {};
   CAT_ORDER.forEach(c => grouped[c] = []);
   data.theoryCostMenuRows.forEach(item => {
-    const key = CAT_ORDER.find(c => item.category.includes(c.replace('메뉴','').replace('판',''))) || item.category;
-    if (!grouped[key]) grouped[key] = [];
+    const key = CAT_ORDER.includes(item.category) ? item.category : null;
+    if (!key) return;
     grouped[key].push(item);
   });
   const rows = CAT_ORDER.filter(c => grouped[c] && grouped[c].length).map(cat => `
