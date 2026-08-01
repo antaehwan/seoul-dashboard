@@ -404,22 +404,26 @@ function renderReview(days, today, month) {
   const avgDaily = Math.round(cumActual/done.length);
   const needAvg = remaining > 0 ? Math.round((monthTarget-cumActual)/remaining) : 0;
 
-  // 요일 패턴 — 사용자 정의 비중 대비 실제 강약
+  // 요일 패턴 — 월요일 실평균을 기준(1.0)으로, 다른 요일은 weight 배수 대비 실적 비교
   // 월화=1.0, 수목=1.1, 금=1.4, 토일=2.0
   const WD_WEIGHT = {0:2.0, 1:1.0, 2:1.0, 3:1.1, 4:1.1, 5:1.4, 6:2.0};
-  const totalWeight = done.reduce((s,d) => s + WD_WEIGHT[new Date(d.date).getDay()], 0);
-  const baseDaily = totalWeight > 0 ? cumActual / totalWeight : 0;
-  const wdMap = {};
+  const wdAvg = {};
   done.forEach(d => {
     const w = new Date(d.date).getDay();
-    const expected = baseDaily * WD_WEIGHT[w];
-    if (!wdMap[w]) wdMap[w] = {sumActual:0, sumExpected:0, cnt:0};
-    wdMap[w].sumActual += d.actual;
-    wdMap[w].sumExpected += expected;
-    wdMap[w].cnt++;
+    if (!wdAvg[w]) wdAvg[w] = {sum:0, cnt:0};
+    wdAvg[w].sum += d.actual;
+    wdAvg[w].cnt++;
   });
+  // 기준: 월요일 평균 (없으면 전체 일평균 / weight[1])
+  const monAvg = wdAvg[1] ? wdAvg[1].sum / wdAvg[1].cnt
+    : (done.reduce((s,d)=>s+d.actual,0) / done.length / WD_WEIGHT[1]);
   const wdNames = ['일','월','화','수','목','금','토'];
-  const wdRates = Object.entries(wdMap).map(([w,v])=>({w:parseInt(w),rate:v.sumExpected>0?v.sumActual/v.sumExpected:1})).sort((a,b)=>b.rate-a.rate);
+  const wdRates = Object.entries(wdAvg).map(([w, v]) => {
+    const wd = parseInt(w);
+    const avgAct = v.sum / v.cnt;
+    const expected = monAvg * WD_WEIGHT[wd];
+    return { w: wd, rate: expected > 0 ? avgAct / expected : 1 };
+  }).sort((a,b) => b.rate - a.rate);
   const bestDay = wdRates[0];
   const worstDay = wdRates[wdRates.length-1];
 
@@ -576,21 +580,25 @@ function renderStrategy(days, today) {
   const projected = Math.round(window._projected || monthTarget * pace);
   const avgDaily = Math.round(cumActual / done.length);
 
-  // 요일별 패턴 — 사용자 정의 비중 대비 실제 강약 (월화=1.0, 수목=1.1, 금=1.4, 토일=2.0)
+  // 요일별 패턴 — 월요일 실평균을 기준(1.0)으로, 다른 요일은 weight 배수 대비 실적 비교
+  // 월화=1.0, 수목=1.1, 금=1.4, 토일=2.0
   const WD_WEIGHT = {0:2.0, 1:1.0, 2:1.0, 3:1.1, 4:1.1, 5:1.4, 6:2.0};
-  const totalWeight = done.reduce((s,d) => s + WD_WEIGHT[new Date(d.date).getDay()], 0);
-  const baseDaily = totalWeight > 0 ? cumActual / totalWeight : 0;
-  const wdNames = ['일','월','화','수','목','금','토'];
-  const wdMap = {};
+  const wdAvg = {};
   done.forEach(d => {
     const w = new Date(d.date).getDay();
-    const expected = baseDaily * WD_WEIGHT[w];
-    if (!wdMap[w]) wdMap[w] = { sumActual: 0, sumExpected: 0, cnt: 0 };
-    wdMap[w].sumActual += d.actual;
-    wdMap[w].sumExpected += expected;
-    wdMap[w].cnt++;
+    if (!wdAvg[w]) wdAvg[w] = {sum:0, cnt:0};
+    wdAvg[w].sum += d.actual;
+    wdAvg[w].cnt++;
   });
-  const wdRates = Object.entries(wdMap).map(([w, v]) => ({ w: parseInt(w), rate: v.sumExpected > 0 ? v.sumActual / v.sumExpected : 1 }));
+  const monAvgS = wdAvg[1] ? wdAvg[1].sum / wdAvg[1].cnt
+    : (done.reduce((s,d)=>s+d.actual,0) / done.length / WD_WEIGHT[1]);
+  const wdNames = ['일','월','화','수','목','금','토'];
+  const wdRates = Object.entries(wdAvg).map(([w, v]) => {
+    const wd = parseInt(w);
+    const avgAct = v.sum / v.cnt;
+    const expected = monAvgS * WD_WEIGHT[wd];
+    return { w: wd, rate: expected > 0 ? avgAct / expected : 1 };
+  });
   wdRates.sort((a,b) => b.rate - a.rate);
   const bestDay = wdRates[0];
   const worstDay = wdRates[wdRates.length - 1];
