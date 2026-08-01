@@ -406,7 +406,7 @@ function render(month) {
         ? `<div class="delta ${diff >= 0 ? 'up' : 'dn'}" style="margin-top:6px">${diff >= 0 ? '▲' : '▼'} ${Math.abs(diff)}개 (전일 대비)</div>`
         : `<div class="sub-value" style="margin-top:6px;color:var(--muted)">${lastDate} 기준</div>`;
       return `
-    <div class="card">
+    <div class="card" onclick="openReviewPanel()" style="cursor:pointer">
       <div class="label">네이버 리뷰</div>
       <div class="value-num" style="font-size:26px;font-weight:700;color:#fff">${lastCount.toLocaleString('ko-KR')}개</div>
       ${diffStr}
@@ -1422,6 +1422,62 @@ function openPnlPanel(m) {
 function closePnlPanel() {
   const panel = document.getElementById('pnl-panel');
   const overlay = document.getElementById('pnl-overlay');
+  if (panel) { panel.style.right = '-420px'; setTimeout(() => panel.remove(), 250); }
+  if (overlay) { overlay.style.opacity = '0'; setTimeout(() => overlay.remove(), 250); }
+}
+
+// 네이버 리뷰 일자별 패널
+function openReviewPanel() {
+  const reviews = DATA.reviews || {};
+  const dates = Object.keys(reviews).sort();
+  if (dates.length === 0) return;
+
+  let existing = document.getElementById('review-panel');
+  if (existing) { closeReviewPanel(); return; }
+  let overlay = document.getElementById('review-overlay');
+  if (overlay) overlay.remove();
+
+  overlay = document.createElement('div');
+  overlay.id = 'review-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:999;transition:opacity .25s';
+  overlay.onclick = closeReviewPanel;
+  document.body.appendChild(overlay);
+
+  const rows = dates.slice().reverse().map((date, i, arr) => {
+    const count = reviews[date];
+    const prevDate = arr[i + 1];
+    const prev = prevDate ? reviews[prevDate] : null;
+    const diff = prev !== null && prev !== undefined ? count - prev : null;
+    const diffHtml = diff !== null
+      ? `<span class="${diff > 0 ? 'up' : diff < 0 ? 'dn' : ''}" style="font-size:12px;margin-left:6px">${diff > 0 ? '▲' : diff < 0 ? '▼' : ''}${diff !== 0 ? Math.abs(diff) : '-'}</span>`
+      : '';
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="font-size:13px;color:var(--muted)">${date}</div>
+        <div style="font-size:14px;font-weight:600">${count.toLocaleString('ko-KR')}개${diffHtml}</div>
+      </div>`;
+  }).join('');
+
+  const panel = document.createElement('div');
+  panel.id = 'review-panel';
+  panel.style.cssText = 'position:fixed;top:0;right:-420px;width:380px;height:100%;background:var(--card);z-index:1000;box-shadow:-4px 0 24px rgba(0,0,0,0.4);display:flex;flex-direction:column;transition:right .25s ease';
+  panel.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <div>
+        <div style="font-size:14px;font-weight:700">네이버 리뷰 일자별 현황</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">총 ${dates.length}일 기록</div>
+      </div>
+      <button onclick="closeReviewPanel()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:4px">✕</button>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:0 20px 20px">${rows}</div>`;
+  document.body.appendChild(panel);
+
+  requestAnimationFrame(() => { panel.style.right = '0'; });
+}
+
+function closeReviewPanel() {
+  const panel = document.getElementById('review-panel');
+  const overlay = document.getElementById('review-overlay');
   if (panel) { panel.style.right = '-420px'; setTimeout(() => panel.remove(), 250); }
   if (overlay) { overlay.style.opacity = '0'; setTimeout(() => overlay.remove(), 250); }
 }
