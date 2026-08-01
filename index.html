@@ -382,14 +382,14 @@ function render(month) {
       const proPct = base > 0 ? (proRev / base * 100).toFixed(1) : '0.0';
       return `
     <div class="card">
-      <div class="label">배달 매출</div>
-      <div class="value-num" style="font-size:22px;font-weight:700;color:#fff">${fmt(delRev)}원</div>
-      <div class="sub-value" style="margin-top:6px;color:var(--muted)">전체 매출 대비 ${delPct}%</div>
-    </div>
-    <div class="card">
       <div class="label">프로모션 매출</div>
       <div class="value-num" style="font-size:22px;font-weight:700;color:#fff">${fmt(proRev)}원</div>
       <div class="sub-value" style="margin-top:6px;color:var(--muted)">전체 매출 대비 ${proPct}%</div>
+    </div>
+    <div class="card">
+      <div class="label">배달 매출</div>
+      <div class="value-num" style="font-size:22px;font-weight:700;color:#fff">${fmt(delRev)}원</div>
+      <div class="sub-value" style="margin-top:6px;color:var(--muted)">전체 매출 대비 ${delPct}%</div>
     </div>`;
     })()}
     ${(() => {
