@@ -20,9 +20,10 @@ if os.name == "nt":  # Windows
 else:  # macOS
     _ONEDRIVE = os.path.expanduser("~/Library/CloudStorage/OneDrive-개인")
 
-EXCEL_PATH = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 26.08~ )", "00. 매출 & 손익", "01. 매출", "H.영등포 월간 매출 _ 26Y.xlsx")
-PNL_PATH   = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 26.08~ )", "00. 매출 & 손익", "00. 실적", "H.영등포 누적 실적 _ 25Y~.xlsx")
-PMIX_PATH  = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 26.08~ )", "00. 매출 & 손익", "02.P-MIX", "H.영등포 P-MIX _ 26Y.xlsx")
+_BASE      = os.path.join(_ONEDRIVE, "01. 외식업 신규 ( 26.08~ )", "00. 영등포 (26.08 ~ )", "00. 매출 & 손익")
+EXCEL_PATH = os.path.join(_BASE, "01. 매출", "H.영등포 월간 매출 _ 26Y.xlsx")
+PNL_PATH   = os.path.join(_BASE, "00. 실적", "H.영등포 누적 실적 _ 25Y~.xlsx")
+PMIX_PATH  = os.path.join(_BASE, "02.P-MIX", "H.영등포 P-MIX _ 26Y.xlsx")
 OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "data", "data.json")
 
 WEEKDAY_KO = ["월", "화", "수", "목", "금", "토", "일"]
