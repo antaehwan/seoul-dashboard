@@ -816,7 +816,7 @@ function renderMarketStrategy(days, today) {
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
 
       <div class="strat-card">
-        <h3>📊 성장 레버 — 객단가 vs 객수</h3>
+        <h3>성장 레버 — 객단가 vs 객수</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
           <div style="background:var(--bg);border-radius:6px;padding:10px;text-align:center">
             <div style="font-size:10px;color:var(--muted);margin-bottom:4px">객수 전년비</div>
@@ -837,7 +837,7 @@ function renderMarketStrategy(days, today) {
           <span>객단가 기여액</span><span style="color:#e8a020;font-weight:600">${N(atvContrib)}원</span>
         </div>
         <div style="background:#2a78d615;border-radius:6px;padding:8px 10px;font-size:11px;color:var(--text);line-height:1.6">
-          💡 ${priorityMsg}
+          ${priorityMsg}
         </div>
         <div style="font-size:11px;color:var(--muted);margin-top:8px">
           객단가 5% 상승 시 → 일 +<strong style="color:#1baf7a">${N(Math.round(atv*0.05*cumCount/done.length))}원</strong> 기대 효과
@@ -845,10 +845,10 @@ function renderMarketStrategy(days, today) {
       </div>
 
       <div class="strat-card">
-        <h3>⏰ 타임대별 고객 전략</h3>
+        <h3>타임대별 고객 전략</h3>
         <div style="border-left:3px solid #2a78d6;padding-left:10px;margin-bottom:12px">
           <div style="font-size:11px;font-weight:600;color:#2a78d6;margin-bottom:4px">
-            🍜 런치 — 직장인 (${Math.round(cumSalesL/cumActual*100)}% 비중 · 객단가 ${N(lunchAtv)}원)
+            런치 — 직장인 (${Math.round(cumSalesL/cumActual*100)}% 비중 · 객단가 ${N(lunchAtv)}원)
           </div>
           <div style="font-size:11px;color:var(--muted);line-height:1.8">
             · 테이블 회전 30~40분 이내 유지 최우선<br>
@@ -858,7 +858,7 @@ function renderMarketStrategy(days, today) {
         </div>
         <div style="border-left:3px solid #6c5ce7;padding-left:10px;margin-bottom:12px">
           <div style="font-size:11px;font-weight:600;color:#6c5ce7;margin-bottom:4px">
-            🌙 디너 — 커플 · 친구 (${Math.round(cumSalesD/cumActual*100)}% 비중 · 객단가 ${N(dinnerAtv)}원)
+            디너 — 커플 · 친구 (${Math.round(cumSalesD/cumActual*100)}% 비중 · 객단가 ${N(dinnerAtv)}원)
           </div>
           <div style="font-size:11px;color:var(--muted);line-height:1.8">
             · 시그니처2인세트 우선 추천${sigGP ? ` (GP ${N(gpU(sigGP))}원/건)` : ''}<br>
@@ -867,7 +867,7 @@ function renderMarketStrategy(days, today) {
           </div>
         </div>
         <div style="border-left:3px solid #1baf7a;padding-left:10px">
-          <div style="font-size:11px;font-weight:600;color:#1baf7a;margin-bottom:4px">🏖️ 주말 — 가족 · 단체</div>
+          <div style="font-size:11px;font-weight:600;color:#1baf7a;margin-bottom:4px">주말 — 가족 · 단체</div>
           <div style="font-size:11px;color:var(--muted);line-height:1.8">
             · 패밀리3인세트 전면 홍보${famGP ? ` (GP ${N(gpU(famGP))}원/건, 현재 판매량 낮음)` : ''}<br>
             · CGV 영화 전·후 식사 동선 유입 활용<br>
@@ -877,23 +877,23 @@ function renderMarketStrategy(days, today) {
       </div>
 
       <div class="strat-card">
-        <h3>🍽️ 메뉴 전략 — 7월 P-MIX 기반</h3>
-        <div style="font-size:11px;font-weight:600;color:#1baf7a;margin-bottom:5px">✅ Stars — 전면 유지 · 서버 1순위 추천</div>
+        <h3>메뉴 전략 — 7월 P-MIX 기반</h3>
+        <div style="font-size:11px;font-weight:600;color:#1baf7a;margin-bottom:5px">Stars — 전면 유지 · 서버 1순위 추천</div>
         ${stars.map(m=>`<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
           <span>${m.name}</span><span style="color:#1baf7a;font-weight:600">GP ${N(gpU(m))}원</span>
         </div>`).join('')}
-        <div style="font-size:11px;font-weight:600;color:#e8a020;margin-top:10px;margin-bottom:4px">💡 Puzzles — 업셀링 1순위 (GP 높음, 판매량 낮음)</div>
+        <div style="font-size:11px;font-weight:600;color:#e8a020;margin-top:10px;margin-bottom:4px">Puzzles — 업셀링 1순위 (GP 높음, 판매량 낮음)</div>
         <div style="font-size:10px;color:var(--muted);margin-bottom:5px">메뉴판 상단 배치 · 서버 추천 멘트 집중</div>
         ${puzzles.map(m=>`<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
           <span>${m.name}</span><span style="color:#e8a020;font-weight:600">GP ${N(gpU(m))}원</span>
         </div>`).join('')}
         <div style="background:#e8a02015;border-radius:6px;padding:8px 10px;font-size:11px;color:var(--text);margin-top:10px;line-height:1.6">
-          💬 단품 대비 세트 메뉴 GP 최대 5배↑<br>서버의 첫 추천 한 마디가 객단가를 결정합니다.
+          단품 대비 세트 메뉴 GP 최대 5배↑<br>서버의 첫 추천 한 마디가 객단가를 결정합니다.
         </div>
       </div>
 
       <div class="strat-card">
-        <h3>🏆 타임스퀘어 내 경쟁 구도</h3>
+        <h3>타임스퀘어 내 경쟁 구도</h3>
         <div style="display:grid;gap:8px">
           <div style="background:var(--bg);border-radius:8px;padding:10px 12px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
@@ -927,7 +927,7 @@ function renderMarketStrategy(days, today) {
       </div>
 
       <div class="strat-card">
-        <h3>🏙️ 상권 기회 & 관리 포인트</h3>
+        <h3>상권 기회 & 관리 포인트</h3>
         <div style="font-size:10px;color:var(--muted);margin-bottom:10px">영등포 타임스퀘어 · 일평균 방문객 약 20만 명</div>
         <div style="border-left:3px solid #1baf7a;padding-left:10px;margin-bottom:12px">
           <div style="font-size:11px;font-weight:600;color:#1baf7a;margin-bottom:5px">기회 요소</div>
@@ -947,8 +947,36 @@ function renderMarketStrategy(days, today) {
           </div>
         </div>
         <div style="background:#2a78d615;border-radius:6px;padding:8px 10px;font-size:11px;color:var(--text);line-height:1.6">
-          🎯 네이버 리뷰 1,295개 신뢰도를 기반으로<br>
+          네이버 리뷰 1,295개 신뢰도를 기반으로<br>
           <strong>"타임스퀘어 딤섬 1위"</strong> 포지셔닝 강화가 핵심 전략입니다.
+        </div>
+      </div>
+
+      <div class="strat-card">
+        <h3>재방문 & 마케팅 전략</h3>
+        <div style="border-left:3px solid #2a78d6;padding-left:10px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:#2a78d6;margin-bottom:4px">네이버 플레이스 관리</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8">
+            · 리뷰 댓글 응답률 유지 → 신뢰도 & 검색 노출 강화<br>
+            · 메뉴 사진 정기 업데이트 (신메뉴·계절 메뉴 중심)<br>
+            · 플레이스 예약·대기 기능 적극 활용
+          </div>
+        </div>
+        <div style="border-left:3px solid #6c5ce7;padding-left:10px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:#6c5ce7;margin-bottom:4px">재방문 유도</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8">
+            · 런치 스탬프 제도: 5회 방문 시 사이드 메뉴 제공<br>
+            · 단골 직장인 대상 월간 런치 혜택 안내<br>
+            · 시즌별 한정 메뉴로 재방문 사유 지속 생성
+          </div>
+        </div>
+        <div style="border-left:3px solid #e8a020;padding-left:10px">
+          <div style="font-size:11px;font-weight:600;color:#e8a020;margin-bottom:4px">SNS & 인증샷 유도</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8">
+            · 딤섬 공유 플레이팅 비주얼 강화 → 자연 확산 유도<br>
+            · 타임스퀘어 방문객 인스타그램 태그 이벤트<br>
+            · 뽀짜이판 등 독자 메뉴의 스토리텔링 콘텐츠화
+          </div>
         </div>
       </div>
 
