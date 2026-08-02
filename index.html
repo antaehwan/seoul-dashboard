@@ -141,6 +141,7 @@
     <h2>전략 분석</h2>
     <p class="sub">데이터 기반 이상 탐지 · 추세 · 전략 제안</p>
     <div id="strategy-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px"></div>
+    <div id="market-strategy-grid" style="margin-top:12px"></div>
   </section>
 
 
@@ -425,6 +426,7 @@ function render(month) {
 
   renderReview(days, today, month);
   renderStrategy(days, today);
+  renderMarketStrategy(days, today);
   renderPmix(month);
   renderMenuMatrix(month);
   renderTable(days, today);
@@ -764,6 +766,193 @@ function renderStrategy(days, today) {
     })()}
 
   `;
+}
+
+function renderMarketStrategy(days, today) {
+  const el = document.getElementById('market-strategy-grid');
+  if (!el) return;
+  const done = days.filter(d => d.actual > 0 && d.date <= today);
+  if (done.length === 0) { el.innerHTML = ''; return; }
+
+  const cumActual  = done.reduce((s,d) => s+d.actual, 0);
+  const cumPrev    = done.reduce((s,d) => s+d.prev_actual, 0);
+  const cumCount   = done.reduce((s,d) => s+d.count, 0);
+  const cumPrevCnt = done.reduce((s,d) => s+(d.prev_count||0), 0);
+  const cumCountL  = done.reduce((s,d) => s+(d.count_l||0), 0);
+  const cumCountD  = done.reduce((s,d) => s+(d.count_d||0), 0);
+  const cumSalesL  = done.reduce((s,d) => s+(d.sales_l||0), 0);
+  const cumSalesD  = done.reduce((s,d) => s+(d.sales_d||0), 0);
+
+  const atv      = cumCount   > 0 ? Math.round(cumActual / cumCount) : 0;
+  const prevAtv  = cumPrevCnt > 0 ? Math.round(cumPrev   / cumPrevCnt) : 0;
+  const atvYoy   = prevAtv    > 0 ? +((atv - prevAtv) / prevAtv * 100).toFixed(1) : 0;
+  const countYoy = cumPrevCnt > 0 ? +((cumCount - cumPrevCnt) / cumPrevCnt * 100).toFixed(1) : 0;
+  const cntContrib = prevAtv  > 0 ? Math.round(prevAtv * (cumCount - cumPrevCnt)) : 0;
+  const atvContrib = Math.round((atv - prevAtv) * cumCount);
+  const lunchAtv = cumCountL > 0 ? Math.round(cumSalesL / cumCountL) : 0;
+  const dinnerAtv= cumCountD > 0 ? Math.round(cumSalesD / cumCountD) : 0;
+
+  const pmix7  = DATA.pmix?.['7'];
+  const menus7 = pmix7?.menus_all || [];
+  const gpU    = m => m.qty > 0 ? Math.round(m.revenue / m.qty * (1 - (m.cost_rate||0)/100)) : 0;
+  const valid  = menus7.filter(m => m.qty > 0 && m.revenue > 0 && m.category !== '음료');
+  const avgQty = valid.reduce((s,m)=>s+m.qty,0) / (valid.length||1);
+  const avgGP  = valid.map(gpU).reduce((s,v)=>s+v,0) / (valid.length||1);
+  const stars  = valid.filter(m => m.qty>=avgQty && gpU(m)>=avgGP).sort((a,b)=>gpU(b)-gpU(a));
+  const puzzles= valid.filter(m => m.qty<avgQty  && gpU(m)>=avgGP).sort((a,b)=>gpU(b)-gpU(a)).slice(0,4);
+
+  const N = n => Math.round(n).toLocaleString('ko-KR');
+  const arw = v => v >= 0 ? `▲${Math.abs(v)}%` : `▼${Math.abs(v)}%`;
+  const clr = v => v >= 0 ? '#1baf7a' : '#e34948';
+  const priorityMsg = Math.abs(countYoy) > Math.abs(atvYoy)
+    ? '객수 기여도가 압도적입니다. 이제 <strong>객단가 상승</strong>이 더 효율적인 다음 레버입니다.'
+    : '객단가 기여도가 높습니다. <strong>집객(객수) 강화</strong>가 성장 가속 레버입니다.';
+
+  const sigGP = stars.find(m=>m.name.includes('시그니처2인'));
+  const famGP = puzzles.find(m=>m.name.includes('패밀리'));
+
+  el.innerHTML = `
+    <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">상권 전략 분석 · 영등포 타임스퀘어 지하 1층</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
+
+      <div class="strat-card">
+        <h3>📊 성장 레버 — 객단가 vs 객수</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div style="background:var(--bg);border-radius:6px;padding:10px;text-align:center">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:4px">객수 전년비</div>
+            <div style="font-size:22px;font-weight:700;color:${clr(countYoy)}">${arw(countYoy)}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px">${N(cumPrevCnt)}명 → ${N(cumCount)}명</div>
+          </div>
+          <div style="background:var(--bg);border-radius:6px;padding:10px;text-align:center">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:4px">객단가 전년비</div>
+            <div style="font-size:22px;font-weight:700;color:${clr(atvYoy)}">${arw(atvYoy)}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px">${N(prevAtv)}원 → ${N(atv)}원</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:5px">매출 성장 기여 분해 (전년 대비)</div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+          <span>객수 기여액</span><span style="color:#2a78d6;font-weight:600">${N(cntContrib)}원</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:10px">
+          <span>객단가 기여액</span><span style="color:#e8a020;font-weight:600">${N(atvContrib)}원</span>
+        </div>
+        <div style="background:#2a78d615;border-radius:6px;padding:8px 10px;font-size:11px;color:var(--text);line-height:1.6">
+          💡 ${priorityMsg}
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">
+          객단가 5% 상승 시 → 일 +<strong style="color:#1baf7a">${N(Math.round(atv*0.05*cumCount/done.length))}원</strong> 기대 효과
+        </div>
+      </div>
+
+      <div class="strat-card">
+        <h3>⏰ 타임대별 고객 전략</h3>
+        <div style="border-left:3px solid #2a78d6;padding-left:10px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:#2a78d6;margin-bottom:4px">
+            🍜 런치 — 직장인 (${Math.round(cumSalesL/cumActual*100)}% 비중 · 객단가 ${N(lunchAtv)}원)
+          </div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8">
+            · 테이블 회전 30~40분 이내 유지 최우선<br>
+            · 면류 단품 → 런치 콤보 업셀링 유도<br>
+            · 영등포 인근 직장인 단골화: 스탬프 제도 검토
+          </div>
+        </div>
+        <div style="border-left:3px solid #6c5ce7;padding-left:10px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:#6c5ce7;margin-bottom:4px">
+            🌙 디너 — 커플 · 친구 (${Math.round(cumSalesD/cumActual*100)}% 비중 · 객단가 ${N(dinnerAtv)}원)
+          </div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8">
+            · 시그니처2인세트 우선 추천${sigGP ? ` (GP ${N(gpU(sigGP))}원/건)` : ''}<br>
+            · 딤섬 공유 플레이팅 → 체험형 식사로 차별화<br>
+            · 홍콩식 정통 분위기 강조 · 디저트 추가 유도
+          </div>
+        </div>
+        <div style="border-left:3px solid #1baf7a;padding-left:10px">
+          <div style="font-size:11px;font-weight:600;color:#1baf7a;margin-bottom:4px">🏖️ 주말 — 가족 · 단체</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8">
+            · 패밀리3인세트 전면 홍보${famGP ? ` (GP ${N(gpU(famGP))}원/건, 현재 판매량 낮음)` : ''}<br>
+            · CGV 영화 전·후 식사 동선 유입 활용<br>
+            · 딤섬 다양성 체험 세트 구성 강조
+          </div>
+        </div>
+      </div>
+
+      <div class="strat-card">
+        <h3>🍽️ 메뉴 전략 — 7월 P-MIX 기반</h3>
+        <div style="font-size:11px;font-weight:600;color:#1baf7a;margin-bottom:5px">✅ Stars — 전면 유지 · 서버 1순위 추천</div>
+        ${stars.map(m=>`<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+          <span>${m.name}</span><span style="color:#1baf7a;font-weight:600">GP ${N(gpU(m))}원</span>
+        </div>`).join('')}
+        <div style="font-size:11px;font-weight:600;color:#e8a020;margin-top:10px;margin-bottom:4px">💡 Puzzles — 업셀링 1순위 (GP 높음, 판매량 낮음)</div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:5px">메뉴판 상단 배치 · 서버 추천 멘트 집중</div>
+        ${puzzles.map(m=>`<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+          <span>${m.name}</span><span style="color:#e8a020;font-weight:600">GP ${N(gpU(m))}원</span>
+        </div>`).join('')}
+        <div style="background:#e8a02015;border-radius:6px;padding:8px 10px;font-size:11px;color:var(--text);margin-top:10px;line-height:1.6">
+          💬 단품 대비 세트 메뉴 GP 최대 5배↑<br>서버의 첫 추천 한 마디가 객단가를 결정합니다.
+        </div>
+      </div>
+
+      <div class="strat-card">
+        <h3>🏆 타임스퀘어 내 경쟁 구도</h3>
+        <div style="display:grid;gap:8px">
+          <div style="background:var(--bg);border-radius:8px;padding:10px 12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <span style="font-size:11px;font-weight:600">딘타이펑 (타임스퀘어점)</span>
+              <span style="font-size:11px;color:#e8a020;font-weight:600">★ 3.5</span>
+            </div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.7">
+              글로벌 프리미엄 딤섬 체인 · 높은 가격대<br>
+              <span style="color:#1baf7a">→ 호우섬(★4.1) 평점 우위 · 가격 경쟁력 보유</span>
+            </div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:10px 12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <span style="font-size:11px;font-weight:600">오한수우육면가</span>
+              <span style="font-size:11px;color:#e8a020;font-weight:600">★ 4.0</span>
+            </div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.7">
+              홍콩식 우육면 전문 · 면류 직접 경쟁<br>
+              <span style="color:#e34948">→ 면 단독 vs 딤섬+면 풀라인업 차별화 필요</span>
+            </div>
+          </div>
+          <div style="background:#1baf7a10;border:1px solid #1baf7a30;border-radius:8px;padding:10px 12px">
+            <div style="font-size:11px;font-weight:600;color:#1baf7a;margin-bottom:4px">호우섬 차별화 포인트</div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.7">
+              · 동선 내 딤섬 평점 1위 (★4.1)<br>
+              · 홍콩식 정통 딤섬 + 뽀짜이판 독자 포지션<br>
+              · 딘타이펑 대비 합리적 가격 · 네이버 리뷰 1,295개
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="strat-card">
+        <h3>🏙️ 상권 기회 & 관리 포인트</h3>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:10px">영등포 타임스퀘어 · 일평균 방문객 약 20만 명</div>
+        <div style="border-left:3px solid #1baf7a;padding-left:10px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:#1baf7a;margin-bottom:5px">기회 요소</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8">
+            · CGV 연계: 영화 전·후 식사 동선 (티켓 할인 혜택 등)<br>
+            · 신세계백화점 VIP 고객: 구매력 높음 → 고GP 메뉴 업셀링<br>
+            · 메리어트 호텔 투숙객: 홍콩 정통 딤섬 포지셔닝 적합<br>
+            · 영등포역 직결 접근성: 서울 서남권 최대 유동 인구
+          </div>
+        </div>
+        <div style="border-left:3px solid #e34948;padding-left:10px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:#e34948;margin-bottom:5px">관리 포인트</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8">
+            · 임차료 13.0% MG → 손익 분기점 정밀 관리 필수<br>
+            · 딘타이펑 브랜드파워 → 최초 방문 고객 유입 경쟁<br>
+            · 쇼핑 우선 동선 → 식사 결정이 즉흥적 · 가시성 확보 중요
+          </div>
+        </div>
+        <div style="background:#2a78d615;border-radius:6px;padding:8px 10px;font-size:11px;color:var(--text);line-height:1.6">
+          🎯 네이버 리뷰 1,295개 신뢰도를 기반으로<br>
+          <strong>"타임스퀘어 딤섬 1위"</strong> 포지셔닝 강화가 핵심 전략입니다.
+        </div>
+      </div>
+
+    </div>`;
 }
 
 function renderPnl() {
