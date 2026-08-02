@@ -328,6 +328,8 @@ function render(month) {
   const cumCount = withData.reduce((s,d) => s+d.count, 0);
   const cumCountL = withData.reduce((s,d) => s+d.count_l, 0);
   const cumCountD = withData.reduce((s,d) => s+d.count_d, 0);
+  const cumSalesL = withData.reduce((s,d) => s+(d.sales_l||0), 0);
+  const cumSalesD = withData.reduce((s,d) => s+(d.sales_d||0), 0);
   const avgSpend = cumCount > 0 ? Math.round(cumActual / cumCount) : 0;
 
   // sub text
@@ -353,12 +355,14 @@ function render(month) {
     <div class="card">
       <div class="label">실적</div>
       <div class="value">${cumActual.toLocaleString('ko-KR')}원</div>
-      <div class="delta ${diff1 >= 0 ? 'up' : 'dn'}" style="margin-top:8px">${diffStr}</div>
+      <div class="sub-value" style="margin-top:6px">런치 ${cumSalesL.toLocaleString('ko-KR')}원</div>
+      <div class="sub-value">디너 ${cumSalesD.toLocaleString('ko-KR')}원</div>
     </div>
     <div class="card">
       <div class="label">계획</div>
       <div class="value">${cumTarget.toLocaleString('ko-KR')}원</div>
       <div class="sub-value" style="margin-top:6px">${monthTarget.toLocaleString('ko-KR')}원</div>
+      <div class="delta ${diff1 >= 0 ? 'up' : 'dn'}" style="margin-top:6px">${diffStr}</div>
     </div>
     <div class="card">
       <div class="label">예상 달성률</div>
