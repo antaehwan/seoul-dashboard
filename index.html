@@ -309,14 +309,17 @@ function render(month) {
     else if (wk.daysWithData > 0) weeklyProjected += Math.round(wk.actual / wk.daysWithData * wk.totalDays); // 진행 중: 일평균으로 주차 전체 추정
     else if (anchor1 !== null && ratio !== null) weeklyProjected += Math.round(anchor1 * ratio);
   });
-  const projected = weeklyProjected > 0 ? weeklyProjected : (dataCount > 0 ? cumActual / dataCount * totalDays : 0);
-  window._projected = projected; // 전략분석·총평에서 동일 값 사용
-  const projectedAch = monthTarget > 0 ? (projected / monthTarget * 100).toFixed(1) : '0.0';
-
-  // 예상 월말 매출: 목표 페이스 vs 전년 페이스
+  // 목표 페이스 (projected 폴백에서도 사용)
   const planRate = cumTarget > 0 ? cumActual / cumTarget : 0;
   const planProj = Math.round(monthTarget * planRate);
-  const planDiff = (Math.abs(1 - planRate) * 100).toFixed(1);
+
+  // anchor1 없으면(완료 주차 없음 = 월초) 목표 페이스로 대체
+  const projected = (anchor1 !== null && weeklyProjected > 0)
+    ? weeklyProjected
+    : (dataCount > 0 ? planProj : 0);
+  window._projected = projected; // 전략분석·총평에서 동일 값 사용
+  const projectedAch = monthTarget > 0 ? (projected / monthTarget * 100).toFixed(1) : '0.0';
+  const planDiff  = (Math.abs(1 - planRate) * 100).toFixed(1);
   const projVsPlanArr = planRate >= 1 ? '▲' : '▼';
 
   const yoyRate = cumPrevActual > 0 ? cumActual / cumPrevActual : 0;
