@@ -101,10 +101,12 @@
   <div class="header-title">
     <h1>호우섬 영등포 매출현황</h1>
     <div class="header-meta">
-      <span class="badge" id="badge-store">4012 · 영등포</span>
-      <span class="badge" id="badge-date">—</span>
-      <span class="badge">SRC · 엑셀 매출데이터</span>
-      <span class="badge">일 1회 수동 갱신</span>
+      <span class="badge">오픈 : 23.11.05</span>
+      <span class="badge">만료 : 27.08.31</span>
+      <span class="badge">임차료 : 13.0%</span>
+      <span class="badge">MG (1,300만)</span>
+      <span class="badge">면적 : 45평</span>
+      <span class="badge">좌석수 : 49</span>
     </div>
   </div>
   <div class="controls">
@@ -207,7 +209,7 @@ let currentMonth = null;
 async function loadData() {
   const res = await fetch('data/data.json?t=' + Date.now());
   DATA = await res.json();
-  document.getElementById('badge-date').textContent = 'DATA · ' + DATA.updated_at;
+  // badge-date removed
   initMonthSelect();
 }
 
