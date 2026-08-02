@@ -1040,81 +1040,119 @@ function renderMenuMatrix(month) {
   if (!el) return;
   if (!DATA.pmix) { el.innerHTML = ''; return; }
 
-  // 전체 월 합산 (특정 월이 아닌 누적 기준으로 메뉴 구조 파악)
-  const aggMap = {};
-  Object.values(DATA.pmix).forEach(pmix => {
-    (pmix.menus_all || []).forEach(m => {
-      if (!aggMap[m.name]) aggMap[m.name] = { name: m.name, qty: 0, revenue: 0, category: m.category, cost_rate: m.cost_rate };
-      aggMap[m.name].qty += m.qty;
-      aggMap[m.name].revenue += m.revenue;
-    });
-  });
-  const MATRIX_EXCLUDE = new Set(['조식', '음료']);
-  let menus = Object.values(aggMap).filter(m => m.qty > 0 && m.revenue > 0 && !MATRIX_EXCLUDE.has(m.category));
+  // 7월 판매 기준 고정 (매월 말일 전월 누적 업데이트)
+  const baseKey = '7';
+  const basePmix = DATA.pmix[baseKey];
+  if (!basePmix?.menus_all?.length) {
+    el.innerHTML = '<div class="strat-card" style="color:var(--muted);font-size:12px">7월 P-MIX 데이터 없음</div>';
+    return;
+  }
+
+  const EXCLUDE = new Set(['음료']);
+  let menus = basePmix.menus_all
+    .filter(m => m.qty > 0 && m.revenue > 0 && !EXCLUDE.has(m.category))
+    .map(m => ({...m}));
   if (!menus.length) { el.innerHTML = ''; return; }
 
-  const median = arr => { const s = [...arr].sort((a,b)=>a-b); const m = Math.floor(s.length/2); return s.length%2 ? s[m] : (s[m-1]+s[m])/2; };
-
-  // 공헌이익 = 매출 × (1 - 메뉴별 원가율)
+  // 건당 공헌이익(GP) = 단가 × (1 - 원가율)
   menus.forEach(m => {
     const rate = (m.cost_rate || 0) / 100;
-    m.contribution = Math.round(m.revenue * (1 - rate));
+    m.gp_unit  = m.qty > 0 ? Math.round(m.revenue / m.qty * (1 - rate)) : 0;
+    m.gp_total = Math.round(m.revenue * (1 - rate));
   });
 
-  const medQty = median(menus.map(m=>m.qty));
-  const medCon = median(menus.map(m=>m.contribution));
+  const avg = arr => arr.reduce((s,v) => s+v, 0) / arr.length;
+  const avgQty = avg(menus.map(m => m.qty));
+  const avgGP  = avg(menus.map(m => m.gp_unit));
 
   menus.forEach(m => {
-    const hi_qty = m.qty >= medQty, hi_con = m.contribution >= medCon;
-    if (hi_qty && hi_con)  m.q = 'stars';
-    else if (!hi_qty && hi_con) m.q = 'puzzles';
-    else if (hi_qty && !hi_con) m.q = 'plowhorse';
-    else m.q = 'dogs';
+    const hi_qty = m.qty >= avgQty, hi_gp = m.gp_unit >= avgGP;
+    if (hi_qty && hi_gp)       m.q = 'stars';
+    else if (!hi_qty && hi_gp) m.q = 'puzzles';
+    else if (hi_qty && !hi_gp) m.q = 'plowhorse';
+    else                        m.q = 'dogs';
   });
 
   const colors = { stars:'#1baf7a', puzzles:'#e8a020', plowhorse:'#2a78d6', dogs:'#e34948' };
   const qInfo = {
-    plowhorse: { label:'3. PlowHorses', sub:'판매량 ▲  수익성 ▼', col: 0, row: 0 },
-    stars:     { label:'1. Stars',      sub:'판매량 ▲  수익성 ▲', col: 1, row: 0 },
-    dogs:      { label:'4. Dogs',       sub:'판매량 ▼  수익성 ▼', col: 0, row: 1 },
-    puzzles:   { label:'2. Puzzles',    sub:'판매량 ▼  수익성 ▲', col: 1, row: 1 },
+    stars:     { label:'1. Stars',      sub:'판매량 ▲  건당 GP ▲', action:'핵심 메뉴 — 유지 및 강화' },
+    plowhorse: { label:'2. Plowhorses', sub:'판매량 ▲  건당 GP ▼', action:'원가 개선 또는 판매가 조정 검토' },
+    puzzles:   { label:'3. Puzzles',    sub:'판매량 ▼  건당 GP ▲', action:'홍보 강화로 판매량 견인 필요' },
+    dogs:      { label:'4. Dogs',       sub:'판매량 ▼  건당 GP ▼', action:'메뉴 철수 또는 전면 리뉴얼 검토' },
   };
 
-  const dogActions = [
-    { title:'원가 구조 재검토', desc:'재료비·레시피 개선으로 수익성 끌어올리기' },
-    { title:'세트 번들 구성', desc:'Stars/PlowHorses 메뉴와 묶어 함께 판매' },
-    { title:'시간대별 집중 판촉', desc:'수요가 몰리는 시간대·요일 타깃 프로모션' },
-    { title:'메뉴 리뉴얼', desc:'비주얼·레시피 개선으로 재인식 유도' },
-  ];
+  const CAT_DOT = {
+    '세트':'#6c5ce7','딤섬':'#0984e3','면':'#00cec9','뽀짜이판':'#e17055',
+    '요리':'#d63031','사이드메뉴':'#636e72','프로모션':'#fd79a8','추가메뉴':'#b2bec3',
+  };
 
-  const mkCell = (q) => {
+  const mkTag = m => {
+    const c   = colors[m.q];
+    const dot = CAT_DOT[m.category] || 'var(--muted)';
+    const highCost = (m.cost_rate || 0) >= 40;
+    const costBadge = highCost
+      ? `<span style="background:#e34948;color:#fff;border-radius:2px;padding:1px 4px;font-size:9px;margin-left:3px;font-weight:600">원가 ${m.cost_rate}%</span>`
+      : '';
+    return `<span style="display:inline-flex;align-items:center;background:${c}12;border:1px solid ${c}30;color:var(--text);border-radius:4px;padding:3px 7px;margin:2px 3px 2px 0;font-size:11px">
+      <span style="width:6px;height:6px;border-radius:50%;background:${dot};margin-right:4px;flex-shrink:0"></span>${m.name}${costBadge}
+    </span>`;
+  };
+
+  const mkCell = q => {
     const info = qInfo[q], c = colors[q];
-    const items = menus.filter(m => m.q === q);
-    const menuTags = items.map(m =>
-      `<span style="display:inline-block;background:${c}18;color:${c};border-radius:3px;padding:2px 7px;margin:2px 3px 2px 0;font-size:11px;font-weight:500">${m.name}</span>`
-    ).join('');
-    const actions = q === 'dogs' ? `
-      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px">
-        ${dogActions.map(a=>`<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px">
-          <div><span style="font-size:11px;font-weight:600;color:var(--text)">${a.title}</span>
-          <span style="font-size:10px;color:var(--muted)"> — ${a.desc}</span></div>
-        </div>`).join('')}
-      </div>` : '';
+    const items = menus.filter(m => m.q === q).sort((a,b) => b.qty - a.qty);
     return `<div style="border:1px solid ${c}40;border-radius:8px;padding:10px 12px;background:${c}08">
-      <div style="font-size:11px;font-weight:700;color:${c};margin-bottom:2px">${info.label}</div>
-      <div style="font-size:10px;color:${c};opacity:0.7;margin-bottom:8px">${info.sub}</div>
-      <div style="line-height:1.8">${menuTags || '<span style="font-size:11px;color:var(--muted)">해당 없음</span>'}</div>
-      ${actions}
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
+        <span style="font-size:11px;font-weight:700;color:${c}">${info.label}</span>
+        <span style="font-size:9px;color:${c};opacity:0.75">${info.sub} · ${items.length}개</span>
+      </div>
+      <div style="line-height:2.1">${items.map(mkTag).join('') || '<span style="font-size:11px;color:var(--muted)">해당 없음</span>'}</div>
+      <div style="font-size:10px;color:${c};margin-top:8px;padding-top:6px;border-top:1px solid ${c}20">→ ${info.action}</div>
     </div>`;
   };
 
+  // 불필요 메뉴: Dogs + 원가율 ≥40% 인 Plowhorse (손익 부담 프로모션 포함)
+  const badMenus  = menus.filter(m => m.q === 'dogs' || (m.q === 'plowhorse' && (m.cost_rate||0) >= 40))
+                         .sort((a,b) => (b.cost_rate||0) - (a.cost_rate||0));
+  const goodMenus = menus.filter(m => m.q === 'stars').sort((a,b) => b.gp_unit - a.gp_unit);
+  const topPuzzle = menus.filter(m => m.q === 'puzzles').sort((a,b) => b.gp_unit - a.gp_unit).slice(0,4);
+
+  const mkInsightRow = (m, valueStr, color) =>
+    `<div style="font-size:10px;color:var(--text);padding:2px 0;display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.name}</span>
+      <span style="color:${color};white-space:nowrap;flex-shrink:0">${valueStr}</span>
+    </div>`;
+
+  const legend = Object.entries(CAT_DOT).filter(([k]) => menus.some(m => m.category === k))
+    .map(([k,c]) => `<span style="display:inline-flex;align-items:center;gap:3px;margin-right:8px;font-size:10px;color:var(--muted)"><span style="width:7px;height:7px;border-radius:50%;background:${c}"></span>${k}</span>`)
+    .join('');
+
   el.innerHTML = `
     <div class="strat-card">
-      <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px">메뉴 엔지니어링 매트릭스 <span style="font-weight:400;font-size:10px">· 기준: 판매수량·매출 중앙값</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
+        <div style="font-size:12px;font-weight:600;color:var(--muted)">메뉴 엔지니어링 매트릭스</div>
+        <div style="font-size:10px;color:var(--muted)">7월 판매 기준 · 평균 판매수량 ${Math.round(avgQty)}건 · 건당 GP ${Math.round(avgGP).toLocaleString('ko-KR')}원</div>
+      </div>
+      <div style="margin-bottom:10px;line-height:1.8">${legend}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div style="display:contents">
-          ${mkCell('plowhorse')}${mkCell('stars')}
-          ${mkCell('dogs')}${mkCell('puzzles')}
+        ${mkCell('plowhorse')}${mkCell('stars')}
+        ${mkCell('dogs')}${mkCell('puzzles')}
+      </div>
+      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--card);border:1px solid #e3494840;border-radius:8px;padding:10px 12px">
+          <div style="font-size:11px;font-weight:600;color:#e34948;margin-bottom:6px">⚠️ 불필요/손익 부담 메뉴 (${badMenus.length}개)</div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:6px">Dogs · 원가율 40% 이상 Plowhorse 포함</div>
+          ${badMenus.map(m => mkInsightRow(m,
+            `원가 ${m.cost_rate||'-'}% · GP ${m.gp_unit.toLocaleString('ko-KR')}원`,
+            (m.cost_rate||0) >= 40 ? '#e34948' : 'var(--muted)'
+          )).join('')}
+        </div>
+        <div style="background:var(--card);border:1px solid #1baf7a40;border-radius:8px;padding:10px 12px">
+          <div style="font-size:11px;font-weight:600;color:#1baf7a;margin-bottom:6px">✅ Stars 핵심 메뉴 (${goodMenus.length}개)</div>
+          ${goodMenus.map(m => mkInsightRow(m, `GP ${m.gp_unit.toLocaleString('ko-KR')}원/건`, '#1baf7a')).join('')}
+          <div style="font-size:11px;font-weight:600;color:#e8a020;margin-top:10px;margin-bottom:4px">💡 Puzzles — 홍보 강화 후보</div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px">건당 GP 높지만 판매량 낮은 메뉴</div>
+          ${topPuzzle.map(m => mkInsightRow(m, `GP ${m.gp_unit.toLocaleString('ko-KR')}원/건`, '#e8a020')).join('')}
         </div>
       </div>
     </div>`;
