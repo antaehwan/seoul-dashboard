@@ -182,7 +182,7 @@ def parse_pmix():
             if current_cat in EXCLUDE_CATEGORIES: continue
             name = row[2]; qty = row[6]; price = row[3]; cost_amt = row[4]
             rev = row[7] if isinstance(row[7], (int, float)) and row[7] > 0 \
-                else (price * qty if isinstance(price, (int, float)) and isinstance(qty, (int, float)) else None)
+                else (price / 1.1 * qty if isinstance(price, (int, float)) and isinstance(qty, (int, float)) else None)
             n = clean_name(name)
             if not n or not isinstance(qty, (int, float)) or not isinstance(price, (int, float)): continue
             if n in seen: continue
@@ -226,6 +226,29 @@ def parse_pmix():
                 if isinstance(net_rev, (int, float)):
                     theory_net_rev[k] = round(net_rev)
 
+        # TOP10 폴백: R~V 수식이 캐시 안 된 경우 all_menus에서 직접 계산 (홀 메뉴 기준)
+        if not sales_top10 and all_menus:
+            hall = [m for m in all_menus if m['category'] not in ('프로모션', '배달')]
+            sales_top10   = [{"name": m["name"], "qty": m["qty"]}
+                             for m in sorted(hall, key=lambda x: -x['qty'])[:10]]
+            revenue_top10 = [{"name": m["name"], "revenue": m["revenue"]}
+                             for m in sorted(hall, key=lambda x: -x['revenue'])[:10]]
+
+        # 이론원가 폴백: R~V 수식이 캐시 안 된 경우 all_menus 가중평균으로 계산
+        if not theory_cost and all_menus:
+            cat_rev = {}; cat_gp = {}
+            for menu in all_menus:
+                c = menu['category']; r = menu['revenue']; cr = menu.get('cost_rate')
+                if r > 0 and cr is not None:
+                    cat_rev[c] = cat_rev.get(c, 0) + r
+                    cat_gp[c]  = cat_gp.get(c, 0) + r * (1 - cr / 100)
+            for c in cat_rev:
+                if cat_rev[c] > 0:
+                    theory_cost[c] = round((1 - cat_gp[c] / cat_rev[c]) * 100, 1)
+            total_r = sum(cat_rev.values()); total_g = sum(cat_gp.values())
+            if total_r > 0:
+                theory_cost['합계'] = round((1 - total_g / total_r) * 100, 1)
+
         # ── 오른쪽: 배달 & 프로모션 (col J~P, index 9~15) ──
         delivery_revenue = 0
         promo_revenue = 0
@@ -235,6 +258,12 @@ def parse_pmix():
             cat = row[9]
             name_cell = row[10]
             rev = row[15]
+            # P열 None이면 L열(단가,index11) × O열(건수,index14) / 1.1 폴백
+            if not isinstance(rev, (int, float)) or rev <= 0:
+                price_p = row[11] if len(row) > 11 else None
+                qty_p0  = row[14] if len(row) > 14 else None
+                if isinstance(price_p, (int, float)) and isinstance(qty_p0, (int, float)):
+                    rev = price_p / 1.1 * qty_p0
             if cat and isinstance(cat, str) and cat not in ('소분류',):
                 current_right_cat = cat.strip()
             # 이름 없는 행(소계행) 제외
