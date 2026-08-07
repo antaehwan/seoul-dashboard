@@ -175,15 +175,25 @@ def parse_pmix():
         EXCLUDE_CATEGORIES = {'추가메뉴', '음료'}
         seen = set()
         current_cat = ''
+        hall_cost_amt_map = {}   # 홀메뉴명 → E열 원가금액 (프로모션 원가율 계산에 활용)
         for i in range(3, len(rows)):
             row = rows[i]
             cat_cell = row[1]
             if cat_cell and isinstance(cat_cell, str): current_cat = cat_cell.strip()
-            if current_cat in EXCLUDE_CATEGORIES: continue
             name = row[2]; qty = row[6]; price = row[3]; cost_amt = row[4]
-            rev = row[7] if isinstance(row[7], (int, float)) and row[7] > 0 \
-                else (price / 1.1 * qty if isinstance(price, (int, float)) and isinstance(qty, (int, float)) else None)
             n = clean_name(name)
+            # 원가금액은 음료/추가메뉴 포함 전체 홀 메뉴에서 저장 (프로모션 매핑용)
+            if n and isinstance(cost_amt, (int, float)) and cost_amt > 0:
+                hall_cost_amt_map[n] = cost_amt
+            if current_cat in EXCLUDE_CATEGORIES: continue
+            # H열(index7)은 엑셀 수식 D*G(VAT포함)이므로 캐시됐을 때 /1.1 필요.
+            # 항상 D/1.1*G 계산을 우선. H는 D 또는 G가 None일 때만 보조.
+            if isinstance(price, (int, float)) and isinstance(qty, (int, float)):
+                rev = price / 1.1 * qty
+            elif isinstance(row[7], (int, float)) and row[7] > 0:
+                rev = row[7] / 1.1   # H열 캐시값(VAT포함)을 VAT제외로 변환
+            else:
+                rev = None
             if not n or not isinstance(qty, (int, float)) or not isinstance(price, (int, float)): continue
             if n in seen: continue
             seen.add(n)
@@ -250,6 +260,15 @@ def parse_pmix():
                 theory_cost['합계'] = round((1 - total_g / total_r) * 100, 1)
 
         # ── 오른쪽: 배달 & 프로모션 (col J~P, index 9~15) ──
+        # 프로모션명 → 홀메뉴명 매핑 (M/N열 수식 캐시 없을 때 홀 E열로 원가율 계산)
+        PROMO_TO_HALL = {
+            "[화]완탕면":          "완탕면",
+            "[주말]크리스피라페치킨": "크리스피라페치킨",
+            "[3주년]완탕면":       "완탕면",
+            "[3주년]라구짜장도삭면": "라구짜장도삭면",
+            "[3주년]마파두부뽀짜이판": "돼지고기&마파두부 뽀짜이판",
+            "[3주년]라구짜장뽀짜이판": "라구짜장&계란튀김 뽀짜이판",
+        }
         delivery_revenue = 0
         promo_revenue = 0
         promo_menus = []
@@ -257,13 +276,16 @@ def parse_pmix():
         for row in rows[3:]:
             cat = row[9]
             name_cell = row[10]
-            rev = row[15]
-            # P열 None이면 L열(단가,index11) × O열(건수,index14) / 1.1 폴백
-            if not isinstance(rev, (int, float)) or rev <= 0:
-                price_p = row[11] if len(row) > 11 else None
-                qty_p0  = row[14] if len(row) > 14 else None
-                if isinstance(price_p, (int, float)) and isinstance(qty_p0, (int, float)):
-                    rev = price_p / 1.1 * qty_p0
+            # P열(index15)은 엑셀 수식 L*O(VAT포함)이므로 캐시됐을 때 /1.1 필요.
+            # 항상 L/1.1*O 계산을 우선. P는 L 또는 O가 None일 때만 보조.
+            price_p = row[11] if len(row) > 11 else None
+            qty_p0  = row[14] if len(row) > 14 else None
+            if isinstance(price_p, (int, float)) and isinstance(qty_p0, (int, float)):
+                rev = price_p / 1.1 * qty_p0
+            elif isinstance(row[15], (int, float)) and row[15] > 0:
+                rev = row[15] / 1.1   # P열 캐시값(VAT포함)을 VAT제외로 변환
+            else:
+                rev = None
             if cat and isinstance(cat, str) and cat not in ('소분류',):
                 current_right_cat = cat.strip()
             # 이름 없는 행(소계행) 제외
@@ -275,9 +297,23 @@ def parse_pmix():
                 promo_revenue += rev
                 n = clean_name(name_cell)
                 qty_p = row[14]  # O열: 총건수
-                cost_rate_raw = row[13]  # N열: 원가율
+                cost_rate_raw = row[13]  # N열: 원가율 (수식 캐시)
                 qty_int = int(qty_p) if isinstance(qty_p, (int, float)) and qty_p > 0 else 0
-                cost_rate = round(cost_rate_raw * 100, 1) if isinstance(cost_rate_raw, (int, float)) else None
+                if isinstance(cost_rate_raw, (int, float)):
+                    cost_rate = round(cost_rate_raw * 100, 1)
+                else:
+                    # 1차 폴백: M열(원가금액) / L열(단가VAT포함)/1.1
+                    cost_amt_p = row[12] if len(row) > 12 else None
+                    if isinstance(cost_amt_p, (int, float)) and isinstance(price_p, (int, float)) and price_p > 0:
+                        cost_rate = round(cost_amt_p / (price_p / 1.1) * 100, 1)
+                    else:
+                        # 2차 폴백: 홀 메뉴 E열(원가금액)로 계산 (수식 캐시 없을 때)
+                        hall_name = PROMO_TO_HALL.get(n)
+                        hall_cost = hall_cost_amt_map.get(hall_name) if hall_name else None
+                        if isinstance(hall_cost, (int, float)) and isinstance(price_p, (int, float)) and price_p > 0:
+                            cost_rate = round(hall_cost / (price_p / 1.1) * 100, 1)
+                        else:
+                            cost_rate = None
                 if n and qty_int > 0:
                     promo_menus.append({
                         "name": n, "qty": qty_int, "revenue": int(rev),
