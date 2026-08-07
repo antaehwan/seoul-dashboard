@@ -236,15 +236,7 @@ def parse_pmix():
                 if isinstance(net_rev, (int, float)):
                     theory_net_rev[k] = round(net_rev)
 
-        # TOP10 폴백: R~V 수식이 캐시 안 된 경우 all_menus에서 직접 계산 (홀 메뉴 기준)
-        if not sales_top10 and all_menus:
-            hall = [m for m in all_menus if m['category'] not in ('프로모션', '배달')]
-            sales_top10   = [{"name": m["name"], "qty": m["qty"]}
-                             for m in sorted(hall, key=lambda x: -x['qty'])[:10]]
-            revenue_top10 = [{"name": m["name"], "revenue": m["revenue"]}
-                             for m in sorted(hall, key=lambda x: -x['revenue'])[:10]]
-
-        # 이론원가 폴백: R~V 수식이 캐시 안 된 경우 all_menus 가중평균으로 계산
+        # 이론원가 폴백: R~V 수식이 캐시 안 된 경우 all_menus 가중평균으로 계산 (홀 기준, 프로모션 제외)
         if not theory_cost and all_menus:
             cat_rev = {}; cat_gp = {}
             for menu in all_menus:
@@ -334,6 +326,14 @@ def parse_pmix():
         all_menus += promo_menus
         total_qty  += sum(m["qty"]     for m in promo_menus)
         total_revenue += sum(m["revenue"] for m in promo_menus)
+
+        # TOP10 폴백: 프로모션 합산 후 계산 (홀+프로모션 포함, 배달 제외)
+        if not sales_top10 and all_menus:
+            ranked = [m for m in all_menus if m['category'] != '배달']
+            sales_top10   = [{"name": m["name"], "qty": m["qty"]}
+                             for m in sorted(ranked, key=lambda x: -x['qty'])[:10]]
+            revenue_top10 = [{"name": m["name"], "revenue": m["revenue"]}
+                             for m in sorted(ranked, key=lambda x: -x['revenue'])[:10]]
 
         if all_menus:
             pmix[str(m)] = {
