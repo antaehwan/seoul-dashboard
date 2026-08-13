@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-10 09:23",
+  "updated_at": "2026-08-13 19:36",
   "store": "영등포",
   "store_code": "영등포",
   "months": {
@@ -3337,13 +3337,13 @@
         "date": "2026-08-10",
         "weekday": "월",
         "target": 1964498,
-        "actual": 0,
-        "sales_l": 0,
-        "sales_d": 0,
-        "count": 0,
-        "count_l": 0,
-        "count_d": 0,
-        "avg_spend": 0,
+        "actual": 2815625,
+        "sales_l": 1298721,
+        "sales_d": 1516904,
+        "count": 155,
+        "count_l": 68,
+        "count_d": 87,
+        "avg_spend": 18165.3,
         "prev_target": 4700000,
         "prev_actual": 3893436,
         "prev_count": 176
@@ -3352,13 +3352,13 @@
         "date": "2026-08-11",
         "weekday": "화",
         "target": 1964498,
-        "actual": 0,
-        "sales_l": 0,
-        "sales_d": 0,
-        "count": 0,
-        "count_l": 0,
-        "count_d": 0,
-        "avg_spend": 0,
+        "actual": 2371565,
+        "sales_l": 1195481,
+        "sales_d": 1176084,
+        "count": 133,
+        "count_l": 75,
+        "count_d": 58,
+        "avg_spend": 17831.3,
         "prev_target": 2500000,
         "prev_actual": 1222812,
         "prev_count": 49
@@ -3367,13 +3367,13 @@
         "date": "2026-08-12",
         "weekday": "수",
         "target": 2160947,
-        "actual": 0,
-        "sales_l": 0,
-        "sales_d": 0,
-        "count": 0,
-        "count_l": 0,
-        "count_d": 0,
-        "avg_spend": 0,
+        "actual": 2101111,
+        "sales_l": 1124844,
+        "sales_d": 976267,
+        "count": 106,
+        "count_l": 56,
+        "count_d": 50,
+        "avg_spend": 19821.8,
         "prev_target": 3000000,
         "prev_actual": 1839953,
         "prev_count": 76
@@ -6344,22 +6344,22 @@
       "menus_all": [
         {
           "name": "쇼마이_3pcs",
-          "qty": 135,
-          "revenue": 1165909,
+          "qty": 164,
+          "revenue": 1416363,
           "category": "딤섬",
           "cost_rate": 23.6
         },
         {
           "name": "블랙하가우_3pcs",
-          "qty": 150,
-          "revenue": 1295454,
+          "qty": 176,
+          "revenue": 1520000,
           "category": "딤섬",
           "cost_rate": 20.7
         },
         {
           "name": "소롱포_4pcs",
-          "qty": 296,
-          "revenue": 2018181,
+          "qty": 369,
+          "revenue": 2515909,
           "category": "딤섬",
           "cost_rate": 20.3
         },
@@ -6372,29 +6372,29 @@
         },
         {
           "name": "트리플치즈춘권_2pcs",
-          "qty": 3,
-          "revenue": 32727,
+          "qty": 5,
+          "revenue": 54545,
           "category": "딤섬",
           "cost_rate": 24.9
         },
         {
           "name": "크런치쉬림프딤섬_3pcs",
-          "qty": 55,
-          "revenue": 545000,
+          "qty": 59,
+          "revenue": 584636,
           "category": "딤섬",
           "cost_rate": 27.2
         },
         {
           "name": "호우섬 완탕",
-          "qty": 65,
-          "revenue": 585000,
+          "qty": 77,
+          "revenue": 693000,
           "category": "딤섬",
           "cost_rate": 18.5
         },
         {
           "name": "맑은우육탕면",
-          "qty": 269,
-          "revenue": 3765999,
+          "qty": 314,
+          "revenue": 4395999,
           "category": "면",
           "cost_rate": 21.0
         },
@@ -6407,29 +6407,29 @@
         },
         {
           "name": "완탕면",
-          "qty": 76,
-          "revenue": 1063999,
+          "qty": 77,
+          "revenue": 1077999,
           "category": "면",
           "cost_rate": 19.8
         },
         {
           "name": "라구짜장도삭면",
-          "qty": 51,
-          "revenue": 551727,
+          "qty": 52,
+          "revenue": 562545,
           "category": "면",
           "cost_rate": 15.8
         },
         {
           "name": "마라완탕비빔면",
-          "qty": 60,
-          "revenue": 839999,
+          "qty": 73,
+          "revenue": 1021999,
           "category": "면",
           "cost_rate": 18.9
         },
         {
           "name": "새우/돼지고기완자",
-          "qty": 126,
-          "revenue": 2164909,
+          "qty": 150,
+          "revenue": 2577272,
           "category": "뽀짜이판",
           "cost_rate": 27.5
         },
@@ -6442,15 +6442,15 @@
         },
         {
           "name": "홍콩식포크커틀릿뽀짜이판",
-          "qty": 48,
-          "revenue": 785454,
+          "qty": 64,
+          "revenue": 1047272,
           "category": "뽀짜이판",
           "cost_rate": 25.8
         },
         {
           "name": "새우가지조림뽀짜이판",
-          "qty": 60,
-          "revenue": 1009090,
+          "qty": 72,
+          "revenue": 1210909,
           "category": "뽀짜이판",
           "cost_rate": 21.2
         },
@@ -6463,15 +6463,15 @@
         },
         {
           "name": "마늘칩꿔바육",
-          "qty": 105,
-          "revenue": 2854090,
+          "qty": 126,
+          "revenue": 3424909,
           "category": "요리",
           "cost_rate": 19.2
         },
         {
           "name": "볼케이노뼈찜",
-          "qty": 4,
-          "revenue": 145090,
+          "qty": 5,
+          "revenue": 181363,
           "category": "요리",
           "cost_rate": 19.5
         },
@@ -6484,8 +6484,8 @@
         },
         {
           "name": "쯔란갑오징어튀김",
-          "qty": 31,
-          "revenue": 620000,
+          "qty": 35,
+          "revenue": 700000,
           "category": "요리",
           "cost_rate": 21.1
         },
@@ -6512,8 +6512,8 @@
         },
         {
           "name": "(8월)시그니처2인세트",
-          "qty": 78,
-          "revenue": 3751090,
+          "qty": 99,
+          "revenue": 4761000,
           "category": "세트",
           "cost_rate": null
         },
@@ -6526,22 +6526,22 @@
         },
         {
           "name": "공심채 볶음",
-          "qty": 76,
-          "revenue": 656363,
+          "qty": 87,
+          "revenue": 751363,
           "category": "사이드메뉴",
           "cost_rate": 20.3
         },
         {
           "name": "파이황과",
-          "qty": 58,
-          "revenue": 369090,
+          "qty": 69,
+          "revenue": 439090,
           "category": "사이드메뉴",
           "cost_rate": 22.6
         },
         {
           "name": "홍콩식 배추찜",
-          "qty": 20,
-          "revenue": 172727,
+          "qty": 24,
+          "revenue": 207272,
           "category": "사이드메뉴",
           "cost_rate": 15.5
         },
@@ -6554,22 +6554,22 @@
         },
         {
           "name": "[기간한정]완탕면/W)",
-          "qty": 9,
-          "revenue": 89181,
+          "qty": 11,
+          "revenue": 108999,
           "category": "프로모션",
           "cost_rate": 23.4
         },
         {
           "name": "[기간한정]돼지고기&마파두부뽀짜이판/W)",
-          "qty": 6,
-          "revenue": 62727,
+          "qty": 8,
+          "revenue": 83636,
           "category": "프로모션",
           "cost_rate": 19.3
         },
         {
           "name": "[기간한정]호우섬마라탕면",
-          "qty": 90,
-          "revenue": 891818,
+          "qty": 142,
+          "revenue": 1407090,
           "category": "프로모션",
           "cost_rate": null
         },
@@ -6582,15 +6582,15 @@
         },
         {
           "name": "[3주년]라구짜장도삭면",
-          "qty": 108,
-          "revenue": 834545,
+          "qty": 134,
+          "revenue": 1035454,
           "category": "프로모션",
           "cost_rate": 23.1
         },
         {
           "name": "[3주년]완탕면",
-          "qty": 208,
-          "revenue": 2061090,
+          "qty": 272,
+          "revenue": 2695272,
           "category": "프로모션",
           "cost_rate": 23.4
         },
@@ -6612,101 +6612,101 @@
       "sales_top10": [
         {
           "name": "소롱포_4pcs",
-          "qty": 296
+          "qty": 369
         },
         {
           "name": "맑은우육탕면",
-          "qty": 269
+          "qty": 314
         },
         {
           "name": "[3주년]완탕면",
-          "qty": 208
+          "qty": 272
         },
         {
           "name": "블랙하가우_3pcs",
-          "qty": 150
+          "qty": 176
         },
         {
           "name": "쇼마이_3pcs",
-          "qty": 135
+          "qty": 164
         },
         {
           "name": "새우/돼지고기완자",
+          "qty": 150
+        },
+        {
+          "name": "[기간한정]호우섬마라탕면",
+          "qty": 142
+        },
+        {
+          "name": "[3주년]라구짜장도삭면",
+          "qty": 134
+        },
+        {
+          "name": "마늘칩꿔바육",
           "qty": 126
         },
         {
           "name": "[3주년]마파두부뽀짜이판",
           "qty": 122
-        },
-        {
-          "name": "호우섬마라탕면",
-          "qty": 108
-        },
-        {
-          "name": "[3주년]라구짜장도삭면",
-          "qty": 108
-        },
-        {
-          "name": "마늘칩꿔바육",
-          "qty": 105
         }
       ],
       "revenue_top10": [
+        {
+          "name": "(8월)시그니처2인세트",
+          "revenue": 4761000
+        },
+        {
+          "name": "맑은우육탕면",
+          "revenue": 4395999
+        },
         {
           "name": "시그니처2인세트",
           "revenue": 4173454
         },
         {
-          "name": "맑은우육탕면",
-          "revenue": 3765999
-        },
-        {
-          "name": "(8월)시그니처2인세트",
-          "revenue": 3751090
-        },
-        {
           "name": "마늘칩꿔바육",
-          "revenue": 2854090
-        },
-        {
-          "name": "새우/돼지고기완자",
-          "revenue": 2164909
+          "revenue": 3424909
         },
         {
           "name": "[3주년]완탕면",
-          "revenue": 2061090
+          "revenue": 2695272
+        },
+        {
+          "name": "새우/돼지고기완자",
+          "revenue": 2577272
         },
         {
           "name": "소롱포_4pcs",
-          "revenue": 2018181
+          "revenue": 2515909
         },
         {
           "name": "호우섬마라탕면",
           "revenue": 1561090
         },
         {
-          "name": "[3주년]마파두부뽀짜이판",
-          "revenue": 1319818
+          "name": "블랙하가우_3pcs",
+          "revenue": 1520000
         },
         {
-          "name": "블랙하가우_3pcs",
-          "revenue": 1295454
+          "name": "쇼마이_3pcs",
+          "revenue": 1416363
         }
       ],
       "theory_cost": {
         "딤섬": 21.5,
-        "면": 19.9,
-        "뽀짜이판": 23.6,
-        "요리": 19.1,
+        "면": 20.0,
+        "뽀짜이판": 23.9,
+        "요리": 19.2,
         "세트": 20.4,
         "사이드메뉴": 20.3,
-        "합계": 20.8
+        "합계": 20.9
       },
       "theory_net_rev": {},
-      "total_revenue": 39738982,
-      "total_qty": 2700,
-      "delivery_revenue": 1064909,
-      "promo_revenue": 5941272
+      "total_revenue": 45881619,
+      "total_qty": 3177,
+      "delivery_revenue": 1412363,
+      "promo_revenue": 7332363
     },
     "7": {
       "menus_all": [
@@ -7028,6 +7028,7 @@
     "2026-08-06": 1296,
     "2026-08-07": 1296,
     "2026-08-09": 1296,
-    "2026-08-10": 1296
+    "2026-08-10": 1296,
+    "2026-08-13": 1296
   }
 }
