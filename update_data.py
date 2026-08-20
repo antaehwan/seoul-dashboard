@@ -335,6 +335,30 @@ def parse_pmix():
             revenue_top10 = [{"name": m["name"], "revenue": m["revenue"]}
                              for m in sorted(ranked, key=lambda x: -x['revenue'])[:10]]
 
+        # ── 카테고리 세일즈믹스 (홀+프로모션 집계, 배달 제외) ──
+        # all_menus 기준으로 카테고리별 매출·건수 합산 후 매출 가중평균 이론원가율 산출
+        cat_agg = {}
+        for menu in all_menus:
+            a = cat_agg.setdefault(menu['category'],
+                                   {"revenue": 0, "qty": 0, "cost_num": 0.0, "cost_den": 0})
+            a["revenue"] += menu["revenue"]
+            a["qty"]     += menu["qty"]
+            cr = menu.get("cost_rate")
+            if cr is not None and menu["revenue"] > 0:
+                a["cost_num"] += menu["revenue"] * cr
+                a["cost_den"] += menu["revenue"]
+        mix_total = sum(a["revenue"] for a in cat_agg.values())
+        category_mix = [
+            {
+                "category": c,
+                "revenue": a["revenue"],
+                "qty": a["qty"],
+                "pct": round(a["revenue"] / mix_total * 100, 1) if mix_total > 0 else 0,
+                "cost_rate": round(a["cost_num"] / a["cost_den"], 1) if a["cost_den"] > 0 else None,
+            }
+            for c, a in sorted(cat_agg.items(), key=lambda kv: -kv[1]["revenue"])
+        ]
+
         if all_menus:
             pmix[str(m)] = {
                 "menus_all": all_menus,
@@ -346,6 +370,7 @@ def parse_pmix():
                 "total_qty": total_qty,
                 "delivery_revenue": int(delivery_revenue),
                 "promo_revenue": int(promo_revenue),
+                "category_mix": category_mix,
             }
             print(f"  P-MIX {m}월: 판매TOP{len(sales_top10)} 매출TOP{len(revenue_top10)} 배달 {int(delivery_revenue):,}원 프로모션 {int(promo_revenue):,}원")
     return pmix
