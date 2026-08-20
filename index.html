@@ -725,11 +725,6 @@ function renderStrategy(days, today, month) {
   const bestDay = wdRates[0];
   const worstDay = wdRates[wdRates.length - 1];
 
-  // 이상 탐지: 목표 대비 ±25% 이상 벗어난 날
-  const anomalies = done.filter(d => d.target > 0 && Math.abs(d.actual - d.target) / d.target > 0.25);
-  const over = anomalies.filter(d => d.actual > d.target);
-  const under = anomalies.filter(d => d.actual < d.target);
-
   // 전일 대비 추세 (마지막 3일)
   const last3 = done.slice(-3);
   let trendStr = '-', trendClass = '';
@@ -773,17 +768,6 @@ function renderStrategy(days, today, month) {
         </div>`;
       }).join('')}
       ${bestDay ? `<p class="strat-tip">기대치 대비: <strong>${wdNames[bestDay.w]}요일</strong> 가장 강, <strong>${wdNames[worstDay.w]}요일</strong> 가장 약</p>` : ''}
-    </div>
-    <div class="strat-card">
-      <h3>이상 탐지</h3>
-      ${anomalies.length === 0
-        ? '<p class="strat-tip" style="margin-top:0">이상 일자 없음 (±25% 기준)</p>'
-        : `
-          ${over.length > 0 ? `<div class="strat-row"><span class="strat-label">초과 달성일</span><span class="strat-badge badge-ok">${over.map(d=>d.date.slice(5)).join(', ')}</span></div>` : ''}
-          ${under.length > 0 ? `<div class="strat-row"><span class="strat-label">미달 일자</span><span class="strat-badge badge-danger">${under.map(d=>d.date.slice(5)).join(', ')}</span></div>` : ''}
-          <p class="strat-tip">미달 일자의 원인(날씨·행사·운영)을 파악해 반복 방지 전략이 필요합니다.</p>`
-      }
-      <div class="strat-row" style="margin-top:8px"><span class="strat-label">전년 대비 누적</span><span class="strat-val ${done.reduce((s,d)=>s+d.actual,0) >= done.reduce((s,d)=>s+d.prev_actual,0)?'up':'dn'}">${signStr(yoy(done.reduce((s,d)=>s+d.actual,0), done.reduce((s,d)=>s+d.prev_actual,0)))}</span></div>
     </div>
 
     ${(() => {
