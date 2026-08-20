@@ -383,33 +383,6 @@ function render(month) {
       <div class="sub-value" style="margin-top:8px;margin-bottom:2px">예상 월매출 <span class="value-num">${fmt(projected)}</span></div>
       <div class="sub-value" style="font-size:10px;color:var(--muted)">전년 주차 비율 기반</div>
     </div>
-    <div class="card">
-      <div class="label">객수 / 객단가</div>
-      <div class="value">${cumCount.toLocaleString('ko-KR')}명</div>
-      <div class="sub-value" style="margin-top:6px">런치 ${cumCountL.toLocaleString('ko-KR')}명 · 디너 ${cumCountD.toLocaleString('ko-KR')}명</div>
-      <div class="sub-value">객단가 ${fmt(avgSpend)}원</div>
-    </div>
-    <div style="grid-column:1/-1;border-top:1px solid var(--border);margin:4px 0"></div>
-    ${(() => {
-      const pmix = DATA.pmix && DATA.pmix[String(month)];
-      if (!pmix) return '';
-      const delRev = pmix.delivery_revenue || 0;
-      const proRev = pmix.promo_revenue || 0;
-      const base = pmix.total_revenue || 1;
-      const delPct = base > 0 ? (delRev / base * 100).toFixed(1) : '0.0';
-      const proPct = base > 0 ? (proRev / base * 100).toFixed(1) : '0.0';
-      return `
-    <div class="card">
-      <div class="label">프로모션 매출</div>
-      <div class="value-num" style="font-size:22px;font-weight:700;color:#fff">${fmt(proRev)}원</div>
-      <div class="sub-value" style="margin-top:6px;color:var(--muted)">전체 매출 대비 ${proPct}%</div>
-    </div>
-    <div class="card">
-      <div class="label">배달 매출</div>
-      <div class="value-num" style="font-size:22px;font-weight:700;color:#fff">${fmt(delRev)}원</div>
-      <div class="sub-value" style="margin-top:6px;color:var(--muted)">전체 매출 대비 ${delPct}%</div>
-    </div>`;
-    })()}
     ${(() => {
       // ① 당월 추정 영업이익
       const pnlEntries = Object.entries(DATA.pnl || {}).sort((a,b)=>parseInt(a[0])-parseInt(b[0]));
@@ -449,6 +422,33 @@ function render(month) {
     </div>`;
       }
       return '';
+    })()}
+    <div class="card">
+      <div class="label">객수 / 객단가</div>
+      <div class="value">${cumCount.toLocaleString('ko-KR')}명</div>
+      <div class="sub-value" style="margin-top:6px">런치 ${cumCountL.toLocaleString('ko-KR')}명 · 디너 ${cumCountD.toLocaleString('ko-KR')}명</div>
+      <div class="sub-value">객단가 ${fmt(avgSpend)}원</div>
+    </div>
+    <div style="grid-column:1/-1;border-top:1px solid var(--border);margin:4px 0"></div>
+    ${(() => {
+      const pmix = DATA.pmix && DATA.pmix[String(month)];
+      if (!pmix) return '';
+      const delRev = pmix.delivery_revenue || 0;
+      const proRev = pmix.promo_revenue || 0;
+      const base = pmix.total_revenue || 1;
+      const delPct = base > 0 ? (delRev / base * 100).toFixed(1) : '0.0';
+      const proPct = base > 0 ? (proRev / base * 100).toFixed(1) : '0.0';
+      return `
+    <div class="card">
+      <div class="label">프로모션 매출</div>
+      <div class="value-num" style="font-size:22px;font-weight:700;color:#fff">${fmt(proRev)}원</div>
+      <div class="sub-value" style="margin-top:6px;color:var(--muted)">전체 매출 대비 ${proPct}%</div>
+    </div>
+    <div class="card">
+      <div class="label">배달 매출</div>
+      <div class="value-num" style="font-size:22px;font-weight:700;color:#fff">${fmt(delRev)}원</div>
+      <div class="sub-value" style="margin-top:6px;color:var(--muted)">전체 매출 대비 ${delPct}%</div>
+    </div>`;
     })()}
     ${(() => {
       const reviews = DATA.reviews || {};
