@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-20 09:53",
+  "updated_at": "2026-08-20 10:28",
   "store": "영등포",
   "store_code": "영등포",
   "months": {
@@ -6845,7 +6845,58 @@
       "total_revenue": 68146166,
       "total_qty": 4775,
       "delivery_revenue": 2515000,
-      "promo_revenue": 9102636
+      "promo_revenue": 9102636,
+      "category_mix": [
+        {
+          "category": "세트",
+          "revenue": 15029544,
+          "qty": 305,
+          "pct": 22.1,
+          "cost_rate": 20.4
+        },
+        {
+          "category": "면",
+          "revenue": 14316633,
+          "qty": 1042,
+          "pct": 21.0,
+          "cost_rate": 19.9
+        },
+        {
+          "category": "딤섬",
+          "revenue": 10749543,
+          "qty": 1348,
+          "pct": 15.8,
+          "cost_rate": 21.5
+        },
+        {
+          "category": "뽀짜이판",
+          "revenue": 9525998,
+          "qty": 575,
+          "pct": 14.0,
+          "cost_rate": 23.5
+        },
+        {
+          "category": "프로모션",
+          "revenue": 9102633,
+          "qty": 941,
+          "pct": 13.4,
+          "cost_rate": 22.2
+        },
+        {
+          "category": "요리",
+          "revenue": 7140454,
+          "qty": 273,
+          "pct": 10.5,
+          "cost_rate": 19.2
+        },
+        {
+          "category": "사이드메뉴",
+          "revenue": 2281361,
+          "qty": 291,
+          "pct": 3.3,
+          "cost_rate": 20.3
+        }
+      ]
     },
     "7": {
       "menus_all": [
@@ -7157,7 +7208,58 @@
       "total_revenue": 93929256,
       "total_qty": 6649,
       "delivery_revenue": 4464636,
-      "promo_revenue": 19167636
+      "promo_revenue": 19167636,
+      "category_mix": [
+        {
+          "category": "세트",
+          "revenue": 21007636,
+          "qty": 436,
+          "pct": 22.4,
+          "cost_rate": 20.4
+        },
+        {
+          "category": "프로모션",
+          "revenue": 19167633,
+          "qty": 1908,
+          "pct": 20.4,
+          "cost_rate": 24.5
+        },
+        {
+          "category": "면",
+          "revenue": 17724541,
+          "qty": 1275,
+          "pct": 18.9,
+          "cost_rate": 19.9
+        },
+        {
+          "category": "딤섬",
+          "revenue": 13385543,
+          "qty": 1673,
+          "pct": 14.3,
+          "cost_rate": 21.7
+        },
+        {
+          "category": "뽀짜이판",
+          "revenue": 10239270,
+          "qty": 613,
+          "pct": 10.9,
+          "cost_rate": 24.1
+        },
+        {
+          "category": "요리",
+          "revenue": 9423271,
+          "qty": 368,
+          "pct": 10.0,
+          "cost_rate": 18.9
+        },
+        {
+          "category": "사이드메뉴",
+          "revenue": 2981362,
+          "qty": 376,
+          "pct": 3.2,
+          "cost_rate": 20.2
+        }
+      ]
     }
   },
   "reviews": {

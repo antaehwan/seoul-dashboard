@@ -153,6 +153,13 @@
     <div id="menu-matrix" style="margin-top:16px"></div>
   </section>
 
+  <!-- 카테고리 세일즈믹스 & 원가율 -->
+  <section id="category-mix">
+    <h2>카테고리 세일즈믹스 & 원가율</h2>
+    <p class="sub">카테고리별 매출 비중 · 가중평균 이론원가율</p>
+    <div id="category-mix-grid" style="margin-top:12px"></div>
+  </section>
+
   <!-- 일별 테이블 -->
   <section id="daily">
     <h2>일별 현황</h2>
@@ -404,6 +411,46 @@ function render(month) {
     </div>`;
     })()}
     ${(() => {
+      // ① 당월 추정 영업이익
+      const pnlEntries = Object.entries(DATA.pnl || {}).sort((a,b)=>parseInt(a[0])-parseInt(b[0]));
+      // 기준 P&L: 현재 월보다 이전의 가장 최근 확정 P&L
+      const refPnl = pnlEntries.filter(([m]) => parseInt(m) < month).slice(-1)[0]?.[1]
+                  || pnlEntries.slice(-1)[0]?.[1];
+      if (refPnl && projected > 0) {
+        const estFood   = Math.round(projected * refPnl.food_cost_pct  / 100);
+        const estLabor  = Math.round(projected * refPnl.labor_cost_pct / 100);
+        const estGa     = Math.round(projected * refPnl.ga_cost_pct    / 100);
+        const estProfit = projected - estFood - estLabor - estGa;
+        const estProfitPct = (estProfit / projected * 100).toFixed(1);
+        const profitCls = estProfit >= 0 ? 'up' : 'dn';
+        return `
+    <div class="card" style="grid-column:span 2">
+      <div class="label">당월 추정 영업이익 <span style="font-weight:400;color:var(--muted)">(예상매출 기준)</span></div>
+      <div class="value-num" style="font-size:22px;font-weight:700;color:#fff;margin-top:4px">${fmt(estProfit)}원</div>
+      <div class="sub-value" style="margin-top:6px"><span class="${profitCls}" style="font-size:14px;font-weight:700">${estProfitPct}%</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px">
+        <div style="background:var(--bg);border-radius:6px;padding:7px 10px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">재료비</div>
+          <div style="font-size:12px;font-weight:600;color:#e34948">${refPnl.food_cost_pct}%</div>
+          <div style="font-size:11px;color:var(--muted)">${fmtM(estFood)}</div>
+        </div>
+        <div style="background:var(--bg);border-radius:6px;padding:7px 10px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">인건비</div>
+          <div style="font-size:12px;font-weight:600;color:#378add">${refPnl.labor_cost_pct}%</div>
+          <div style="font-size:11px;color:var(--muted)">${fmtM(estLabor)}</div>
+        </div>
+        <div style="background:var(--bg);border-radius:6px;padding:7px 10px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">일반관리비</div>
+          <div style="font-size:12px;font-weight:600;color:#eda100">${refPnl.ga_cost_pct}%</div>
+          <div style="font-size:11px;color:var(--muted)">${fmtM(estGa)}</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px">예상매출 ${fmtM(projected)} × 전월 비용구조 적용 추정</div>
+    </div>`;
+      }
+      return '';
+    })()}
+    ${(() => {
       const reviews = DATA.reviews || {};
       const dates = Object.keys(reviews).sort();
       if (dates.length === 0) return '';
@@ -425,10 +472,11 @@ function render(month) {
   `;
 
   renderReview(days, today, month);
-  renderStrategy(days, today);
+  renderStrategy(days, today, month);
   renderMarketStrategy(days, today);
   renderPmix(month);
   renderMenuMatrix(month);
+  renderCategoryMix(month);
   renderTable(days, today);
 }
 
@@ -617,7 +665,7 @@ function renderReview(days, today, month) {
     </div>`;
 }
 
-function renderStrategy(days, today) {
+function renderStrategy(days, today, month) {
   const el = document.getElementById('strategy-grid');
   const done = days.filter(d => d.actual > 0 && d.date <= today);
   if (done.length === 0) { el.innerHTML = '<p style="color:var(--muted);font-size:13px">실적 데이터 없음</p>'; return; }
@@ -740,6 +788,60 @@ function renderStrategy(days, today) {
         <div class="strat-row"><span class="strat-label">디너 객단가</span><span class="strat-val">${fmt(avgSpendD)}원</span></div>
         <p class="strat-tip"><strong>${weakTime}</strong> 타임이 상대적으로 약합니다. 집중 프로모션 전략을 검토해보세요.</p>
       </div>`;
+    })()}
+
+    ${(() => {
+      // ④ 주간 YoY 추세 알림
+      function getWkNum(dateStr) {
+        const d = new Date(dateStr), first = new Date(d.getFullYear(), d.getMonth(), 1);
+        const firstMon = new Date(first); const dow = first.getDay() || 7;
+        if (dow !== 1) firstMon.setDate(first.getDate() - (dow - 1));
+        return Math.floor((d - firstMon) / 86400000 / 7) + 1;
+      }
+      const wkMap = {};
+      days.forEach(d => {
+        const w = getWkNum(d.date);
+        if (!wkMap[w]) wkMap[w] = { actual: 0, prev: 0, done: 0, total: 0 };
+        wkMap[w].total++;
+        wkMap[w].prev += d.prev_actual || 0;
+        if (d.actual > 0 && d.date <= today) { wkMap[w].actual += d.actual; wkMap[w].done++; }
+      });
+      const completedWks = Object.entries(wkMap)
+        .filter(([,v]) => v.done === v.total && v.total > 0)
+        .sort((a,b) => parseInt(a[0]) - parseInt(b[0]));
+      if (completedWks.length >= 2) {
+        const wkYoys = completedWks.map(([w, v]) => ({
+          w: parseInt(w),
+          yoy: v.prev > 0 ? Math.round((v.actual - v.prev) / v.prev * 100) : null,
+          actual: v.actual, prev: v.prev
+        })).filter(x => x.yoy !== null);
+        const last2 = wkYoys.slice(-2);
+        const last3 = wkYoys.slice(-3);
+        const consecDn = last2.length >= 2 && last2.every(w => w.yoy < 0);
+        const consec3Dn = last3.length >= 3 && last3.every(w => w.yoy < 0);
+        const latestYoy = wkYoys[wkYoys.length - 1];
+        const prevYoy   = wkYoys[wkYoys.length - 2];
+        const wkLabel = w => `${w}주차`;
+        const yoyBadge = y => `<span class="${y >= 0 ? 'up' : 'dn'}" style="font-weight:700">${y >= 0 ? '▲' : '▼'}${Math.abs(y)}%</span>`;
+        const alertColor = consec3Dn ? '#e34948' : consecDn ? '#f0b429' : '#1baf7a';
+        const alertBg = consec3Dn ? 'rgba(240,96,96,.08)' : consecDn ? 'rgba(240,180,41,.08)' : 'rgba(76,175,125,.08)';
+        const alertBorder = consec3Dn ? '#e3494840' : consecDn ? '#f0b42940' : '#1baf7a40';
+        const alertEmoji = consec3Dn ? '🚨' : consecDn ? '⚠️' : '✅';
+        const alertText = consec3Dn
+          ? `<strong>3주 연속 전년 대비 하락</strong> 중입니다. 즉각 원인 분석이 필요합니다.`
+          : consecDn
+          ? `<strong>2주 연속 전년 대비 하락</strong> 중입니다. 추세 반전 전략을 점검하세요.`
+          : `전년 대비 회복 또는 성장 중입니다.`;
+        return `<div class="strat-card" style="border:1px solid ${alertBorder};background:${alertBg}">
+          <h3 style="color:${alertColor}">주간 YoY 추세 ${alertEmoji}</h3>
+          ${wkYoys.slice(-4).map(w => `<div class="strat-row">
+            <span class="strat-label">${wkLabel(w.w)} <span style="font-size:11px">(${fmt(w.actual)}원)</span></span>
+            <span class="strat-val">${yoyBadge(w.yoy)} <span style="font-size:11px;color:var(--muted)">vs 전년 ${fmt(w.prev)}</span></span>
+          </div>`).join('')}
+          <p class="strat-tip" style="color:${alertColor}">${alertEmoji} ${alertText}</p>
+        </div>`;
+      }
+      return '';
     })()}
 
     ${(() => {
@@ -1252,6 +1354,94 @@ function renderPmix(month) {
     costRate: item.cost_rate !== undefined && item.cost_rate !== null ? item.cost_rate : (theory_cost[item.category] || 0),
   }));
   window._pmixPanelData = { allRevRows, allQtyRows, allMenusSrc: allMenus, total: allMenus.length, theoryCostMenuRows, theory_cost };
+}
+
+function renderCategoryMix(month) {
+  const el = document.getElementById('category-mix-grid');
+  if (!el) return;
+  const pmix = DATA.pmix && DATA.pmix[String(month)];
+  if (!pmix || !pmix.category_mix || pmix.category_mix.length === 0) {
+    el.innerHTML = '<p style="color:var(--muted);font-size:13px">카테고리 데이터 없음</p>';
+    return;
+  }
+  const cats = pmix.category_mix;
+  const maxPct = Math.max(...cats.map(c => c.pct));
+  const maxCostRate = Math.max(...cats.filter(c => c.cost_rate !== null).map(c => c.cost_rate));
+  const totalRev = cats.reduce((s,c) => s + c.revenue, 0);
+
+  // 가중평균 원가율
+  let costNumer = 0, costDenom = 0;
+  cats.forEach(c => { if (c.cost_rate !== null) { costNumer += c.revenue * c.cost_rate / 100; costDenom += c.revenue; } });
+  const avgCostRate = costDenom > 0 ? (costNumer / costDenom * 100).toFixed(1) : null;
+
+  const CAT_COLOR = {
+    '면':'#00cec9','세트':'#6c5ce7','딤섬':'#0984e3','뽀짜이판':'#e17055',
+    '요리':'#d63031','사이드메뉴':'#636e72','프로모션':'#fd79a8','배달':'#b2bec3','음료':'#fdcb6e',
+  };
+
+  const mkMixRow = (c) => {
+    const color = CAT_COLOR[c.category] || '#888';
+    const barW = maxPct > 0 ? Math.round(c.pct / maxPct * 100) : 0;
+    const costColor = c.cost_rate !== null
+      ? (c.cost_rate > 25 ? '#e34948' : c.cost_rate > 20 ? '#f0b429' : '#1baf7a') : 'var(--muted)';
+    return `
+    <div style="display:grid;grid-template-columns:80px 1fr 60px 56px;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:12px;font-weight:600;color:${color};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.category}</span>
+      <div>
+        <div style="height:6px;background:var(--border);border-radius:3px">
+          <div style="height:6px;width:${barW}%;background:${color};border-radius:3px;transition:width .3s"></div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">${fmt(c.revenue)}원 · ${c.qty.toLocaleString()}건</div>
+      </div>
+      <div style="text-align:right">
+        <span style="font-size:13px;font-weight:700;color:#fff">${c.pct}%</span>
+      </div>
+      <div style="text-align:right">
+        ${c.cost_rate !== null
+          ? `<span style="font-size:12px;font-weight:600;color:${costColor}">${c.cost_rate}%</span>`
+          : `<span style="font-size:11px;color:var(--muted)">-</span>`}
+      </div>
+    </div>`;
+  };
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 220px;gap:12px;align-items:start">
+      <div class="strat-card">
+        <div style="display:grid;grid-template-columns:80px 1fr 60px 56px;gap:8px;padding:0 0 6px;border-bottom:2px solid var(--border)">
+          <span style="font-size:10px;font-weight:600;color:var(--muted)">카테고리</span>
+          <span style="font-size:10px;font-weight:600;color:var(--muted)">비중</span>
+          <span style="font-size:10px;font-weight:600;color:var(--muted);text-align:right">매출믹스</span>
+          <span style="font-size:10px;font-weight:600;color:var(--muted);text-align:right">원가율</span>
+        </div>
+        ${cats.map(mkMixRow).join('')}
+      </div>
+      <div class="strat-card">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px">요약</div>
+        <div class="strat-row">
+          <span class="strat-label">총 매출</span>
+          <span class="strat-val">${fmtM(totalRev)}</span>
+        </div>
+        <div class="strat-row">
+          <span class="strat-label">카테고리 수</span>
+          <span class="strat-val">${cats.length}개</span>
+        </div>
+        <div class="strat-row">
+          <span class="strat-label">최대 비중</span>
+          <span class="strat-val">${cats[0]?.category} ${cats[0]?.pct}%</span>
+        </div>
+        <div class="strat-row">
+          <span class="strat-label">가중 이론원가율</span>
+          <span class="strat-val ${avgCostRate !== null ? (parseFloat(avgCostRate) > 25 ? 'dn' : 'up') : ''}">${avgCostRate !== null ? avgCostRate + '%' : '-'}</span>
+        </div>
+        ${cats.filter(c => c.cost_rate !== null).sort((a,b) => b.cost_rate - a.cost_rate).slice(0,3).length > 0 ? `
+        <div style="margin-top:10px;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">원가율 높은 카테고리</div>
+        ${cats.filter(c => c.cost_rate !== null).sort((a,b) => b.cost_rate - a.cost_rate).slice(0,3).map(c => `
+          <div class="strat-row">
+            <span class="strat-label" style="color:${CAT_COLOR[c.category]||'var(--muted)'}">${c.category}</span>
+            <span class="strat-val dn">${c.cost_rate}%</span>
+          </div>`).join('')}` : ''}
+      </div>
+    </div>`;
 }
 
 function renderMenuMatrix(month) {
