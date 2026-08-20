@@ -396,11 +396,23 @@ function render(month) {
         const estProfit = projected - estFood - estLabor - estGa;
         const estProfitPct = (estProfit / projected * 100).toFixed(1);
         const profitCls = estProfit >= 0 ? 'up' : 'dn';
+        const totalCosts = estFood + estLabor + estGa;
+        const errAmt = Math.round(totalCosts * 0.027);
+        const profitLow  = estProfit - errAmt;
+        const profitHigh = estProfit + errAmt;
         return `
     <div class="card" style="grid-column:span 2">
-      <div class="label">당월 추정 영업이익 <span style="font-weight:400;color:var(--muted)">(예상매출 기준)</span></div>
-      <div class="value-num" style="font-size:22px;font-weight:700;color:#fff;margin-top:4px">${fmt(estProfit)}원</div>
-      <div class="sub-value" style="margin-top:6px"><span class="${profitCls}" style="font-size:14px;font-weight:700">${estProfitPct}%</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+        <div>
+          <div class="label">당월 추정 영업이익 <span style="font-weight:400;color:var(--muted)">(예상매출 기준)</span></div>
+          <div class="value-num" style="font-size:22px;font-weight:700;color:#fff;margin-top:4px">${fmt(estProfit)}원</div>
+          <div class="sub-value" style="margin-top:4px"><span class="${profitCls}" style="font-size:14px;font-weight:700">${estProfitPct}%</span></div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:10px 14px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px">이익 구간 <span style="opacity:.6">(비용오차 ±2.7% 반영)</span></div>
+          <div style="font-size:14px;font-weight:600;color:#fff">${fmtM(profitLow)} ~ ${fmtM(profitHigh)}</div>
+        </div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px">
         <div style="background:var(--bg);border-radius:6px;padding:7px 10px">
           <div style="font-size:10px;color:var(--muted);margin-bottom:2px">재료비</div>
@@ -417,6 +429,18 @@ function render(month) {
           <div style="font-size:12px;font-weight:600;color:#eda100">${refPnl.ga_cost_pct}%</div>
           <div style="font-size:11px;color:var(--muted)">${fmtM(estGa)}</div>
         </div>
+      </div>
+      <div style="margin-top:10px;border-radius:5px;overflow:hidden;height:12px;display:flex">
+        <div style="width:${refPnl.food_cost_pct}%;background:#e34948" title="재료비 ${refPnl.food_cost_pct}%"></div>
+        <div style="width:${refPnl.labor_cost_pct}%;background:#378add" title="인건비 ${refPnl.labor_cost_pct}%"></div>
+        <div style="width:${refPnl.ga_cost_pct}%;background:#eda100" title="일반관리비 ${refPnl.ga_cost_pct}%"></div>
+        <div style="flex:1;background:${estProfit >= 0 ? '#22c55e' : '#ef4444'}" title="영업이익 ${estProfitPct}%"></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:5px;flex-wrap:wrap">
+        <span style="font-size:10px;color:#e34948">■ 재료비 ${refPnl.food_cost_pct}%</span>
+        <span style="font-size:10px;color:#378add">■ 인건비 ${refPnl.labor_cost_pct}%</span>
+        <span style="font-size:10px;color:#eda100">■ 일관비 ${refPnl.ga_cost_pct}%</span>
+        <span style="font-size:10px;color:${estProfit >= 0 ? '#22c55e' : '#ef4444'}">■ 영업이익 ${estProfitPct}%</span>
       </div>
       <div style="font-size:10px;color:var(--muted);margin-top:6px">예상매출 ${fmtM(projected)} × 전월 비용구조 적용 추정</div>
     </div>`;
@@ -832,9 +856,30 @@ function renderStrategy(days, today, month) {
           : consecDn
           ? `<strong>2주 연속 전년 대비 하락</strong> 중입니다. 추세 반전 전략을 점검하세요.`
           : `전년 대비 회복 또는 성장 중입니다.`;
+        // SVG 스파크라인 차트
+        const svgW = 300, svgH = 64;
+        const ys = wkYoys.map(w => w.yoy);
+        const minY = Math.min(...ys, -5), maxY = Math.max(...ys, 5);
+        const range = (maxY - minY) || 10;
+        const pad = 8;
+        const n = wkYoys.length;
+        const xStep = n > 1 ? (svgW - pad*2) / (n - 1) : svgW / 2;
+        const toX = i => pad + i * xStep;
+        const toY = v => svgH * 0.08 + (1 - (v - minY) / range) * svgH * 0.72;
+        const zero = toY(0);
+        const pts = wkYoys.map((w,i) => `${toX(i)},${toY(w.yoy)}`).join(' ');
+        const svgChart = `<svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:52px;margin-top:8px;display:block" preserveAspectRatio="none">
+          <line x1="${pad}" y1="${zero}" x2="${svgW-pad}" y2="${zero}" stroke="rgba(255,255,255,.18)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="${pad}" y="${zero - 3}" font-size="8.5" fill="rgba(255,255,255,.35)" text-anchor="start">0%</text>
+          <polyline points="${pts}" fill="none" stroke="${alertColor}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+          ${wkYoys.map((w,i) => `<circle cx="${toX(i)}" cy="${toY(w.yoy)}" r="3.5" fill="${w.yoy>=0?'#22c55e':'#e34948'}" stroke="#1e2022" stroke-width="1.5"/>
+          <text x="${toX(i)}" y="${toY(w.yoy) - 7}" font-size="8.5" fill="${w.yoy>=0?'#22c55e':'#ef4444'}" text-anchor="middle">${w.yoy>=0?'+':''}${w.yoy}%</text>
+          <text x="${toX(i)}" y="${svgH - 1}" font-size="8.5" fill="rgba(255,255,255,.4)" text-anchor="${i===0?'start':i===n-1?'end':'middle'}">${w.w}주</text>`).join('')}
+        </svg>`;
         return `<div class="strat-card" style="border:1px solid ${alertBorder};background:${alertBg}">
           <h3 style="color:${alertColor}">주간 YoY 추세 ${alertEmoji}</h3>
-          ${wkYoys.slice(-4).map(w => `<div class="strat-row">
+          ${svgChart}
+          ${wkYoys.slice(-4).map(w => `<div class="strat-row" style="margin-top:4px">
             <span class="strat-label">${wkLabel(w.w)} <span style="font-size:11px">(${fmt(w.actual)}원)</span></span>
             <span class="strat-val">${yoyBadge(w.yoy)} <span style="font-size:11px;color:var(--muted)">vs 전년 ${fmt(w.prev)}</span></span>
           </div>`).join('')}
