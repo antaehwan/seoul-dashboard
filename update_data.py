@@ -43,10 +43,10 @@ def parse_sheet(ws, month):
             date_26y = date_25y.replace(year=date_25y.year + 1, day=28)
 
         target = row[16] or 0       # col Q: 26Y 목표
-        sales_l = row[18] or 0      # col S: 26Y 홀 매출
-        sales_d = row[19] or 0      # col T: 26Y 배달 매출
-        count_l = row[21] or 0      # col V: 26Y 홀 객수
-        count_d = row[22] or 0      # col W: 26Y 배달 객수
+        sales_l = row[18] or 0      # col S: 26Y 런치 매출 (L = Lunch)
+        sales_d = row[19] or 0      # col T: 26Y 디너 매출 (D = Dinner)
+        count_l = row[21] or 0      # col V: 26Y 런치 객수
+        count_d = row[22] or 0      # col W: 26Y 디너 객수
 
         actual = sales_l + sales_d
         count = count_l + count_d
